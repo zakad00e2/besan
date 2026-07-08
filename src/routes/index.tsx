@@ -99,10 +99,10 @@ function Hero() {
         <Reveal delay={320}>
           <div className="mt-10">
             <a
-              href="#services"
+              href="/workshops"
               className="inline-block border border-foreground px-16 py-4 text-xs font-normal tracking-[0.1em] transition-colors hover:bg-foreground hover:text-background"
             >
-              MY SERVICES
+              WORKSHOPS
             </a>
           </div>
         </Reveal>
