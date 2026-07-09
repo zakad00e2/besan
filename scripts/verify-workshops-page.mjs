@@ -14,21 +14,29 @@ const siteSource = readFileSync(sitePath, "utf8");
 
 for (const expected of [
   'createFileRoute("/workshops")',
-  "BESAN KHALAILY",
   "ATELIER",
   "First workshop",
   "Mini course",
-  "850",
+  "One day",
+  "WorkshopBookingDialog",
+  "pattern-foundation",
+  "mini-course",
+  "corset-workshop",
 ]) {
   if (!routeSource.includes(expected)) {
     throw new Error(`Workshops page is missing expected content: ${expected}`);
   }
 }
 
+const bookingActionCount = routeSource.match(/<BookingButton\b/g)?.length ?? 0;
+if (bookingActionCount !== 3) {
+  throw new Error(`Expected 3 workshop booking actions, found ${bookingActionCount}`);
+}
+
 if (/[\u0600-\u06ff]/.test(routeSource)) {
   throw new Error("Workshops page should be English-only and must not include Arabic text");
 }
 
-if (!siteSource.includes('href: "/workshops"')) {
+if (!siteSource.includes('href="/workshops"')) {
   throw new Error("Site navigation does not link to /workshops");
 }

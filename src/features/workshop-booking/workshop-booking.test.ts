@@ -72,11 +72,7 @@ describe("parseWorkshopBooking", () => {
   });
 
   it("accepts an empty optional email and rejects a malformed email", () => {
-    const emptyEmail = parseWorkshopBooking(
-      workshop,
-      validValues,
-      new Date(2026, 6, 9, 12),
-    );
+    const emptyEmail = parseWorkshopBooking(workshop, validValues, new Date(2026, 6, 9, 12));
     const malformedEmail = parseWorkshopBooking(
       workshop,
       { ...validValues, email: "noor@" },

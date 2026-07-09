@@ -30,10 +30,7 @@ const initialValues: WorkshopBookingFormValues = {
   notes: "",
 };
 
-export function WorkshopBookingDialog({
-  workshop,
-  onOpenChange,
-}: WorkshopBookingDialogProps) {
+export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookingDialogProps) {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<WorkshopBookingErrors>({});
   const [submitted, setSubmitted] = useState(false);
@@ -71,9 +68,7 @@ export function WorkshopBookingDialog({
         {submitted ? (
           <div className="flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center sm:px-10">
             <Check className="h-8 w-8" aria-hidden="true" />
-            <p className="mt-5 text-xs tracking-[0.2em] text-muted-foreground">
-              DEMO CONFIRMATION
-            </p>
+            <p className="mt-5 text-xs tracking-[0.2em] text-muted-foreground">DEMO CONFIRMATION</p>
             <DialogTitle className="mt-3 font-serif text-4xl font-normal tracking-tighter">
               Booking prepared
             </DialogTitle>
