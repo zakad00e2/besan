@@ -31,6 +31,23 @@ describe("WorkshopBookingDialog", () => {
     expect(screen.getByLabelText("Additional notes (optional)")).toBeTruthy();
   });
 
+  it("stacks booking fields on small screens", () => {
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
+
+    const fieldsGrid = screen.getByLabelText("Full name").parentElement?.parentElement;
+    const emailFieldClasses =
+      screen.getByLabelText("Email (optional)").parentElement?.className.split(" ") ?? [];
+    const notesFieldClasses =
+      screen.getByLabelText("Additional notes (optional)").parentElement?.className.split(" ") ??
+      [];
+
+    expect(fieldsGrid?.className).toContain("grid-cols-1");
+    expect(fieldsGrid?.className).toContain("sm:grid-cols-2");
+    expect(emailFieldClasses).not.toContain("col-span-2");
+    expect(notesFieldClasses).not.toContain("col-span-2");
+    expect(notesFieldClasses).toContain("sm:col-span-2");
+  });
+
   it("preserves entered values and shows field errors after invalid submission", () => {
     render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
 

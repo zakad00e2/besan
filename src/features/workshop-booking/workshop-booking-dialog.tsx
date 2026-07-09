@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -87,18 +86,16 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate>
-            <DialogHeader className="border-b border-foreground/30 px-6 pb-4 pt-6 text-left sm:px-8">
-              <p className="text-xs tracking-[0.2em] text-muted-foreground">WORKSHOP BOOKING</p>
-              <DialogTitle className="font-serif text-3xl font-normal tracking-tighter">
+            <DialogHeader className="gap-0 px-6 pb-1 pt-4 text-left sm:px-8">
+              <p className="text-xs leading-none tracking-[0.2em] text-muted-foreground">
+                WORKSHOP BOOKING
+              </p>
+              <DialogTitle className="-mt-0.5 font-serif text-3xl font-normal leading-none tracking-tighter">
                 {workshop?.name}
               </DialogTitle>
-              <DialogDescription className="leading-6">
-                Choose a future date and leave your details. This form is currently a demonstration
-                and does not send a request.
-              </DialogDescription>
             </DialogHeader>
 
-            <div className="grid grid-cols-2 gap-3 px-4 py-4 sm:px-8 sm:py-5">
+            <div className="grid grid-cols-1 gap-2 px-4 pb-3 pt-1 sm:grid-cols-2 sm:px-8 sm:pb-4 sm:pt-1">
               <Field label="Full name" error={errors.fullName}>
                 <input
                   value={values.fullName}
@@ -136,11 +133,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
                   className={inputClass}
                 />
               </Field>
-              <Field
-                label="Email (optional)"
-                error={errors.email}
-                className="col-span-2 sm:col-span-1"
-              >
+              <Field label="Email (optional)" error={errors.email} className="sm:col-span-1">
                 <input
                   value={values.email}
                   onChange={(event) => updateValue("email", event.target.value)}
@@ -152,18 +145,18 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
               <Field
                 label="Additional notes (optional)"
                 error={errors.notes}
-                className="col-span-2"
+                className="sm:col-span-2"
               >
                 <textarea
                   value={values.notes}
                   onChange={(event) => updateValue("notes", event.target.value)}
-                  rows={3}
+                  rows={2}
                   className={`${inputClass} resize-none`}
                 />
               </Field>
             </div>
 
-            <div className="flex justify-end border-t border-foreground/30 px-6 py-4 sm:px-8">
+            <div className="flex justify-end border-t border-foreground/30 px-6 py-3 sm:px-8">
               <button
                 type="submit"
                 className="w-full border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.12em] text-background transition-opacity hover:opacity-85 sm:w-auto"
@@ -179,7 +172,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
 }
 
 const inputClass =
-  "mt-1.5 w-full border border-foreground/40 bg-transparent px-4 py-2.5 text-sm outline-none transition-colors focus:border-foreground";
+  "mt-1 w-full border border-foreground/40 bg-transparent px-4 py-2 text-sm outline-none transition-colors focus:border-foreground";
 
 type AccessibleFieldProps = {
   id?: string;

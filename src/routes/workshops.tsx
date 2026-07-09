@@ -349,7 +349,7 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
             <div>
               <div className="lg:flex lg:items-center lg:justify-between lg:gap-8">
                 <h3 className="font-serif text-4xl leading-none tracking-tighter md:text-5xl">
-                  Corset Atelier Workshop
+                  Corset Atelier
                 </h3>
                 <BookingButton
                   workshop={workshops.corsetWorkshop}
