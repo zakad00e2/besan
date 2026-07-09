@@ -41,6 +41,8 @@ describe("WorkshopBookingDialog", () => {
     expect(mobile.value).toBe("0501234567");
     expect(screen.getByText("Enter your full name.")).toBeTruthy();
     expect(screen.getByText("Choose a workshop date.")).toBeTruthy();
+    expect(screen.getByLabelText("Full name")).toBeTruthy();
+    expect(screen.getByLabelText("Workshop date")).toBeTruthy();
   });
 
   it("shows an explicit demo-only confirmation after valid submission", () => {

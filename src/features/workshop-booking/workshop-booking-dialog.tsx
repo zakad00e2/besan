@@ -198,8 +198,10 @@ function Field({
   const errorId = `${id}-error`;
 
   return (
-    <label className={`block text-sm ${className}`}>
-      <span className="text-xs tracking-[0.1em] text-muted-foreground">{label}</span>
+    <div className={`block text-sm ${className}`}>
+      <label htmlFor={id} className="text-xs tracking-[0.1em] text-muted-foreground">
+        {label}
+      </label>
       {cloneElement(children, {
         id,
         "aria-describedby": error ? errorId : undefined,
@@ -210,6 +212,6 @@ function Field({
           {error}
         </span>
       ) : null}
-    </label>
+    </div>
   );
 }
