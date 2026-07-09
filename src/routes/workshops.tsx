@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import workshopCorset from "@/assets/workshop-corset.jpg";
 import workshopsHero from "@/assets/workshops-hero-wide.png";
 import workshopMiniCourse from "@/assets/workshop-mini-course.jpg";
 import workshopPatternFoundation from "@/assets/workshop-pattern-foundation.jpg";
 import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
+import { WorkshopBookingDialog } from "@/features/workshop-booking/workshop-booking-dialog";
+import type { WorkshopOption } from "@/features/workshop-booking/workshop-booking";
 
 export const Route = createFileRoute("/workshops")({
   component: Workshops,
@@ -51,17 +54,42 @@ const corsetWorkshopDetails = [
   },
 ];
 
+const workshops = {
+  patternFoundation: {
+    id: "pattern-foundation",
+    name: "Pattern foundation",
+  },
+  miniCourse: {
+    id: "mini-course",
+    name: "Private mini course",
+  },
+  corsetWorkshop: {
+    id: "corset-workshop",
+    name: "One-day corset workshop",
+  },
+} satisfies Record<string, WorkshopOption>;
+
+type BookWorkshop = (workshop: WorkshopOption) => void;
+
 function Workshops() {
+  const [selectedWorkshop, setSelectedWorkshop] = useState<WorkshopOption | null>(null);
+
   return (
     <div dir="ltr" className="min-h-screen bg-background text-foreground">
       <SiteNav />
       <main>
         <WorkshopsHero />
-        <FirstWorkshop />
-        <MiniCourse />
-        <PrivateGathering />
+        <FirstWorkshop onBook={setSelectedWorkshop} />
+        <MiniCourse onBook={setSelectedWorkshop} />
+        <PrivateGathering onBook={setSelectedWorkshop} />
       </main>
       <SiteFooter />
+      <WorkshopBookingDialog
+        workshop={selectedWorkshop}
+        onOpenChange={(open) => {
+          if (!open) setSelectedWorkshop(null);
+        }}
+      />
     </div>
   );
 }
@@ -77,7 +105,7 @@ function WorkshopsHero() {
             WORKSHOPS
           </h1>
         </Reveal>
-        <Reveal delay={120} className="mt-6 flex flex-col justify-end md:mt-0">
+        <Reveal delay={120} className="mt-3 flex flex-col justify-end md:mt-0">
           <div className="max-w-xl text-sm leading-5 text-muted-foreground md:text-base md:leading-6">
             <p>
               Focused atelier workshops for learning measurements, pattern drafting, and practical
@@ -88,10 +116,10 @@ function WorkshopsHero() {
         </Reveal>
       </div>
       <Reveal delay={180}>
-        <div className="mt-4 h-[360px] overflow-hidden md:mt-6 md:h-[560px]">
+        <div className="mt-4 h-[360px] overflow-hidden md:mt-1 md:h-[560px]">
           <img
             src={workshopsHero}
-            alt="Two people working at an industrial sewing machine in a bright atelier"
+            alt="Fashion workshop with dress forms, cutting tables, and sewing machines"
             className="h-full w-full object-cover grayscale"
           />
         </div>
@@ -100,7 +128,27 @@ function WorkshopsHero() {
   );
 }
 
-function FirstWorkshop() {
+function BookingButton({
+  workshop,
+  onBook,
+  className = "",
+}: {
+  workshop: WorkshopOption;
+  onBook: BookWorkshop;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onBook(workshop)}
+      className={`mt-6 w-full border border-foreground bg-transparent px-8 py-4 text-xs tracking-[0.12em] text-foreground transition-colors hover:bg-foreground hover:text-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:translate-y-px sm:w-auto ${className}`}
+    >
+      BOOK THIS WORKSHOP
+    </button>
+  );
+}
+
+function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
   return (
     <section className="mx-auto max-w-[1400px] px-6 pb-20 pt-10 md:px-10 md:pb-28 md:pt-14">
       <div className="grid grid-cols-1 gap-12 md:grid-cols-[0.95fr_1.05fr] md:gap-20">
@@ -130,9 +178,16 @@ function FirstWorkshop() {
           <div>
             <Reveal>
               <article>
-                <h3 className="font-serif text-4xl leading-none tracking-tighter md:text-5xl">
-                  First workshop
-                </h3>
+                <div className="lg:flex lg:items-center lg:justify-between lg:gap-8">
+                  <h3 className="font-serif text-4xl leading-none tracking-tighter md:text-5xl">
+                    First workshop
+                  </h3>
+                  <BookingButton
+                    workshop={workshops.patternFoundation}
+                    onBook={onBook}
+                    className="hidden shrink-0 lg:inline-flex lg:mt-0"
+                  />
+                </div>
                 <ul className="mt-3 space-y-1 text-base leading-5 text-muted-foreground">
                   <li className="flex gap-4">
                     <span className="mt-2.5 h-px w-5 shrink-0 bg-foreground/60" />
@@ -183,6 +238,11 @@ function FirstWorkshop() {
                   <p className="font-serif text-3xl tracking-tight">{price.value}</p>
                 </div>
               ))}
+              <BookingButton
+                workshop={workshops.patternFoundation}
+                onBook={onBook}
+                className="lg:hidden"
+              />
             </div>
           </Reveal>
         </div>
@@ -191,7 +251,7 @@ function FirstWorkshop() {
   );
 }
 
-function MiniCourse() {
+function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
   return (
     <section className="border-y border-foreground/70 bg-accent/25">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-12 px-6 py-20 md:grid-cols-[0.95fr_1.05fr] md:px-10 md:py-28">
@@ -216,9 +276,16 @@ function MiniCourse() {
         <Reveal delay={100} as="section" className="h-full">
           <div className="flex h-full flex-col justify-between gap-10">
             <div className="space-y-5">
-              <h3 className="font-serif text-4xl leading-none tracking-tighter md:text-5xl">
-                Private mini course
-              </h3>
+              <div className="lg:flex lg:items-center lg:justify-between lg:gap-8">
+                <h3 className="font-serif text-4xl leading-none tracking-tighter md:text-5xl">
+                  Private mini course
+                </h3>
+                <BookingButton
+                  workshop={workshops.miniCourse}
+                  onBook={onBook}
+                  className="hidden shrink-0 lg:inline-flex lg:mt-0"
+                />
+              </div>
               <p className="text-base leading-7 text-muted-foreground">
                 This is a private, concentrated workshop designed to make sure you get the full
                 benefit. We build the foundation first, then continue into practical fabric work and
@@ -244,6 +311,7 @@ function MiniCourse() {
                 </p>
               </div>
             </div>
+            <BookingButton workshop={workshops.miniCourse} onBook={onBook} className="lg:hidden" />
           </div>
         </Reveal>
       </div>
@@ -251,22 +319,45 @@ function MiniCourse() {
   );
 }
 
-function PrivateGathering() {
+function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
   return (
     <section id="booking" className="border-t border-foreground/70">
-      <div className="mx-auto max-w-[1400px] px-6 py-20 md:px-10 md:py-28">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-end lg:gap-14">
-          <Reveal>
-            <div className="lg:pb-10">
-              <p className="text-xs tracking-[0.24em] text-muted-foreground">
-                ONE DAY WORKSHOP
-              </p>
-              <h2 className="mt-4 max-w-xl font-serif text-5xl leading-[0.82] tracking-tighter md:text-7xl">
-                One day
-                <br />
-                corset workshop
-              </h2>
-              <p className="mt-6 max-w-md text-base leading-6 text-muted-foreground">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-12 px-6 py-20 md:grid-cols-[0.95fr_1.05fr] md:px-10 md:py-28">
+        <Reveal>
+          <div className="group relative min-h-[420px] overflow-hidden text-background md:min-h-[580px]">
+            <img
+              src={workshopCorset}
+              alt="Corset dress forms lined up in an atelier"
+              className="absolute inset-0 h-full w-full object-cover grayscale transition duration-500 group-hover:grayscale-0"
+            />
+            <div className="absolute inset-0 bg-foreground/35 transition duration-500 group-hover:bg-foreground/15" />
+            <div className="relative flex min-h-[420px] items-end p-6 md:min-h-[580px] md:p-8">
+              <div className="w-full">
+                <p className="text-xs tracking-[0.24em] text-background/80">ONE DAY WORKSHOP</p>
+                <h2 className="mt-2 font-serif text-4xl leading-none tracking-tighter md:text-5xl">
+                  One day
+                  <br />
+                  corset workshop
+                </h2>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={100} as="section" className="h-full">
+          <div className="flex h-full flex-col justify-between gap-10">
+            <div>
+              <div className="lg:flex lg:items-center lg:justify-between lg:gap-8">
+                <h3 className="font-serif text-4xl leading-none tracking-tighter md:text-5xl">
+                  Corset Atelier Workshop
+                </h3>
+                <BookingButton
+                  workshop={workshops.corsetWorkshop}
+                  onBook={onBook}
+                  className="hidden shrink-0 lg:inline-flex lg:mt-0"
+                />
+              </div>
+              <p className="mt-5 max-w-2xl text-base leading-6 text-muted-foreground">
                 Corset sewing workshop in a focused atelier format, built around hands-on
                 construction from the first stitch to the final fit.
               </p>
@@ -286,26 +377,17 @@ function PrivateGathering() {
                 ))}
               </div>
             </div>
-          </Reveal>
-
-          <Reveal delay={100}>
-            <div className="group relative min-h-[420px] overflow-hidden text-background md:min-h-[620px]">
-              <img
-                src={workshopCorset}
-                alt="Corset dress forms lined up in an atelier"
-                className="absolute inset-0 h-full w-full object-cover grayscale transition duration-500 group-hover:grayscale-0"
+            <div>
+              <p className="text-sm text-muted-foreground">Corset workshop price</p>
+              <p className="mt-2 font-serif text-4xl">850 NIS</p>
+              <BookingButton
+                workshop={workshops.corsetWorkshop}
+                onBook={onBook}
+                className="lg:hidden"
               />
-              <div className="absolute inset-0 bg-foreground/35 transition duration-500 group-hover:bg-foreground/15" />
-              <div className="relative flex min-h-[420px] items-end p-6 md:min-h-[620px] md:p-8">
-                <div className="grid w-full grid-cols-3 gap-4 border-t border-background/60 pt-5">
-                  <p className="text-xs tracking-[0.2em] text-background/85">PATTERN</p>
-                  <p className="text-xs tracking-[0.2em] text-background/85">FABRIC</p>
-                  <p className="text-xs tracking-[0.2em] text-background/85">FINISH</p>
-                </div>
-              </div>
             </div>
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

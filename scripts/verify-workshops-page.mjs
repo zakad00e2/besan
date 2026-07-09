@@ -29,8 +29,8 @@ for (const expected of [
 }
 
 const bookingActionCount = routeSource.match(/<BookingButton\b/g)?.length ?? 0;
-if (bookingActionCount !== 3) {
-  throw new Error(`Expected 3 workshop booking actions, found ${bookingActionCount}`);
+if (bookingActionCount !== 6) {
+  throw new Error(`Expected 6 responsive workshop booking actions, found ${bookingActionCount}`);
 }
 
 if (/[\u0600-\u06ff]/.test(routeSource)) {

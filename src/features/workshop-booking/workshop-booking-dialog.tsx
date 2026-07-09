@@ -64,7 +64,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
 
   return (
     <Dialog open={workshop !== null} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[calc(100vh-2rem)] max-w-2xl overflow-y-auto rounded-none border-foreground/70 p-0">
+      <DialogContent className="max-h-[calc(100vh-0.5rem)] max-w-2xl overflow-hidden rounded-none border-foreground/70 p-0">
         {submitted ? (
           <div className="flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center sm:px-10">
             <Check className="h-8 w-8" aria-hidden="true" />
@@ -87,9 +87,9 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate>
-            <DialogHeader className="border-b border-foreground/30 px-6 pb-6 pt-8 text-left sm:px-10">
+            <DialogHeader className="border-b border-foreground/30 px-6 pb-4 pt-6 text-left sm:px-8">
               <p className="text-xs tracking-[0.2em] text-muted-foreground">WORKSHOP BOOKING</p>
-              <DialogTitle className="font-serif text-4xl font-normal tracking-tighter">
+              <DialogTitle className="font-serif text-3xl font-normal tracking-tighter">
                 {workshop?.name}
               </DialogTitle>
               <DialogDescription className="leading-6">
@@ -98,7 +98,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid gap-5 px-6 py-7 sm:grid-cols-2 sm:px-10">
+            <div className="grid grid-cols-2 gap-3 px-4 py-4 sm:px-8 sm:py-5">
               <Field label="Full name" error={errors.fullName}>
                 <input
                   value={values.fullName}
@@ -113,15 +113,6 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
                   onChange={(event) => updateValue("mobile", event.target.value)}
                   type="tel"
                   autoComplete="tel"
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Email (optional)" error={errors.email}>
-                <input
-                  value={values.email}
-                  onChange={(event) => updateValue("email", event.target.value)}
-                  type="email"
-                  autoComplete="email"
                   className={inputClass}
                 />
               </Field>
@@ -146,20 +137,33 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
                 />
               </Field>
               <Field
+                label="Email (optional)"
+                error={errors.email}
+                className="col-span-2 sm:col-span-1"
+              >
+                <input
+                  value={values.email}
+                  onChange={(event) => updateValue("email", event.target.value)}
+                  type="email"
+                  autoComplete="email"
+                  className={inputClass}
+                />
+              </Field>
+              <Field
                 label="Additional notes (optional)"
                 error={errors.notes}
-                className="sm:col-span-2"
+                className="col-span-2"
               >
                 <textarea
                   value={values.notes}
                   onChange={(event) => updateValue("notes", event.target.value)}
-                  rows={4}
+                  rows={3}
                   className={`${inputClass} resize-none`}
                 />
               </Field>
             </div>
 
-            <div className="flex justify-end border-t border-foreground/30 px-6 py-5 sm:px-10">
+            <div className="flex justify-end border-t border-foreground/30 px-6 py-4 sm:px-8">
               <button
                 type="submit"
                 className="w-full border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.12em] text-background transition-opacity hover:opacity-85 sm:w-auto"
@@ -175,7 +179,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
 }
 
 const inputClass =
-  "mt-2 w-full border border-foreground/40 bg-transparent px-4 py-3 text-sm outline-none transition-colors focus:border-foreground";
+  "mt-1.5 w-full border border-foreground/40 bg-transparent px-4 py-2.5 text-sm outline-none transition-colors focus:border-foreground";
 
 type AccessibleFieldProps = {
   id?: string;
