@@ -1,6 +1,7 @@
 # Besan atelier admin dashboard — frontend design specification
 
-**Date:** 2026-07-10  
+**Date:** 2026-07-10
+
 **Status:** Design approved; awaiting written-spec review
 
 ## Goal
