@@ -10,12 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkshopsRouteImport } from './routes/workshops'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BookCallRouteImport } from './routes/book-call'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardBookingsRouteImport } from './routes/dashboard/bookings'
+import { Route as DashboardAvailabilityRouteImport } from './routes/dashboard/availability'
+import { Route as DashboardCustomersIndexRouteImport } from './routes/dashboard/customers/index'
+import { Route as DashboardCustomersIdRouteImport } from './routes/dashboard/customers/$id'
 
 const WorkshopsRoute = WorkshopsRouteImport.update({
   id: '/workshops',
   path: '/workshops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookCallRoute = BookCallRouteImport.update({
@@ -28,34 +39,104 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBookingsRoute = DashboardBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAvailabilityRoute = DashboardAvailabilityRouteImport.update({
+  id: '/availability',
+  path: '/availability',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCustomersIndexRoute = DashboardCustomersIndexRouteImport.update({
+  id: '/customers/',
+  path: '/customers/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCustomersIdRoute = DashboardCustomersIdRouteImport.update({
+  id: '/customers/$id',
+  path: '/customers/$id',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/book-call': typeof BookCallRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/workshops': typeof WorkshopsRoute
+  '/dashboard/availability': typeof DashboardAvailabilityRoute
+  '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
+  '/dashboard/customers/': typeof DashboardCustomersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/book-call': typeof BookCallRoute
   '/workshops': typeof WorkshopsRoute
+  '/dashboard/availability': typeof DashboardAvailabilityRoute
+  '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
+  '/dashboard/customers': typeof DashboardCustomersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/book-call': typeof BookCallRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/workshops': typeof WorkshopsRoute
+  '/dashboard/availability': typeof DashboardAvailabilityRoute
+  '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
+  '/dashboard/customers/': typeof DashboardCustomersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/book-call' | '/workshops'
+  fullPaths:
+    | '/'
+    | '/book-call'
+    | '/dashboard'
+    | '/workshops'
+    | '/dashboard/availability'
+    | '/dashboard/bookings'
+    | '/dashboard/'
+    | '/dashboard/customers/$id'
+    | '/dashboard/customers/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/book-call' | '/workshops'
-  id: '__root__' | '/' | '/book-call' | '/workshops'
+  to:
+    | '/'
+    | '/book-call'
+    | '/workshops'
+    | '/dashboard/availability'
+    | '/dashboard/bookings'
+    | '/dashboard'
+    | '/dashboard/customers/$id'
+    | '/dashboard/customers'
+  id:
+    | '__root__'
+    | '/'
+    | '/book-call'
+    | '/dashboard'
+    | '/workshops'
+    | '/dashboard/availability'
+    | '/dashboard/bookings'
+    | '/dashboard/'
+    | '/dashboard/customers/$id'
+    | '/dashboard/customers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BookCallRoute: typeof BookCallRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   WorkshopsRoute: typeof WorkshopsRoute
 }
 
@@ -66,6 +147,13 @@ declare module '@tanstack/react-router' {
       path: '/workshops'
       fullPath: '/workshops'
       preLoaderRoute: typeof WorkshopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/book-call': {
@@ -82,12 +170,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/bookings': {
+      id: '/dashboard/bookings'
+      path: '/bookings'
+      fullPath: '/dashboard/bookings'
+      preLoaderRoute: typeof DashboardBookingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/availability': {
+      id: '/dashboard/availability'
+      path: '/availability'
+      fullPath: '/dashboard/availability'
+      preLoaderRoute: typeof DashboardAvailabilityRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/customers/': {
+      id: '/dashboard/customers/'
+      path: '/customers'
+      fullPath: '/dashboard/customers/'
+      preLoaderRoute: typeof DashboardCustomersIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/customers/$id': {
+      id: '/dashboard/customers/$id'
+      path: '/customers/$id'
+      fullPath: '/dashboard/customers/$id'
+      preLoaderRoute: typeof DashboardCustomersIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
+
+interface DashboardRouteChildren {
+  DashboardAvailabilityRoute: typeof DashboardAvailabilityRoute
+  DashboardBookingsRoute: typeof DashboardBookingsRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardCustomersIdRoute: typeof DashboardCustomersIdRoute
+  DashboardCustomersIndexRoute: typeof DashboardCustomersIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAvailabilityRoute: DashboardAvailabilityRoute,
+  DashboardBookingsRoute: DashboardBookingsRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardCustomersIdRoute: DashboardCustomersIdRoute,
+  DashboardCustomersIndexRoute: DashboardCustomersIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookCallRoute: BookCallRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   WorkshopsRoute: WorkshopsRoute,
 }
 export const routeTree = rootRouteImport
