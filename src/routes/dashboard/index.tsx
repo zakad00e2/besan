@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DashboardOverview } from "@/features/dashboard/dashboard-overview";
+import { useDashboard } from "@/features/dashboard/dashboard-store";
 
 export const Route = createFileRoute("/dashboard/")({ component: DashboardIndexRoute });
 
 function DashboardIndexRoute() {
-  return <h2 className="text-xl font-semibold">نظرة عامة</h2>;
+  const { state } = useDashboard();
+
+  return <DashboardOverview customers={state.customers} appointments={state.appointments} />;
 }
