@@ -124,7 +124,10 @@ export function appointmentsOverlap(
   startsAt: string,
   endsAt: string,
 ) {
-  return new Date(startsAt) < new Date(appointment.endsAt) && new Date(endsAt) > new Date(appointment.startsAt);
+  return (
+    new Date(startsAt) < new Date(appointment.endsAt) &&
+    new Date(endsAt) > new Date(appointment.startsAt)
+  );
 }
 
 export function getDashboardMetrics(
@@ -144,7 +147,8 @@ export function getDashboardMetrics(
     }).length,
     newCustomers: customers.filter((item) => item.stage === "new-inquiry").length,
     needsFollowUp: customers.filter((item) => {
-      const inactiveForThreeDays = now.getTime() - new Date(item.updatedAt).getTime() >= 3 * 24 * 60 * 60 * 1000;
+      const inactiveForThreeDays =
+        now.getTime() - new Date(item.updatedAt).getTime() >= 3 * 24 * 60 * 60 * 1000;
       return inactiveForThreeDays && !["ready-delivery", "completed"].includes(item.stage);
     }).length,
   };

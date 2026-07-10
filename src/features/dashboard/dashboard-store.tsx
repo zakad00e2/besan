@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useReducer,
-  type Dispatch,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useReducer, type Dispatch, type ReactNode } from "react";
 import { demoDashboardState } from "./dashboard-data";
 import type {
   Appointment,
@@ -77,7 +71,9 @@ export function dashboardReducer(state: DashboardState, action: DashboardAction)
 export function DashboardProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(dashboardReducer, demoDashboardState);
 
-  return <DashboardContext.Provider value={{ state, dispatch }}>{children}</DashboardContext.Provider>;
+  return (
+    <DashboardContext.Provider value={{ state, dispatch }}>{children}</DashboardContext.Provider>
+  );
 }
 
 export function useDashboard() {

@@ -38,7 +38,12 @@ export function StatusBadge({ status }: { status: AppointmentStatus }) {
   };
 
   return (
-    <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-xs font-medium", classes[status])}>
+    <span
+      className={cn(
+        "inline-flex rounded-full border px-2.5 py-1 text-xs font-medium",
+        classes[status],
+      )}
+    >
       {appointmentStatusLabels[status]}
     </span>
   );

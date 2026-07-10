@@ -25,7 +25,10 @@ function Harness() {
 describe("dashboardReducer", () => {
   it("toggles only the requested availability slot", () => {
     const slot = demoDashboardState.availability[0];
-    const next = dashboardReducer(demoDashboardState, { type: "availability/toggle", slotId: slot.id });
+    const next = dashboardReducer(demoDashboardState, {
+      type: "availability/toggle",
+      slotId: slot.id,
+    });
 
     expect(next.availability[0].enabled).toBe(!slot.enabled);
     expect(next.availability[1]).toEqual(demoDashboardState.availability[1]);

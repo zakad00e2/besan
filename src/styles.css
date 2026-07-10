@@ -41,8 +41,8 @@
   --radius: 0.25rem;
 
   /* Warm editorial palette */
-  --background: oklch(0.972 0.012 85);   /* warm cream #f8f4ed */
-  --foreground: oklch(0.16 0.01 60);     /* near black warm */
+  --background: oklch(0.972 0.012 85); /* warm cream #f8f4ed */
+  --foreground: oklch(0.16 0.01 60); /* near black warm */
   --cream: oklch(0.972 0.012 85);
   --sage: oklch(0.88 0.02 145);
 
@@ -72,8 +72,12 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { scroll-behavior: smooth; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -81,8 +85,15 @@
     font-weight: 300;
     -webkit-font-smoothing: antialiased;
   }
-  .font-serif { font-family: var(--font-serif); }
-  button:not(:disabled), a[href], [role="button"], summary { cursor: pointer; }
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+  button:not(:disabled),
+  a[href],
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
 }
 
 .dashboard-app {
@@ -91,7 +102,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dashboard-app *, .dashboard-app *::before, .dashboard-app *::after {
+  .dashboard-app *,
+  .dashboard-app *::before,
+  .dashboard-app *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;

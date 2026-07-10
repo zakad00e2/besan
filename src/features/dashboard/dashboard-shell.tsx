@@ -1,5 +1,13 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { CalendarDays, Clock3, LayoutDashboard, Menu, Plus, Users, type LucideIcon } from "lucide-react";
+import {
+  CalendarDays,
+  Clock3,
+  LayoutDashboard,
+  Menu,
+  Plus,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import {
