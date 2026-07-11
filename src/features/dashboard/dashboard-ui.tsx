@@ -16,15 +16,17 @@ export function MetricCard({
   icon: LucideIcon;
 }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-3">
-        <span className="flex size-10 items-center justify-center rounded-lg bg-violet-50 text-violet-700">
-          <Icon className="size-5" aria-hidden="true" />
-        </span>
-        <span className="text-xs text-slate-500">{label}</span>
+    <section className="group rounded-[10px] border border-[#e7e7e9] bg-white px-3.5 py-3 transition-all duration-200 hover:border-[#d9d9dc] hover:shadow-[0_5px_18px_rgba(24,24,27,0.045)]">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[10px] font-medium text-[#55565b]">{label}</span>
+        <Icon className="size-3.5 stroke-[1.7] text-[#a4a5aa]" aria-hidden="true" />
       </div>
-      <p className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">{value}</p>
-      <p className="mt-1 text-xs text-slate-500">{hint}</p>
+      <p className="mt-1 text-[24px] font-semibold leading-none tracking-[-0.035em] text-[#18181b] tabular-nums">
+        {value}
+      </p>
+      <p className="mt-2 text-[8px] text-[#9a9ba0]">
+        <span className="font-semibold text-[#16a67a]">محدّث الآن</span> · {hint}
+      </p>
     </section>
   );
 }
@@ -33,14 +35,14 @@ export function StatusBadge({ status }: { status: AppointmentStatus }) {
   const classes: Record<AppointmentStatus, string> = {
     pending: "border-amber-200 bg-amber-50 text-amber-700",
     confirmed: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    completed: "border-slate-200 bg-slate-100 text-slate-600",
+    completed: "border-[#dedee1] bg-[#f5f5f6] text-[#66676c]",
     cancelled: "border-rose-200 bg-rose-50 text-rose-700",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex rounded-full border px-2.5 py-1 text-xs font-medium",
+        "inline-flex rounded-full border px-2 py-0.5 text-[9px] font-medium",
         classes[status],
       )}
     >
@@ -51,18 +53,18 @@ export function StatusBadge({ status }: { status: AppointmentStatus }) {
 
 export function DashboardEmptyState({ title, body }: { title: string; body: string }) {
   return (
-    <div className="flex min-h-36 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 text-center">
-      <CalendarX2 className="size-5 text-slate-400" aria-hidden="true" />
-      <p className="mt-2 text-sm font-medium text-slate-700">{title}</p>
-      <p className="mt-1 text-xs text-slate-500">{body}</p>
+    <div className="flex min-h-32 flex-col items-center justify-center rounded-lg border border-dashed border-[#e4e4e6] bg-[#fcfcfc] px-4 text-center">
+      <CalendarX2 className="size-4 text-[#aaabb0]" aria-hidden="true" />
+      <p className="mt-2 text-[11px] font-medium text-[#5f6065]">{title}</p>
+      <p className="mt-1 text-[9px] text-[#9a9ba0]">{body}</p>
     </div>
   );
 }
 
 export function DashboardSectionHeading({ title, action }: { title: string; action?: ReactNode }) {
   return (
-    <div className="mb-4 flex items-center justify-between gap-3">
-      <h2 className="text-base font-semibold text-slate-950">{title}</h2>
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <h2 className="text-[11px] font-medium text-[#77787e]">{title}</h2>
       {action}
     </div>
   );

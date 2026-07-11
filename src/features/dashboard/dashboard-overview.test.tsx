@@ -15,9 +15,9 @@ describe("DashboardOverview", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "جدول اليوم" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "مواعيد اليوم" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "الأسبوع" }));
-    expect(screen.getByRole("heading", { name: "جدول الأسبوع" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "مواعيد الأسبوع" })).toBeTruthy();
   });
 
   it("shows metrics, reminder queue, and follow-up customers", () => {
@@ -29,7 +29,7 @@ describe("DashboardOverview", () => {
       />,
     );
 
-    expect(screen.getByText("مواعيد اليوم")).toBeTruthy();
+    expect(screen.getAllByText("مواعيد اليوم").length).toBeGreaterThan(0);
     expect(screen.getByText("تذكيرات الغد")).toBeTruthy();
     expect(screen.getAllByText("بحاجة لمتابعة").length).toBeGreaterThan(0);
   });

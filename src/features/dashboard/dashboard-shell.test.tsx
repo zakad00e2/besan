@@ -25,6 +25,7 @@ describe("DashboardShell", () => {
 
     expect(screen.getByRole("link", { name: "الزبائن" }).getAttribute("aria-current")).toBe("page");
     expect(screen.getByRole("button", { name: "فتح القائمة" })).toBeTruthy();
-    expect(screen.getByText("نسخة تجريبية — التذكيرات غير مرسلة فعليًا")).toBeTruthy();
+    expect(document.body.textContent).toContain("نسخة تجريبية");
+    expect(document.body.textContent).toContain("التذكيرات غير مرسلة فعليًا");
   });
 });

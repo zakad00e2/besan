@@ -99,6 +99,13 @@
 .dashboard-app {
   font-family: var(--font-arabic);
   font-weight: 400;
+  color-scheme: light;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.dashboard-app ::selection {
+  background: rgb(124 58 237 / 0.16);
 }
 
 @media (prefers-reduced-motion: reduce) {
