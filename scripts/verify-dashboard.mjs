@@ -18,10 +18,19 @@ for (const file of required) {
 }
 
 const shell = readFileSync(join(root, "src/features/dashboard/dashboard-shell.tsx"), "utf8");
-for (const label of ["لوحة التحكم", "الحجوزات", "الزبائن", "المواعيد المتاحة"]) {
+for (const label of ["Dashboard", "Bookings", "Customers", "Availability"]) {
   if (!shell.includes(label)) {
     throw new Error(`Missing dashboard navigation label: ${label}`);
   }
+}
+
+for (const token of ['dir="ltr"', 'lang="en"', "left-0", 'side="left"', "lg:pl-56"]) {
+  if (!shell.includes(token)) throw new Error(`Missing LTR dashboard shell token: ${token}`);
+}
+
+const styles = readFileSync(join(root, "src/styles.css"), "utf8");
+if (!styles.includes("Roboto") || !styles.includes(".dashboard-app")) {
+  throw new Error("Dashboard must scope Roboto through .dashboard-app");
 }
 
 const data = readFileSync(join(root, "src/features/dashboard/dashboard-data.ts"), "utf8");

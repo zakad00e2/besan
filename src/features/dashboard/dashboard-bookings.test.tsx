@@ -9,7 +9,7 @@ describe("booking helpers", () => {
   it("filters by customer query, type, and date", () => {
     expect(
       filterAppointments(demoDashboardState.appointments, demoDashboardState.customers, {
-        query: "ليان",
+        query: "Layan",
         type: "all",
         status: "all",
         date: "all",
@@ -28,7 +28,10 @@ describe("booking helpers", () => {
         { customerId: "", type: "design", purpose: "", date: "", time: "" },
         demoDashboardState.appointments,
       ),
-    ).toMatchObject({ customerId: "اختاري الزبونة.", purpose: "أدخلي غرض الموعد." });
+    ).toMatchObject({
+      customerId: "Select a customer.",
+      purpose: "Enter the appointment purpose.",
+    });
   });
 });
 
@@ -42,11 +45,11 @@ describe("DashboardBookings", () => {
       />,
     );
 
-    fireEvent.change(screen.getByLabelText("البحث في الحجوزات"), {
+    fireEvent.change(screen.getByLabelText("Search bookings"), {
       target: { value: "+970 59 123 4567" },
     });
-    expect(screen.getAllByText("ليان منصور").length).toBeGreaterThan(0);
-    fireEvent.click(screen.getByRole("button", { name: "موعد جديد" }));
+    expect(screen.getAllByText("Layan Mansour").length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole("button", { name: "New appointment" }));
     expect(screen.getByRole("dialog")).toBeTruthy();
   });
 });

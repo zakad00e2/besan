@@ -3,7 +3,8 @@ import { toast } from "sonner";
 import type { Appointment, Customer } from "./dashboard-model";
 import { customerStages, stageLabels } from "./dashboard-model";
 import type { DashboardAction } from "./dashboard-store";
-import { DashboardEmptyState, StatusBadge } from "./dashboard-ui";
+import { cn } from "@/lib/utils";
+import { DashboardEmptyState, StatusBadge, dashboardPrimaryButtonClassName } from "./dashboard-ui";
 
 export function DashboardCustomerProfile({
   customer,
@@ -29,14 +30,14 @@ export function DashboardCustomerProfile({
   }, [appointments, customer.id, now]);
   function changeStage(stage: Customer["stage"]) {
     dispatch({ type: "customer/stage", customerId: customer.id, stage });
-    setStatus("تم تحديث مرحلة الزبونة.");
-    toast.success("تم تحديث مرحلة الزبونة.");
+    setStatus("Customer stage updated.");
+    toast.success("Customer stage updated.");
   }
   function addNote(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const body = note.trim();
     if (!body) {
-      setStatus("اكتبي ملاحظة قبل الحفظ.");
+      setStatus("Write a note before saving.");
       return;
     }
     dispatch({
@@ -45,12 +46,12 @@ export function DashboardCustomerProfile({
       note: { id: `note-${Date.now()}`, body, createdAt: new Date().toISOString() },
     });
     setNote("");
-    setStatus("تمت إضافة الملاحظة.");
-    toast.success("تمت إضافة الملاحظة.");
+    setStatus("Note added.");
+    toast.success("Note added.");
   }
   const appointmentList = (items: Appointment[], empty: string) =>
     items.length === 0 ? (
-      <DashboardEmptyState title={empty} body="ستظهر التفاصيل هنا عند توفرها." />
+      <DashboardEmptyState title={empty} body="Details will appear here when available." />
     ) : (
       <div className="divide-y divide-slate-100">
         {items.map((item) => (
@@ -80,9 +81,9 @@ export function DashboardCustomerProfile({
             </p>
           </div>
           <label className="text-sm text-slate-600">
-            مرحلة الزبونة
+            Customer stage
             <select
-              aria-label="مرحلة الزبونة"
+              aria-label="Customer stage"
               value={customer.stage}
               onChange={(event) => changeStage(event.target.value as Customer["stage"])}
               className="mt-1 block h-10 rounded-lg border border-slate-200 bg-white px-3"
@@ -98,37 +99,40 @@ export function DashboardCustomerProfile({
       </section>
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <h3 className="mb-3 font-semibold">المواعيد القادمة</h3>
-          {appointmentList(upcoming, "لا توجد مواعيد قادمة")}
+          <h3 className="mb-3 font-semibold">Upcoming appointments</h3>
+          {appointmentList(upcoming, "No upcoming appointments")}
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <h3 className="mb-3 font-semibold">المواعيد السابقة</h3>
-          {appointmentList(previous, "لا توجد مواعيد سابقة")}
+          <h3 className="mb-3 font-semibold">Previous appointments</h3>
+          {appointmentList(previous, "No previous appointments")}
         </div>
       </section>
       <section className="grid gap-6 lg:grid-cols-2">
         <form onSubmit={addNote} className="rounded-xl border border-slate-200 bg-white p-5">
           <label className="text-sm font-semibold">
-            ملاحظة جديدة
+            New note
             <textarea
-              aria-label="ملاحظة جديدة"
+              aria-label="New note"
               value={note}
               onChange={(event) => setNote(event.target.value)}
               className="mt-3 min-h-28 w-full rounded-lg border border-slate-200 p-3 text-sm"
             />
           </label>
-          <button className="mt-3 min-h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white">
-            إضافة الملاحظة
+          <button
+            type="submit"
+            className={cn(dashboardPrimaryButtonClassName, "mt-3 min-h-10 px-4 text-sm")}
+          >
+            Add note
           </button>
         </form>
         <div className="rounded-xl border border-slate-200 bg-white p-5">
-          <h3 className="mb-3 font-semibold">سجل النشاط</h3>
+          <h3 className="mb-3 font-semibold">Activity</h3>
           {customer.activity.length === 0 ? (
-            <DashboardEmptyState title="لا يوجد نشاط بعد" body="سيظهر تسلسل التحديثات هنا." />
+            <DashboardEmptyState title="No activity yet" body="Updates will appear here." />
           ) : (
             <div className="space-y-3">
               {customer.activity.map((item) => (
-                <div key={item.id} className="border-r-2 border-violet-200 pr-3">
+                <div key={item.id} className="border-l-2 border-violet-200 pl-3">
                   <p className="text-sm">{item.label}</p>
                   <p className="mt-1 text-xs text-slate-500" dir="ltr">
                     {item.createdAt.slice(0, 10)}
@@ -137,9 +141,9 @@ export function DashboardCustomerProfile({
               ))}
             </div>
           )}
-          <h3 className="mb-3 mt-5 font-semibold">الملاحظات</h3>
+          <h3 className="mb-3 mt-5 font-semibold">Notes</h3>
           {customer.notes.length === 0 ? (
-            <p className="text-sm text-slate-500">لا توجد ملاحظات.</p>
+            <p className="text-sm text-slate-500">No notes.</p>
           ) : (
             <div className="space-y-3">
               {[...customer.notes].reverse().map((item) => (

@@ -2,10 +2,11 @@ import { Pencil, Plus, Search } from "lucide-react";
 import { useMemo, useState, type Dispatch } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import type { Appointment, AppointmentStatus, BookingType, Customer } from "./dashboard-model";
 import { bookingTypeLabels, reminderStatusLabels } from "./dashboard-model";
 import type { DashboardAction } from "./dashboard-store";
-import { DashboardEmptyState, StatusBadge } from "./dashboard-ui";
+import { DashboardEmptyState, StatusBadge, dashboardIconButtonClassName, dashboardPrimaryButtonClassName, dashboardSecondaryButtonClassName } from "./dashboard-ui";
 
 export type BookingFilters = {
   query: string;
@@ -52,10 +53,10 @@ export function filterAppointments(
 
 export function validateAppointment(values: AppointmentFormValues, appointments: Appointment[]) {
   const errors: AppointmentFormErrors = {};
-  if (!values.customerId) errors.customerId = "اختاري الزبونة.";
-  if (!values.purpose.trim()) errors.purpose = "أدخلي غرض الموعد.";
-  if (!values.date) errors.date = "اختاري التاريخ.";
-  if (!values.time) errors.time = "اختاري الوقت.";
+  if (!values.customerId) errors.customerId = "Select a customer.";
+  if (!values.purpose.trim()) errors.purpose = "Enter the appointment purpose.";
+  if (!values.date) errors.date = "Select a date.";
+  if (!values.time) errors.time = "Select a time.";
   if (Object.keys(errors).length) return errors;
 
   const startsAt = `${values.date}T${values.time}:00.000Z`;
@@ -67,7 +68,7 @@ export function validateAppointment(values: AppointmentFormValues, appointments:
       new Date(startsAt) < new Date(appointment.endsAt) &&
       end > new Date(appointment.startsAt),
   );
-  if (overlaps) errors.overlap = "هذا الوقت محجوز بالفعل.";
+  if (overlaps) errors.overlap = "This time overlaps another appointment.";
   return errors;
 }
 
@@ -160,7 +161,7 @@ export function DashboardBookings({
         : "scheduled",
     };
     dispatch({ type: editingId ? "appointment/update" : "appointment/add", appointment });
-    const message = editingId ? "تم تحديث الموعد." : "تمت إضافة الموعد.";
+    const message = editingId ? "Appointment updated." : "Appointment added.";
     setStatusMessage(message);
     toast.success(message);
     setOpen(false);
@@ -170,20 +171,20 @@ export function DashboardBookings({
     <div className="space-y-5">
       <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 lg:flex-row lg:items-end">
         <label className="relative block flex-1 text-xs font-medium text-slate-600">
-          البحث في الحجوزات
+          Search bookings
           <Search
-            className="pointer-events-none absolute bottom-3 right-3 size-4 text-slate-400"
+            className="pointer-events-none absolute bottom-3 left-3 size-4 text-slate-400"
             aria-hidden="true"
           />
           <input
-            aria-label="البحث في الحجوزات"
+            aria-label="Search bookings"
             value={filters.query}
             onChange={(event) => setFilters({ ...filters, query: event.target.value })}
-            className="mt-1 h-10 w-full rounded-lg border border-slate-200 pr-9 text-sm outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+            className="mt-1 h-10 w-full rounded-lg border border-slate-200 pl-9 text-sm outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
           />
         </label>
         <label className="text-xs font-medium text-slate-600">
-          النوع
+          Type
           <select
             value={filters.type}
             onChange={(event) =>
@@ -191,13 +192,13 @@ export function DashboardBookings({
             }
             className="mt-1 block h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm"
           >
-            <option value="all">الكل</option>
-            <option value="workshop">ورشة</option>
-            <option value="design">تصميم</option>
+            <option value="all">All</option>
+            <option value="workshop">Workshop</option>
+            <option value="design">Design</option>
           </select>
         </label>
         <label className="text-xs font-medium text-slate-600">
-          الحالة
+          Status
           <select
             value={filters.status}
             onChange={(event) =>
@@ -205,15 +206,15 @@ export function DashboardBookings({
             }
             className="mt-1 block h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm"
           >
-            <option value="all">الكل</option>
-            <option value="pending">بانتظار التأكيد</option>
-            <option value="confirmed">مؤكد</option>
-            <option value="completed">مكتمل</option>
-            <option value="cancelled">ملغى</option>
+            <option value="all">All</option>
+            <option value="pending">Pending confirmation</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </label>
         <label className="text-xs font-medium text-slate-600">
-          التاريخ
+          Date
           <input
             type="date"
             value={filters.date === "all" ? "" : filters.date}
@@ -224,10 +225,10 @@ export function DashboardBookings({
         <button
           type="button"
           onClick={openCreate}
-          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white"
+          className={cn(dashboardPrimaryButtonClassName, "min-h-10 gap-2 px-4 text-sm")}
         >
           <Plus className="size-4" aria-hidden="true" />
-          موعد جديد
+          New appointment
         </button>
       </div>
       <p className="sr-only" role="status">
@@ -236,21 +237,21 @@ export function DashboardBookings({
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         {visibleAppointments.length === 0 ? (
           <div className="p-4">
-            <DashboardEmptyState title="لا توجد حجوزات" body="جرّبي تغيير البحث أو الفلاتر." />
+            <DashboardEmptyState title="No bookings" body="Try changing the search or filters." />
           </div>
         ) : (
           <>
             <div className="hidden overflow-x-auto md:block">
-              <table className="w-full text-right text-sm">
+              <table className="w-full text-left text-sm">
                 <thead className="bg-slate-50 text-xs text-slate-500">
                   <tr>
-                    <th className="px-4 py-3">الزبونة</th>
-                    <th>النوع</th>
-                    <th>الغرض</th>
-                    <th>الموعد</th>
-                    <th>الحالة</th>
-                    <th>التذكير</th>
-                    <th className="px-4">إجراء</th>
+                    <th className="px-4 py-3">Customer</th>
+                    <th>Type</th>
+                    <th>Purpose</th>
+                    <th>Appointment</th>
+                    <th>Status</th>
+                    <th>Reminder</th>
+                    <th className="px-4">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -273,9 +274,9 @@ export function DashboardBookings({
                       <td className="px-4">
                         <button
                           type="button"
-                          aria-label={`تعديل ${appointment.purpose}`}
+                          aria-label={`Edit ${appointment.purpose}`}
                           onClick={() => openEdit(appointment)}
-                          className="rounded-md p-2 text-slate-500 hover:bg-violet-50 hover:text-violet-700"
+                          className={cn(dashboardIconButtonClassName, "p-2 text-slate-500 hover:text-violet-700")}
                         >
                           <Pencil className="size-4" />
                         </button>
@@ -302,9 +303,9 @@ export function DashboardBookings({
                     <button
                       type="button"
                       onClick={() => openEdit(appointment)}
-                      className="min-h-10 text-violet-700"
+                      className={cn(dashboardSecondaryButtonClassName, "min-h-10 px-3 text-xs text-violet-700")}
                     >
-                      تعديل
+                      Edit
                     </button>
                   </div>
                 </article>
@@ -315,19 +316,19 @@ export function DashboardBookings({
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent dir="rtl" className="max-w-xl bg-white">
+        <DialogContent dir="ltr" className="max-w-xl bg-white">
           <DialogHeader>
-            <DialogTitle>{editingId ? "تعديل الموعد" : "موعد جديد"}</DialogTitle>
+            <DialogTitle>{editingId ? "Edit appointment" : "New appointment"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={submit} className="grid gap-4">
             <label className="text-sm">
-              الزبونة
+              Customer
               <select
                 value={form.customerId}
                 onChange={(event) => setForm({ ...form, customerId: event.target.value })}
                 className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
               >
-                <option value="">اختاري زبونة</option>
+                <option value="">Select a customer</option>
                 {customers.map((customer) => (
                   <option key={customer.id} value={customer.id}>
                     {customer.name}
@@ -340,7 +341,7 @@ export function DashboardBookings({
             </label>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm">
-                النوع
+                Type
                 <select
                   value={form.type}
                   onChange={(event) =>
@@ -348,12 +349,12 @@ export function DashboardBookings({
                   }
                   className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
                 >
-                  <option value="design">تصميم</option>
-                  <option value="workshop">ورشة</option>
+                  <option value="design">Design</option>
+                  <option value="workshop">Workshop</option>
                 </select>
               </label>
               <label className="text-sm">
-                غرض الموعد
+                Appointment purpose
                 <input
                   value={form.purpose}
                   onChange={(event) => setForm({ ...form, purpose: event.target.value })}
@@ -366,7 +367,7 @@ export function DashboardBookings({
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm">
-                التاريخ
+                Date
                 <input
                   type="date"
                   value={form.date}
@@ -378,7 +379,7 @@ export function DashboardBookings({
                 )}
               </label>
               <label className="text-sm">
-                الوقت
+                Time
                 <input
                   type="time"
                   value={form.time}
@@ -393,9 +394,9 @@ export function DashboardBookings({
             {errors.overlap && <p className="text-sm text-rose-600">{errors.overlap}</p>}
             <button
               type="submit"
-              className="min-h-10 rounded-lg bg-slate-950 px-4 text-sm font-medium text-white"
+              className={cn(dashboardPrimaryButtonClassName, "min-h-10 px-4 text-sm")}
             >
-              {editingId ? "حفظ التعديلات" : "إضافة الموعد"}
+              {editingId ? "Save changes" : "Add appointment"}
             </button>
           </form>
         </DialogContent>

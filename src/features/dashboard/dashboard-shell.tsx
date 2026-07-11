@@ -18,6 +18,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import {
+  dashboardIconButtonClassName,
+  dashboardPrimaryButtonClassName,
+  dashboardSecondaryButtonClassName,
+} from "./dashboard-ui";
 
 const dashboardNavigation = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
@@ -112,7 +117,10 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           to="/dashboard/bookings"
           search={{ new: 1 }}
           onClick={onNavigate}
-          className="flex min-h-9 w-full items-center justify-center gap-2 rounded-[7px] bg-[#222224] px-3 text-[11px] font-medium text-white shadow-[0_1px_2px_rgba(0,0,0,0.18)] transition-all duration-200 hover:bg-[#111113] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+          className={cn(
+            dashboardPrimaryButtonClassName,
+            "flex min-h-9 w-full gap-2 px-3 text-[11px]",
+          )}
         >
           <Plus className="size-3.5" aria-hidden="true" />
           New appointment
@@ -162,7 +170,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
-              className="flex size-7 items-center justify-center rounded-md border border-[#e5e5e7] text-[#63646a] outline-none transition-colors hover:bg-[#f7f7f8] focus-visible:ring-2 focus-visible:ring-violet-500 lg:hidden"
+              className={cn(dashboardIconButtonClassName, "size-7 lg:hidden")}
             >
               <Menu className="size-4" aria-hidden="true" />
             </button>
@@ -182,7 +190,10 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             <Link
               to="/dashboard/bookings"
               search={{ new: 1 }}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[#dedee1] bg-white px-3 text-[11px] font-medium text-[#36373b] transition-all duration-200 hover:bg-[#fafafa] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 lg:hidden"
+              className={cn(
+                dashboardSecondaryButtonClassName,
+                "min-h-9 gap-1.5 px-3 text-[11px] lg:hidden",
+              )}
             >
               <Plus className="size-3.5" aria-hidden="true" />
               New appointment

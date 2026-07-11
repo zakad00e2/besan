@@ -13,8 +13,8 @@ describe("DashboardCustomers", () => {
         appointments={demoDashboardState.appointments}
       />,
     );
-    fireEvent.change(screen.getByLabelText("البحث عن زبونة"), { target: { value: "ليان" } });
-    expect(screen.getByRole("link", { name: /ليان منصور/ })).toBeTruthy();
-    expect(screen.queryByRole("link", { name: /سارة خليل/ })).toBeNull();
+    fireEvent.change(screen.getByLabelText("Search customers"), { target: { value: "Layan" } });
+    expect(screen.getByRole("link", { name: /Layan Mansour/ })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /Sarah Khalil/ })).toBeNull();
   });
 });

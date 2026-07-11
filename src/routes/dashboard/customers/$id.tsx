@@ -14,9 +14,9 @@ function DashboardCustomerRoute() {
   if (!customer) {
     return (
       <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
-        <p className="font-medium">لم يتم العثور على الزبونة</p>
+        <p className="font-medium">Customer not found</p>
         <a className="mt-3 inline-block text-sm text-violet-700" href="/dashboard/customers">
-          العودة إلى دليل الزبائن
+          Back to customers
         </a>
       </div>
     );

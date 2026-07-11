@@ -15,9 +15,9 @@ describe("DashboardAvailability", () => {
         dispatch={dispatch}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "الأحد 10:00 إلى 11:00 متاح" }));
+    fireEvent.click(screen.getByRole("button", { name: "Sunday 10:00 to 11:00 available" }));
     expect(dispatch).toHaveBeenCalledWith({ type: "availability/toggle", slotId: "sunday-10" });
-    fireEvent.click(screen.getByLabelText("تذكير الزبونة عبر WhatsApp"));
+    fireEvent.click(screen.getByLabelText("Remind customer via WhatsApp"));
     expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: "reminders/update" }));
   });
 });

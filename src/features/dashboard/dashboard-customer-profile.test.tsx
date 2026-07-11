@@ -17,16 +17,16 @@ describe("DashboardCustomerProfile", () => {
         now={new Date("2026-07-10T08:00:00.000Z")}
       />,
     );
-    fireEvent.change(screen.getByLabelText("مرحلة الزبونة"), { target: { value: "fitting" } });
+    fireEvent.change(screen.getByLabelText("Customer stage"), { target: { value: "fitting" } });
     expect(dispatch).toHaveBeenCalledWith({
       type: "customer/stage",
       customerId: customer.id,
       stage: "fitting",
     });
-    fireEvent.change(screen.getByLabelText("ملاحظة جديدة"), {
-      target: { value: "تأكيد القماش قبل البروفة" },
+    fireEvent.change(screen.getByLabelText("New note"), {
+      target: { value: "Confirm the fabric before the fitting" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "إضافة الملاحظة" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add note" }));
     expect(dispatch).toHaveBeenCalledWith(
       expect.objectContaining({ type: "customer/note", customerId: customer.id }),
     );

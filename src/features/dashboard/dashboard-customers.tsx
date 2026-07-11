@@ -29,19 +29,19 @@ export function DashboardCustomers({
   return (
     <div className="space-y-5">
       <label className="relative block max-w-md text-xs font-medium text-slate-600">
-        البحث عن زبونة
-        <Search className="pointer-events-none absolute bottom-3 right-3 size-4 text-slate-400" />
+        Search customers
+        <Search className="pointer-events-none absolute bottom-3 left-3 size-4 text-slate-400" />
         <input
-          aria-label="البحث عن زبونة"
+          aria-label="Search customers"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          className="mt-1 h-10 w-full rounded-lg border border-slate-200 pr-9 text-sm"
+          className="mt-1 h-10 w-full rounded-lg border border-slate-200 pl-9 text-sm"
         />
       </label>
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         {visible.length === 0 ? (
           <div className="p-4">
-            <DashboardEmptyState title="لا توجد نتائج" body="تحققي من الاسم أو رقم الهاتف." />
+            <DashboardEmptyState title="No results" body="Check the name or phone number." />
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
@@ -64,7 +64,7 @@ export function DashboardCustomers({
                         {upcoming.startsAt.slice(0, 10)} · {upcoming.startsAt.slice(11, 16)}
                       </span>
                     ) : (
-                      "لا يوجد موعد قادم"
+                      "No upcoming appointment"
                     )}
                   </span>
                 </a>

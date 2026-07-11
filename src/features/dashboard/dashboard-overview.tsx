@@ -11,7 +11,8 @@ import {
   type AppointmentStatus,
   type CustomerStage,
 } from "./dashboard-model";
-import { DashboardEmptyState, MetricCard, StatusBadge } from "./dashboard-ui";
+import { cn } from "@/lib/utils";
+import { DashboardEmptyState, MetricCard, StatusBadge, dashboardToggleActiveClassName, dashboardToggleGroupClassName, dashboardToggleInactiveClassName } from "./dashboard-ui";
 
 type ScheduleRange = "day" | "week";
 
@@ -264,21 +265,18 @@ export function DashboardOverview({
               {schedule.length}
             </p>
           </div>
-          <div
-            className="flex rounded-md border border-[#e6e6e8] bg-[#fafafa] p-0.5"
-            aria-label="Schedule range"
-          >
+          <div className={dashboardToggleGroupClassName} aria-label="Schedule range">
             <button
               type="button"
               onClick={() => setRange("day")}
-              className={`min-h-7 rounded-[4px] px-2.5 text-[9px] font-medium transition-colors ${range === "day" ? "bg-white text-[#242428] shadow-sm" : "text-[#929399]"}`}
+              className={range === "day" ? dashboardToggleActiveClassName : dashboardToggleInactiveClassName}
             >
               Day
             </button>
             <button
               type="button"
               onClick={() => setRange("week")}
-              className={`min-h-7 rounded-[4px] px-2.5 text-[9px] font-medium transition-colors ${range === "week" ? "bg-white text-[#242428] shadow-sm" : "text-[#929399]"}`}
+              className={range === "week" ? dashboardToggleActiveClassName : dashboardToggleInactiveClassName}
             >
               Week
             </button>
@@ -337,7 +335,10 @@ export function DashboardOverview({
           <h2 className="text-[10px] font-medium text-[#85868c]">Tomorrow's reminders</h2>
           {reminders.length === 0 ? (
             <div className="mt-3">
-              <DashboardEmptyState title="No reminders scheduled" body="Tomorrow's appointments will appear here." />
+              <DashboardEmptyState
+                title="No reminders scheduled"
+                body="Tomorrow's appointments will appear here."
+              />
             </div>
           ) : (
             <div className="mt-3 divide-y divide-[#f0f0f1]">
@@ -363,7 +364,10 @@ export function DashboardOverview({
           <h2 className="text-[10px] font-medium text-[#85868c]">Needs follow-up</h2>
           {followUps.length === 0 ? (
             <div className="mt-3">
-              <DashboardEmptyState title="All profiles are up to date" body="No follow-up is currently required." />
+              <DashboardEmptyState
+                title="All profiles are up to date"
+                body="No follow-up is currently required."
+              />
             </div>
           ) : (
             <div className="mt-3 divide-y divide-[#f0f0f1]">
