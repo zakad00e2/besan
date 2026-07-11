@@ -1,10 +1,12 @@
-import { BellRing, CalendarCheck2, CalendarRange, CircleAlert, UserPlus } from "lucide-react";
+import { CalendarCheck2, CalendarRange, CircleAlert, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
+import reminderAvatar from "@/assets/reminder-avatar.png";
 import type { Appointment, Customer } from "./dashboard-model";
 import {
   appointmentStatusLabels,
   bookingTypeLabels,
   getDashboardMetrics,
+  getDashboardMetricComparisons,
   stageLabels,
   type AppointmentStatus,
   type CustomerStage,
@@ -18,7 +20,7 @@ function dateKey(date: Date | string) {
 }
 
 function dateLabel(date: string) {
-  return new Intl.DateTimeFormat("ar", { weekday: "short", day: "numeric", month: "short" }).format(
+  return new Intl.DateTimeFormat("en", { weekday: "short", day: "numeric", month: "short" }).format(
     new Date(date),
   );
 }
@@ -57,6 +59,10 @@ export function DashboardOverview({
   const [range, setRange] = useState<ScheduleRange>("day");
   const metrics = useMemo(
     () => getDashboardMetrics(customers, appointments, now),
+    [appointments, customers, now],
+  );
+  const comparisons = useMemo(
+    () => getDashboardMetricComparisons(customers, appointments, now),
     [appointments, customers, now],
   );
   const customersById = useMemo(
@@ -110,64 +116,68 @@ export function DashboardOverview({
     <div className="space-y-5">
       <section className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="إجمالي الحجوزات"
+          label="Total bookings"
           value={appointments.length}
-          hint="كل حجوزات المشغل"
+          changePercent={comparisons.totalBookings.changePercent}
           icon={CalendarCheck2}
         />
         <MetricCard
-          label="مواعيد اليوم"
+          label="Today's appointments"
           value={metrics.today}
-          hint="مواعيد مسجلة اليوم"
+          changePercent={comparisons.todayAppointments.changePercent}
           icon={CalendarRange}
         />
         <MetricCard
-          label="زبائن جدد"
+          label="New customers"
           value={metrics.newCustomers}
-          hint="بانتظار المتابعة"
+          changePercent={comparisons.newCustomers.changePercent}
           icon={UserPlus}
         />
         <MetricCard
-          label="قيد المتابعة"
+          label="Needs follow-up"
           value={metrics.needsFollowUp}
-          hint="ملفات تحتاج إجراء"
+          changePercent={comparisons.needsFollowUp.changePercent}
           icon={CircleAlert}
         />
       </section>
 
       <section className="grid gap-2.5 lg:grid-cols-3">
-        <InsightCard title="تقدم التذكيرات">
-          <div className="flex h-[170px] flex-col items-center justify-center">
-            <div className="relative size-28">
+        <InsightCard title="Reminder progress">
+          <div className="flex h-[190px] flex-col items-center justify-center">
+            <div className="relative size-36">
+              <div className="absolute left-1/2 top-1 z-10 -translate-x-1/2 rounded-full bg-[#8b5cf6] px-2.5 py-1 text-[11px] font-semibold leading-none text-white tabular-nums shadow-[0_2px_8px_rgba(139,92,246,0.35)]">
+                {reminderProgress}%
+              </div>
               <svg viewBox="0 0 120 120" className="size-full -rotate-90" aria-hidden="true">
-                <circle cx="60" cy="60" r="48" fill="none" stroke="#f0f0f1" strokeWidth="9" />
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#ebebec" strokeWidth="4" />
                 <circle
                   cx="60"
                   cy="60"
-                  r="48"
+                  r="52"
                   fill="none"
-                  stroke="#7c3aed"
-                  strokeWidth="9"
+                  stroke="#8b5cf6"
+                  strokeWidth="4"
                   strokeLinecap="round"
                   pathLength="100"
                   strokeDasharray={`${reminderProgress} 100`}
                 />
               </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <BellRing className="size-5 text-[#f28b52]" aria-hidden="true" />
-                <span className="mt-1 text-xl font-semibold tabular-nums">{reminderProgress}%</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex size-[6.75rem] items-center justify-center overflow-hidden rounded-full bg-[#ffcbad]">
+                  <img src={reminderAvatar} alt="" className="size-full object-cover" />
+                </div>
               </div>
             </div>
-            <p className="mt-2 text-[10px] font-medium text-[#3d3e42]">
-              {sentReminders} تذكيرات مرسلة
+            <p className="mt-4 text-[13px] font-semibold text-[#1f1f23]">
+              {sentReminders} reminders sent 🔔
             </p>
-            <p className="mt-0.5 text-[8px] text-[#9a9ba0]">
-              من أصل {activeReminders} تذكيرات مفعّلة
+            <p className="mt-1 text-[11px] text-[#94959b]">
+              out of {activeReminders} active reminders
             </p>
           </div>
         </InsightCard>
 
-        <InsightCard title="توزيع حالات الحجوزات">
+        <InsightCard title="Booking status distribution">
           <div className="mt-5 flex h-[145px] items-end justify-center gap-5 border-b border-[#eeeeef] px-2 pb-0">
             {statusCounts.map(({ status, count }, index) => {
               const colors = ["bg-[#e85fa8]", "bg-[#2cc79a]", "bg-[#f39245]", "bg-[#7f55e8]"];
@@ -191,7 +201,7 @@ export function DashboardOverview({
           </div>
         </InsightCard>
 
-        <InsightCard title="تقدم ملفات الزبائن">
+        <InsightCard title="Customer progress">
           <div className="flex h-[174px] flex-col items-center justify-end">
             <div className="relative h-[104px] w-[210px] overflow-hidden">
               <svg viewBox="0 0 220 112" className="size-full" aria-hidden="true">
@@ -223,21 +233,21 @@ export function DashboardOverview({
                 <p className="text-[25px] font-semibold leading-none tabular-nums">
                   {customerProgress}%
                 </p>
-                <p className="mt-1 text-[8px] text-[#919298]">في مراحل متقدمة</p>
+                <p className="mt-1 text-[8px] text-[#919298]">In advanced stages</p>
               </div>
             </div>
             <div className="mt-2 flex gap-4 text-[8px] text-[#8f9095]">
               <span>
-                <i className="ml-1 inline-block size-1.5 rounded-full bg-[#3182f6]" />
-                قيد العمل
+                <i className="mr-1 inline-block size-1.5 rounded-full bg-[#3182f6]" />
+                In progress
               </span>
               <span>
-                <i className="ml-1 inline-block size-1.5 rounded-full bg-[#8b5cf6]" />
-                متقدم
+                <i className="mr-1 inline-block size-1.5 rounded-full bg-[#8b5cf6]" />
+                Advanced
               </span>
               <span>
-                <i className="ml-1 inline-block size-1.5 rounded-full bg-[#dedee1]" />
-                مكتمل
+                <i className="mr-1 inline-block size-1.5 rounded-full bg-[#dedee1]" />
+                Completed
               </span>
             </div>
           </div>
@@ -248,7 +258,7 @@ export function DashboardOverview({
         <div className="flex items-center justify-between border-b border-[#eeeeef] px-4 py-3">
           <div>
             <h2 className="text-[10px] font-medium text-[#77787e]">
-              {range === "day" ? "مواعيد اليوم" : "مواعيد الأسبوع"}
+              {range === "day" ? "Today's appointments" : "This week's appointments"}
             </h2>
             <p className="mt-1 text-[18px] font-semibold leading-none tabular-nums">
               {schedule.length}
@@ -256,21 +266,21 @@ export function DashboardOverview({
           </div>
           <div
             className="flex rounded-md border border-[#e6e6e8] bg-[#fafafa] p-0.5"
-            aria-label="نطاق الجدول"
+            aria-label="Schedule range"
           >
             <button
               type="button"
               onClick={() => setRange("day")}
               className={`min-h-7 rounded-[4px] px-2.5 text-[9px] font-medium transition-colors ${range === "day" ? "bg-white text-[#242428] shadow-sm" : "text-[#929399]"}`}
             >
-              اليوم
+              Day
             </button>
             <button
               type="button"
               onClick={() => setRange("week")}
               className={`min-h-7 rounded-[4px] px-2.5 text-[9px] font-medium transition-colors ${range === "week" ? "bg-white text-[#242428] shadow-sm" : "text-[#929399]"}`}
             >
-              الأسبوع
+              Week
             </button>
           </div>
         </div>
@@ -278,20 +288,20 @@ export function DashboardOverview({
         {schedule.length === 0 ? (
           <div className="p-4">
             <DashboardEmptyState
-              title="لا توجد مواعيد"
-              body="اختاري نطاقًا آخر أو أضيفي موعدًا جديدًا."
+              title="No appointments"
+              body="Choose another range or add a new appointment."
             />
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-right">
+            <table className="w-full min-w-[640px] text-left">
               <thead className="bg-[#fcfcfc] text-[8px] font-medium text-[#999aa0]">
                 <tr>
-                  <th className="px-4 py-2.5">الزبونة</th>
-                  <th className="px-3 py-2.5">الخدمة</th>
-                  <th className="px-3 py-2.5">الغرض</th>
-                  <th className="px-3 py-2.5">التاريخ والوقت</th>
-                  <th className="px-4 py-2.5">الحالة</th>
+                  <th className="px-4 py-2.5">Customer</th>
+                  <th className="px-3 py-2.5">Service</th>
+                  <th className="px-3 py-2.5">Purpose</th>
+                  <th className="px-3 py-2.5">Date and time</th>
+                  <th className="px-4 py-2.5">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0f0f1]">
@@ -300,7 +310,7 @@ export function DashboardOverview({
                   return (
                     <tr key={appointment.id} className="transition-colors hover:bg-[#fcfcfd]">
                       <td className="px-4 py-3 text-[10px] font-medium text-[#333438]">
-                        {customer?.name ?? "زبونة غير معروفة"}
+                        {customer?.name ?? "Unknown customer"}
                       </td>
                       <td className="px-3 py-3 text-[9px] text-[#76777d]">
                         {bookingTypeLabels[appointment.type]}
@@ -324,10 +334,10 @@ export function DashboardOverview({
 
       <section className="grid gap-2.5 lg:grid-cols-2">
         <article className="rounded-[10px] border border-[#e6e6e8] bg-white p-4">
-          <h2 className="text-[10px] font-medium text-[#85868c]">تذكيرات الغد</h2>
+          <h2 className="text-[10px] font-medium text-[#85868c]">Tomorrow's reminders</h2>
           {reminders.length === 0 ? (
             <div className="mt-3">
-              <DashboardEmptyState title="لا توجد تذكيرات مجدولة" body="ستظهر مواعيد الغد هنا." />
+              <DashboardEmptyState title="No reminders scheduled" body="Tomorrow's appointments will appear here." />
             </div>
           ) : (
             <div className="mt-3 divide-y divide-[#f0f0f1]">
@@ -342,7 +352,7 @@ export function DashboardOverview({
                     </p>
                     <p className="mt-1 text-[8px] text-[#95969b]">{appointment.purpose}</p>
                   </div>
-                  <span className="text-[8px] font-medium text-violet-600">مجدول</span>
+                  <span className="text-[8px] font-medium text-violet-600">Scheduled</span>
                 </div>
               ))}
             </div>
@@ -350,10 +360,10 @@ export function DashboardOverview({
         </article>
 
         <article className="rounded-[10px] border border-[#e6e6e8] bg-white p-4">
-          <h2 className="text-[10px] font-medium text-[#85868c]">بحاجة لمتابعة</h2>
+          <h2 className="text-[10px] font-medium text-[#85868c]">Needs follow-up</h2>
           {followUps.length === 0 ? (
             <div className="mt-3">
-              <DashboardEmptyState title="كل الملفات محدثة" body="لا توجد متابعة مطلوبة حاليًا." />
+              <DashboardEmptyState title="All profiles are up to date" body="No follow-up is currently required." />
             </div>
           ) : (
             <div className="mt-3 divide-y divide-[#f0f0f1]">
@@ -369,7 +379,7 @@ export function DashboardOverview({
                       {stageLabels[customer.stage]}
                     </span>
                   </span>
-                  <span className="text-[8px] text-[#77787d]">عرض الملف</span>
+                  <span className="text-[8px] text-[#77787d]">View profile</span>
                 </a>
               ))}
             </div>

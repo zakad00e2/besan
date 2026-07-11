@@ -15,9 +15,9 @@ describe("DashboardOverview", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "مواعيد اليوم" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "الأسبوع" }));
-    expect(screen.getByRole("heading", { name: "مواعيد الأسبوع" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Today's appointments" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Week" }));
+    expect(screen.getByRole("heading", { name: "This week's appointments" })).toBeTruthy();
   });
 
   it("shows metrics, reminder queue, and follow-up customers", () => {
@@ -29,8 +29,11 @@ describe("DashboardOverview", () => {
       />,
     );
 
-    expect(screen.getAllByText("مواعيد اليوم").length).toBeGreaterThan(0);
-    expect(screen.getByText("تذكيرات الغد")).toBeTruthy();
-    expect(screen.getAllByText("بحاجة لمتابعة").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Today's appointments").length).toBeGreaterThan(0);
+    expect(screen.getByText("Tomorrow's reminders")).toBeTruthy();
+    expect(screen.getAllByText("Needs follow-up").length).toBeGreaterThan(0);
+    expect(screen.getByText("Total bookings")).toBeTruthy();
+    expect(screen.getAllByText(/Compared with last month/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Layan Mansour").length).toBeGreaterThan(0);
   });
 });

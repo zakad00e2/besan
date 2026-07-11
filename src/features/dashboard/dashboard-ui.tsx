@@ -7,12 +7,12 @@ import { appointmentStatusLabels, type AppointmentStatus } from "./dashboard-mod
 export function MetricCard({
   label,
   value,
-  hint,
+  changePercent,
   icon: Icon,
 }: {
   label: string;
   value: string | number;
-  hint: string;
+  changePercent: number | null;
   icon: LucideIcon;
 }) {
   return (
@@ -25,7 +25,24 @@ export function MetricCard({
         {value}
       </p>
       <p className="mt-2 text-[8px] text-[#9a9ba0]">
-        <span className="font-semibold text-[#16a67a]">محدّث الآن</span> · {hint}
+        {changePercent === null ? (
+          <span className="font-semibold text-[#16a67a]">New</span>
+        ) : (
+          <span
+            className={cn(
+              "font-semibold",
+              changePercent > 0
+                ? "text-[#16a67a]"
+                : changePercent < 0
+                  ? "text-[#e05252]"
+                  : "text-[#9a9ba0]",
+            )}
+          >
+            {changePercent > 0 ? "+" : ""}
+            {changePercent}%
+          </span>
+        )}{" "}
+        · Compared with last month
       </p>
     </section>
   );
