@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap");
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -96,8 +97,15 @@
   }
 }
 
+.dashboard-app,
+.dashboard-app button,
+.dashboard-app input,
+.dashboard-app select,
+.dashboard-app textarea {
+  font-family: "Roboto", ui-sans-serif, system-ui, sans-serif;
+}
+
 .dashboard-app {
-  font-family: var(--font-arabic);
   font-weight: 400;
   color-scheme: light;
   font-variant-numeric: tabular-nums;

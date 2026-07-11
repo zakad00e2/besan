@@ -3,7 +3,7 @@ import { DashboardShell } from "@/features/dashboard/dashboard-shell";
 import { DashboardProvider } from "@/features/dashboard/dashboard-store";
 
 export const Route = createFileRoute("/dashboard")({
-  head: () => ({ meta: [{ title: "لوحة التحكم | Besan Khalaily" }] }),
+  head: () => ({ meta: [{ title: "Dashboard | Besan Khalaily" }] }),
   component: DashboardLayout,
 });
 

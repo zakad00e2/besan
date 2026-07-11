@@ -16,16 +16,22 @@ import { DashboardShell } from "./dashboard-shell";
 afterEach(cleanup);
 
 describe("DashboardShell", () => {
-  it("renders Arabic navigation and marks the current section", () => {
-    render(
+  it("renders English LTR navigation and marks the current section", () => {
+    const { container } = render(
       <DashboardShell>
-        <p>المحتوى</p>
+        <p>Content</p>
       </DashboardShell>,
     );
 
-    expect(screen.getByRole("link", { name: "الزبائن" }).getAttribute("aria-current")).toBe("page");
-    expect(screen.getByRole("button", { name: "فتح القائمة" })).toBeTruthy();
-    expect(document.body.textContent).toContain("نسخة تجريبية");
-    expect(document.body.textContent).toContain("التذكيرات غير مرسلة فعليًا");
+    const root = container.firstElementChild;
+    expect(root?.getAttribute("lang")).toBe("en");
+    expect(root?.getAttribute("dir")).toBe("ltr");
+    expect(screen.getByRole("link", { name: "Customers" }).getAttribute("aria-current")).toBe(
+      "page",
+    );
+    expect(screen.getByRole("button", { name: "Open menu" })).toBeTruthy();
+    expect(document.body.textContent).toContain("Demo version");
+    expect(document.body.textContent).toContain("Reminders are not actually sent");
+    expect(container.querySelector("aside")?.className).toContain("left-0");
   });
 });

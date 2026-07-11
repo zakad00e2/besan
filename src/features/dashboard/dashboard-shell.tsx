@@ -20,34 +20,34 @@ import {
 import { cn } from "@/lib/utils";
 
 const dashboardNavigation = [
-  { label: "لوحة التحكم", to: "/dashboard", icon: LayoutDashboard },
-  { label: "الحجوزات", to: "/dashboard/bookings", icon: CalendarDays },
-  { label: "الزبائن", to: "/dashboard/customers", icon: Users },
-  { label: "المواعيد المتاحة", to: "/dashboard/availability", icon: Clock3 },
+  { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { label: "Bookings", to: "/dashboard/bookings", icon: CalendarDays },
+  { label: "Customers", to: "/dashboard/customers", icon: Users },
+  { label: "Availability", to: "/dashboard/availability", icon: Clock3 },
 ] as const;
 
 const pageTitles: Record<string, string> = {
-  "/dashboard": "لوحة التحكم",
-  "/dashboard/bookings": "الحجوزات",
-  "/dashboard/customers": "الزبائن",
-  "/dashboard/availability": "المواعيد المتاحة",
+  "/dashboard": "Dashboard",
+  "/dashboard/bookings": "Bookings",
+  "/dashboard/customers": "Customers",
+  "/dashboard/availability": "Availability",
 };
 
 const pageDescriptions: Record<string, string> = {
-  "/dashboard": "نظرة سريعة على مواعيدك وحجوزات المشغل",
-  "/dashboard/bookings": "إدارة حجوزات التصميم والورشات من مكان واحد",
-  "/dashboard/customers": "ملفات الزبائن ومراحل العمل والمواعيد القادمة",
-  "/dashboard/availability": "تحديد الفترات المتاحة وإعدادات التذكير",
+  "/dashboard": "A quick view of your appointments and atelier bookings",
+  "/dashboard/bookings": "Manage design and workshop bookings in one place",
+  "/dashboard/customers": "Customer profiles, production stages, and upcoming appointments",
+  "/dashboard/availability": "Set available time slots and reminder preferences",
 };
 
 function getPageTitle(pathname: string) {
-  if (pathname.startsWith("/dashboard/customers/")) return "ملف الزبونة";
-  return pageTitles[pathname] ?? "لوحة التحكم";
+  if (pathname.startsWith("/dashboard/customers/")) return "Customer profile";
+  return pageTitles[pathname] ?? "Dashboard";
 }
 
 function getPageDescription(pathname: string) {
   if (pathname.startsWith("/dashboard/customers/"))
-    return "المواعيد والملاحظات ومرحلة التنفيذ الحالية";
+    return "Appointments, notes, and current production stage";
   return pageDescriptions[pathname] ?? pageDescriptions["/dashboard"];
 }
 
@@ -55,7 +55,7 @@ function DashboardNav({ onNavigate }: { onNavigate?: () => void }) {
   const { pathname } = useLocation();
 
   return (
-    <nav aria-label="التنقل الرئيسي" className="space-y-0.5">
+    <nav aria-label="Main navigation" className="space-y-0.5">
       {dashboardNavigation.map(({ label, to, icon: Icon }) => {
         const active = to === "/dashboard" ? pathname === to : pathname.startsWith(to);
 
@@ -95,10 +95,8 @@ function Brand() {
           B
         </span>
         <div>
-          <p className="text-[11px] font-semibold leading-none text-[#19191c]" dir="ltr">
-            Besan-Ops
-          </p>
-          <p className="mt-1 text-[9px] text-[#8a8b91]">إدارة المشغل</p>
+          <p className="text-[11px] font-semibold leading-none text-[#19191c]">Besan-Ops</p>
+          <p className="mt-1 text-[9px] text-[#8a8b91]">Atelier management</p>
         </div>
       </div>
     </div>
@@ -117,18 +115,18 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           className="flex min-h-9 w-full items-center justify-center gap-2 rounded-[7px] bg-[#222224] px-3 text-[11px] font-medium text-white shadow-[0_1px_2px_rgba(0,0,0,0.18)] transition-all duration-200 hover:bg-[#111113] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
         >
           <Plus className="size-3.5" aria-hidden="true" />
-          موعد جديد
+          New appointment
         </Link>
       </div>
       <div className="mt-4 px-2.5">
-        <p className="mb-1.5 px-2.5 text-[9px] font-medium text-[#999aa0]">مساحة العمل</p>
+        <p className="mb-1.5 px-2.5 text-[9px] font-medium text-[#999aa0]">Workspace</p>
         <DashboardNav onNavigate={onNavigate} />
       </div>
       <div className="mt-auto border-t border-[#eeeeef] px-3 py-3">
         <div className="rounded-md bg-[#fafafa] px-2.5 py-2 text-[9px] leading-4 text-[#85868c]">
-          نسخة تجريبية
+          Demo version
           <br />
-          التذكيرات غير مرسلة فعليًا
+          Reminders are not actually sent
         </div>
       </div>
     </div>
@@ -142,40 +140,38 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   const description = getPageDescription(pathname);
 
   return (
-    <div className="dashboard-app min-h-screen bg-white text-[#161619]" dir="rtl" lang="ar">
-      <aside className="fixed inset-y-0 right-0 z-30 hidden w-44 border-l border-[#e9e9eb] bg-white lg:block">
+    <div className="dashboard-app min-h-screen bg-white text-[#161619]" dir="ltr" lang="en">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 border-r border-[#e9e9eb] bg-white lg:block">
         <SidebarContent />
       </aside>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="right" className="w-64 border-[#e9e9eb] bg-white p-0" dir="rtl">
+        <SheetContent side="left" className="w-64 border-[#e9e9eb] bg-white p-0" dir="ltr">
           <SheetHeader className="sr-only">
-            <SheetTitle>قائمة لوحة التحكم</SheetTitle>
-            <SheetDescription>روابط التنقل في لوحة التحكم</SheetDescription>
+            <SheetTitle>Dashboard menu</SheetTitle>
+            <SheetDescription>Dashboard navigation links</SheetDescription>
           </SheetHeader>
           <SidebarContent onNavigate={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>
 
-      <div className="lg:pr-44">
+      <div className="lg:pl-56">
         <header className="sticky top-0 z-20 flex h-9 items-center border-b border-[#ededee] bg-white/95 px-4 backdrop-blur sm:px-5">
-          <div className="mx-auto flex w-full max-w-[1180px] items-center justify-between">
+          <div className="mx-auto flex w-full max-w-screen-2xl items-center justify-between">
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              aria-label="فتح القائمة"
+              aria-label="Open menu"
               className="flex size-7 items-center justify-center rounded-md border border-[#e5e5e7] text-[#63646a] outline-none transition-colors hover:bg-[#f7f7f8] focus-visible:ring-2 focus-visible:ring-violet-500 lg:hidden"
             >
               <Menu className="size-4" aria-hidden="true" />
             </button>
-            <span className="hidden text-[10px] font-semibold text-[#44454a] lg:block" dir="ltr">
-              Besan-Ops
-            </span>
-            <span className="text-[9px] text-[#a0a1a6]">لوحة إدارة المشغل</span>
+            <span className="hidden text-[10px] font-semibold text-[#44454a] lg:block">Besan-Ops</span>
+            <span className="text-[9px] text-[#a0a1a6]">Atelier admin dashboard</span>
           </div>
         </header>
 
-        <div className="mx-auto max-w-[1180px] px-4 pb-4 pt-5 sm:px-5 sm:pt-6 lg:px-6">
+        <div className="mx-auto max-w-screen-2xl px-2 pb-4 pt-5 sm:px-3 sm:pt-6 lg:px-4">
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
               <h1 className="text-[23px] font-semibold leading-tight tracking-[-0.025em] text-[#19191c]">
@@ -189,7 +185,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[#dedee1] bg-white px-3 text-[11px] font-medium text-[#36373b] transition-all duration-200 hover:bg-[#fafafa] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 lg:hidden"
             >
               <Plus className="size-3.5" aria-hidden="true" />
-              موعد جديد
+              New appointment
             </Link>
           </div>
           <main>{children}</main>
