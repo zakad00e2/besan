@@ -64,6 +64,8 @@ export type DashboardState = {
   appointments: Appointment[];
   availability: AvailabilitySlot[];
   reminderSettings: ReminderSettings;
+  scoreDist: ScoreDistribution;
+  avgScore?: number;
 };
 
 export type DashboardMetrics = {

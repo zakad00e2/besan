@@ -82,7 +82,12 @@ export function ScoreDistributionChart({ scoreDist, avgScore }: ScoreDistributio
                 );
               })}
             </defs>
-            <CartesianGrid horizontal vertical={false} stroke="var(--border)" strokeOpacity={0.45} />
+            <CartesianGrid
+              horizontal
+              vertical={false}
+              stroke="var(--border)"
+              strokeOpacity={0.45}
+            />
             <CartesianGrid
               horizontal={false}
               vertical

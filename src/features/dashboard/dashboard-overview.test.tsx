@@ -11,6 +11,7 @@ describe("DashboardOverview", () => {
       <DashboardOverview
         customers={demoDashboardState.customers}
         appointments={demoDashboardState.appointments}
+        scoreDist={demoDashboardState.scoreDist}
         now={new Date("2026-07-10T08:00:00.000Z")}
       />,
     );
@@ -25,6 +26,7 @@ describe("DashboardOverview", () => {
       <DashboardOverview
         customers={demoDashboardState.customers}
         appointments={demoDashboardState.appointments}
+        scoreDist={demoDashboardState.scoreDist}
         now={new Date("2026-07-10T08:00:00.000Z")}
       />,
     );
@@ -35,5 +37,7 @@ describe("DashboardOverview", () => {
     expect(screen.getByText("Total bookings")).toBeTruthy();
     expect(screen.getAllByText(/Compared with last month/).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Layan Mansour").length).toBeGreaterThan(0);
+    expect(screen.getByText("توزيع التقييمات")).toBeTruthy();
+    expect(screen.getByText("4.4")).toBeTruthy();
   });
 });

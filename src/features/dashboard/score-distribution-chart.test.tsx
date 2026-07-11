@@ -1,20 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  calculateScoreAverage,
-  ScoreDistributionChart,
-} from "./score-distribution-chart";
+import { afterEach, describe, expect, it } from "vitest";
+import { calculateScoreAverage, ScoreDistributionChart } from "./score-distribution-chart";
 
 afterEach(cleanup);
-
-vi.stubGlobal(
-  "ResizeObserver",
-  class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  },
-);
 
 const scoreDist = { high: 8, good: 4, medium: 2, low: 1 };
 

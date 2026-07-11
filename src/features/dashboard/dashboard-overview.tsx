@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   CalendarCheck2,
   CalendarRange,
   CircleAlert,
@@ -8,18 +7,17 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import reminderAvatar from "@/assets/reminder-avatar.jpg";
-import type { Appointment, Customer } from "./dashboard-model";
+import type { Appointment, Customer, ScoreDistribution } from "./dashboard-model";
 import {
-  appointmentStatusLabels,
   bookingTypeLabels,
   getDashboardMetrics,
   getDashboardMetricComparisons,
   stageLabels,
-  type AppointmentStatus,
   type CustomerStage,
 } from "./dashboard-model";
 import { cn } from "@/lib/utils";
 import { DashboardEmptyState, MetricCard, StatusBadge, dashboardToggleActiveClassName, dashboardToggleGroupClassName, dashboardToggleInactiveClassName } from "./dashboard-ui";
+import { ScoreDistributionChart } from "./score-distribution-chart";
 
 type ScheduleRange = "day" | "week";
 
@@ -75,10 +73,14 @@ function InsightCard({
 export function DashboardOverview({
   customers,
   appointments,
+  scoreDist,
+  avgScore,
   now = new Date(),
 }: {
   customers: Customer[];
   appointments: Appointment[];
+  scoreDist: ScoreDistribution;
+  avgScore?: number;
   now?: Date;
 }) {
   const [range, setRange] = useState<ScheduleRange>("day");
@@ -114,13 +116,6 @@ export function DashboardOverview({
       appointment.reminderStatus === "scheduled",
   );
   const followUps = customers.filter((customer) => isFollowUpCustomer(customer, now));
-  const statusCounts = (Object.keys(appointmentStatusLabels) as AppointmentStatus[]).map(
-    (status) => ({
-      status,
-      count: appointments.filter((appointment) => appointment.status === status).length,
-    }),
-  );
-  const maxStatusCount = Math.max(...statusCounts.map((item) => item.count), 1);
   const sentReminders = appointments.filter(
     (appointment) => appointment.reminderStatus === "sent",
   ).length;
@@ -194,29 +189,7 @@ export function DashboardOverview({
           </div>
         </InsightCard>
 
-        <InsightCard title="Booking status distribution" icon={BarChart3}>
-          <div className="mt-5 flex h-[145px] items-end justify-center gap-5 border-b border-[#eeeeef] px-2 pb-0">
-            {statusCounts.map(({ status, count }, index) => {
-              const colors = ["bg-[#e85fa8]", "bg-[#2cc79a]", "bg-[#f39245]", "bg-[#7f55e8]"];
-              return (
-                <div key={status} className="flex h-full w-10 flex-col items-center justify-end">
-                  <span className="mb-1 text-[8px] font-medium text-[#66676c] tabular-nums">
-                    {count}
-                  </span>
-                  <div
-                    className={`w-7 rounded-t-[6px] ${colors[index]} opacity-95`}
-                    style={{ height: `${Math.max(18, (count / maxStatusCount) * 100)}%` }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-2 grid grid-cols-4 gap-1 text-center text-[7px] text-[#8b8c91]">
-            {statusCounts.map(({ status }) => (
-              <span key={status}>{appointmentStatusLabels[status]}</span>
-            ))}
-          </div>
-        </InsightCard>
+        <ScoreDistributionChart scoreDist={scoreDist} avgScore={avgScore} />
 
         <article className="min-h-[218px] rounded-[10px] border border-[#e6e6e8] bg-white p-4">
           <h2 className="text-[10px] font-medium text-[#85868c]">Needs follow-up</h2>
