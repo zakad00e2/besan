@@ -52,6 +52,13 @@ export type ReminderSettings = {
   hoursBefore: 24;
 };
 
+export type ScoreDistribution = {
+  high: number;
+  good: number;
+  medium: number;
+  low: number;
+};
+
 export type DashboardState = {
   customers: Customer[];
   appointments: Appointment[];
