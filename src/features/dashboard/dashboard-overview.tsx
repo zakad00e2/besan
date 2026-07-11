@@ -1,6 +1,15 @@
-import { CalendarCheck2, CalendarRange, CircleAlert, UserPlus } from "lucide-react";
+import {
+  BarChart3,
+  BellRing,
+  CalendarCheck2,
+  CalendarRange,
+  CircleAlert,
+  UserPlus,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { useMemo, useState } from "react";
-import reminderAvatar from "@/assets/reminder-avatar.png";
+import reminderAvatar from "@/assets/reminder-avatar.jpg";
 import type { Appointment, Customer } from "./dashboard-model";
 import {
   appointmentStatusLabels,
@@ -39,10 +48,27 @@ function isFollowUpCustomer(customer: Customer, now: Date) {
   return stale && !(["ready-delivery", "completed"] as CustomerStage[]).includes(customer.stage);
 }
 
-function InsightCard({ children, title }: { children: React.ReactNode; title: string }) {
+function SectionTitle({ title, icon: Icon }: { title: string; icon: LucideIcon }) {
+  return (
+    <h2 className="flex items-center gap-1.5 text-[11px] font-normal text-[#85868c]">
+      <Icon className="size-3.5 shrink-0 stroke-[1.75] text-[#a4a5aa]" aria-hidden="true" />
+      {title}
+    </h2>
+  );
+}
+
+function InsightCard({
+  children,
+  title,
+  icon,
+}: {
+  children: React.ReactNode;
+  title: string;
+  icon: LucideIcon;
+}) {
   return (
     <article className="min-h-[218px] rounded-[10px] border border-[#e6e6e8] bg-white p-4 transition-all duration-200 hover:border-[#d8d8db] hover:shadow-[0_8px_24px_rgba(24,24,27,0.04)]">
-      <h2 className="text-[10px] font-medium text-[#85868c]">{title}</h2>
+      <SectionTitle title={title} icon={icon} />
       {children}
     </article>
   );
@@ -143,7 +169,7 @@ export function DashboardOverview({
       </section>
 
       <section className="grid gap-2.5 lg:grid-cols-3">
-        <InsightCard title="Reminder progress">
+        <InsightCard title="Reminder progress" icon={BellRing}>
           <div className="flex h-[190px] flex-col items-center justify-center">
             <div className="relative size-36">
               <div className="absolute left-1/2 top-1 z-10 -translate-x-1/2 rounded-full bg-[#8b5cf6] px-2.5 py-1 text-[11px] font-semibold leading-none text-white tabular-nums shadow-[0_2px_8px_rgba(139,92,246,0.35)]">
@@ -164,7 +190,7 @@ export function DashboardOverview({
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex size-[6.75rem] items-center justify-center overflow-hidden rounded-full bg-[#ffcbad]">
+                <div className="flex size-[7.5rem] items-center justify-center overflow-hidden rounded-full bg-[#ffcbad]">
                   <img src={reminderAvatar} alt="" className="size-full object-cover" />
                 </div>
               </div>
@@ -178,7 +204,7 @@ export function DashboardOverview({
           </div>
         </InsightCard>
 
-        <InsightCard title="Booking status distribution">
+        <InsightCard title="Booking status distribution" icon={BarChart3}>
           <div className="mt-5 flex h-[145px] items-end justify-center gap-5 border-b border-[#eeeeef] px-2 pb-0">
             {statusCounts.map(({ status, count }, index) => {
               const colors = ["bg-[#e85fa8]", "bg-[#2cc79a]", "bg-[#f39245]", "bg-[#7f55e8]"];
@@ -202,7 +228,7 @@ export function DashboardOverview({
           </div>
         </InsightCard>
 
-        <InsightCard title="Customer progress">
+        <InsightCard title="Customer progress" icon={Users}>
           <div className="flex h-[174px] flex-col items-center justify-end">
             <div className="relative h-[104px] w-[210px] overflow-hidden">
               <svg viewBox="0 0 220 112" className="size-full" aria-hidden="true">
@@ -258,9 +284,10 @@ export function DashboardOverview({
       <section className="overflow-hidden rounded-[10px] border border-[#e6e6e8] bg-white">
         <div className="flex items-center justify-between border-b border-[#eeeeef] px-4 py-3">
           <div>
-            <h2 className="text-[10px] font-medium text-[#77787e]">
-              {range === "day" ? "Today's appointments" : "This week's appointments"}
-            </h2>
+            <SectionTitle
+              title={range === "day" ? "Today's appointments" : "This week's appointments"}
+              icon={CalendarRange}
+            />
             <p className="mt-1 text-[18px] font-semibold leading-none tabular-nums">
               {schedule.length}
             </p>
