@@ -59,6 +59,8 @@ export type ScoreDistribution = {
   low: number;
 };
 
+export type BookingStatusDistribution = Record<AppointmentStatus, number>;
+
 export type DashboardState = {
   customers: Customer[];
   appointments: Appointment[];
@@ -94,6 +96,18 @@ export function calculateChangePercent(current: number, previous: number): numbe
   }
 
   return Math.round(((current - previous) / previous) * 100);
+}
+
+export function getBookingStatusDistribution(
+  appointments: Appointment[],
+): BookingStatusDistribution {
+  return appointments.reduce<BookingStatusDistribution>(
+    (distribution, appointment) => {
+      distribution[appointment.status] += 1;
+      return distribution;
+    },
+    { confirmed: 0, pending: 0, completed: 0, cancelled: 0 },
+  );
 }
 
 function isWithinRange(dateString: string, start: Date, end: Date) {
