@@ -162,6 +162,8 @@ export function parseWorkshopBookingInput(
   }
   if (!mobile) {
     errors.mobile = "Enter your mobile number.";
+  } else if (mobile.length < 7) {
+    errors.mobile = "Enter a mobile number of at least 7 characters.";
   } else if (mobile.length > 20) {
     errors.mobile = "Enter a mobile number of 20 characters or fewer.";
   }

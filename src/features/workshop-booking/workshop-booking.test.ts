@@ -50,6 +50,15 @@ describe("parseWorkshopBookingInput", () => {
     ).toMatchObject({ success: false, errors: { workshop: "Choose a valid workshop." } });
     expect(workshopOptions).toHaveLength(3);
   });
+
+  it("rejects a mobile number shorter than seven characters after normalization", () => {
+    expect(
+      parseWorkshopBookingInput(
+        { ...validInput, mobile: "1 2-3" },
+        new Date("2026-07-12T08:00:00Z"),
+      ),
+    ).toMatchObject({ success: false, errors: { mobile: expect.any(String) } });
+  });
 });
 
 describe("parseWorkshopBookingStatus", () => {
