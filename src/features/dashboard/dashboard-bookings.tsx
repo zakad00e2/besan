@@ -3,21 +3,21 @@ import { useMemo, useState, type Dispatch } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import type { Appointment, AppointmentStatus, BookingType, Customer } from "./dashboard-model";
+import type { Appointment, AppointmentStatus, Customer } from "./dashboard-model";
 import { bookingTypeLabels, reminderStatusLabels } from "./dashboard-model";
 import type { DashboardAction } from "./dashboard-store";
 import { DashboardEmptyState, StatusBadge, dashboardIconButtonClassName, dashboardPrimaryButtonClassName, dashboardSecondaryButtonClassName } from "./dashboard-ui";
 
 export type BookingFilters = {
   query: string;
-  type: BookingType | "all";
+  type: "design" | "all";
   status: AppointmentStatus | "all";
   date: string | "all";
 };
 
 export type AppointmentFormValues = {
   customerId: string;
-  type: BookingType;
+  type: "design";
   purpose: string;
   date: string;
   time: string;
@@ -27,8 +27,8 @@ export type AppointmentFormErrors = Partial<
   Record<keyof AppointmentFormValues | "overlap", string>
 >;
 
-export function filterAppointments(
-  appointments: Appointment[],
+export function filterAppointments<T extends Appointment>(
+  appointments: T[],
   customers: Customer[],
   filters: BookingFilters,
 ) {
@@ -80,6 +80,8 @@ const emptyForm: AppointmentFormValues = {
   time: "",
 };
 
+type GeneralAppointment = Appointment & { type: "design" };
+
 export function DashboardBookings({
   customers,
   appointments,
@@ -102,12 +104,19 @@ export function DashboardBookings({
   const [form, setForm] = useState<AppointmentFormValues>(emptyForm);
   const [errors, setErrors] = useState<AppointmentFormErrors>({});
   const [statusMessage, setStatusMessage] = useState("");
+  const generalAppointments = useMemo(
+    () =>
+      appointments.filter(
+        (appointment): appointment is GeneralAppointment => appointment.type === "design",
+      ),
+    [appointments],
+  );
   const visibleAppointments = useMemo(
     () =>
-      filterAppointments(appointments, customers, filters).sort((a, b) =>
+      filterAppointments(generalAppointments, customers, filters).sort((a, b) =>
         a.startsAt.localeCompare(b.startsAt),
       ),
-    [appointments, customers, filters],
+    [customers, filters, generalAppointments],
   );
   const customersById = useMemo(
     () => new Map(customers.map((customer) => [customer.id, customer])),
@@ -121,7 +130,7 @@ export function DashboardBookings({
     setOpen(true);
   }
 
-  function openEdit(appointment: Appointment) {
+  function openEdit(appointment: GeneralAppointment) {
     setEditingId(appointment.id);
     setForm({
       customerId: appointment.customerId,
@@ -193,7 +202,6 @@ export function DashboardBookings({
             className="mt-1 block h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm"
           >
             <option value="all">All</option>
-            <option value="workshop">Workshop</option>
             <option value="design">Design</option>
           </select>
         </label>
@@ -345,12 +353,11 @@ export function DashboardBookings({
                 <select
                   value={form.type}
                   onChange={(event) =>
-                    setForm({ ...form, type: event.target.value as BookingType })
+                    setForm({ ...form, type: event.target.value as AppointmentFormValues["type"] })
                   }
                   className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
                 >
                   <option value="design">Design</option>
-                  <option value="workshop">Workshop</option>
                 </select>
               </label>
               <label className="text-sm">

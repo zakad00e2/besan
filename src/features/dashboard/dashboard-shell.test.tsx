@@ -8,7 +8,7 @@ vi.mock("@tanstack/react-router", () => ({
       {children}
     </a>
   ),
-  useLocation: () => ({ pathname: "/dashboard/customers" }),
+  useLocation: () => ({ pathname: "/dashboard/workshop-bookings" }),
 }));
 
 import { DashboardShell } from "./dashboard-shell";
@@ -26,9 +26,10 @@ describe("DashboardShell", () => {
     const root = container.firstElementChild;
     expect(root?.getAttribute("lang")).toBe("en");
     expect(root?.getAttribute("dir")).toBe("ltr");
-    expect(screen.getByRole("link", { name: "Customers" }).getAttribute("aria-current")).toBe(
+    expect(screen.getByRole("link", { name: "Workshop bookings" }).getAttribute("aria-current")).toBe(
       "page",
     );
+    expect(document.body.textContent).toContain("Workshop requests and participant details");
     expect(screen.getByRole("button", { name: "Open menu" })).toBeTruthy();
     expect(document.body.textContent).toContain("Demo version");
     expect(document.body.textContent).toContain("Reminders are not actually sent");

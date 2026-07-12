@@ -15,6 +15,7 @@ import { Route as BookCallRouteImport } from './routes/book-call'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardWorkshopBookingsRouteImport } from './routes/dashboard/workshop-bookings'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard/bookings'
 import { Route as DashboardAvailabilityRouteImport } from './routes/dashboard/availability'
 import { Route as DashboardCustomersIndexRouteImport } from './routes/dashboard/customers/index'
@@ -50,6 +51,12 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardWorkshopBookingsRoute =
+  DashboardWorkshopBookingsRouteImport.update({
+    id: '/workshop-bookings',
+    path: '/workshop-bookings',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardBookingsRoute = DashboardBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/workshops': typeof WorkshopsRoute
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard/workshop-bookings': typeof DashboardWorkshopBookingsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
   '/dashboard/customers/': typeof DashboardCustomersIndexRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
   '/workshops': typeof WorkshopsRoute
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard/workshop-bookings': typeof DashboardWorkshopBookingsRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
   '/dashboard/customers': typeof DashboardCustomersIndexRoute
@@ -103,6 +112,7 @@ export interface FileRoutesById {
   '/workshops': typeof WorkshopsRoute
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard/workshop-bookings': typeof DashboardWorkshopBookingsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
   '/dashboard/customers/': typeof DashboardCustomersIndexRoute
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/workshops'
     | '/dashboard/availability'
     | '/dashboard/bookings'
+    | '/dashboard/workshop-bookings'
     | '/dashboard/'
     | '/dashboard/customers/$id'
     | '/dashboard/customers/'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/workshops'
     | '/dashboard/availability'
     | '/dashboard/bookings'
+    | '/dashboard/workshop-bookings'
     | '/dashboard'
     | '/dashboard/customers/$id'
     | '/dashboard/customers'
@@ -140,6 +152,7 @@ export interface FileRouteTypes {
     | '/workshops'
     | '/dashboard/availability'
     | '/dashboard/bookings'
+    | '/dashboard/workshop-bookings'
     | '/dashboard/'
     | '/dashboard/customers/$id'
     | '/dashboard/customers/'
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/workshop-bookings': {
+      id: '/dashboard/workshop-bookings'
+      path: '/workshop-bookings'
+      fullPath: '/dashboard/workshop-bookings'
+      preLoaderRoute: typeof DashboardWorkshopBookingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/bookings': {
       id: '/dashboard/bookings'
       path: '/bookings'
@@ -231,6 +251,7 @@ declare module '@tanstack/react-router' {
 interface DashboardRouteChildren {
   DashboardAvailabilityRoute: typeof DashboardAvailabilityRoute
   DashboardBookingsRoute: typeof DashboardBookingsRoute
+  DashboardWorkshopBookingsRoute: typeof DashboardWorkshopBookingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardCustomersIdRoute: typeof DashboardCustomersIdRoute
   DashboardCustomersIndexRoute: typeof DashboardCustomersIndexRoute
@@ -239,6 +260,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAvailabilityRoute: DashboardAvailabilityRoute,
   DashboardBookingsRoute: DashboardBookingsRoute,
+  DashboardWorkshopBookingsRoute: DashboardWorkshopBookingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardCustomersIdRoute: DashboardCustomersIdRoute,
   DashboardCustomersIndexRoute: DashboardCustomersIndexRoute,

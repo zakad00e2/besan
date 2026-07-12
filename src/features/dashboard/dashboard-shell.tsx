@@ -28,6 +28,7 @@ const dashboardNavigation = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Bookings", to: "/dashboard/bookings", icon: CalendarDays },
   { label: "Customers", to: "/dashboard/customers", icon: Users },
+  { label: "Workshop bookings", to: "/dashboard/workshop-bookings", icon: CalendarDays },
   { label: "Availability", to: "/dashboard/availability", icon: Clock3 },
 ] as const;
 
@@ -35,6 +36,7 @@ const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/dashboard/bookings": "Bookings",
   "/dashboard/customers": "Customers",
+  "/dashboard/workshop-bookings": "Workshop bookings",
   "/dashboard/availability": "Availability",
 };
 
@@ -42,6 +44,7 @@ const pageDescriptions: Record<string, string> = {
   "/dashboard": "A quick view of your appointments and atelier bookings",
   "/dashboard/bookings": "Manage design and workshop bookings in one place",
   "/dashboard/customers": "Customer profiles, production stages, and upcoming appointments",
+  "/dashboard/workshop-bookings": "Workshop requests and participant details",
   "/dashboard/availability": "Set available time slots and reminder preferences",
 };
 

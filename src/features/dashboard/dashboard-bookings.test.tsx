@@ -18,11 +18,11 @@ describe("booking helpers", () => {
     expect(
       filterAppointments(demoDashboardState.appointments, demoDashboardState.customers, {
         query: "",
-        type: "workshop",
+        type: "design",
         status: "all",
-        date: "2026-07-11",
+        date: "2026-07-10",
       }),
-    ).toHaveLength(1);
+    ).toHaveLength(2);
     expect(
       validateAppointment(
         { customerId: "", type: "design", purpose: "", date: "", time: "" },
@@ -49,7 +49,9 @@ describe("DashboardBookings", () => {
       target: { value: "+970 59 123 4567" },
     });
     expect(screen.getAllByText("Layan Mansour").length).toBeGreaterThan(0);
+    expect(screen.queryByRole("option", { name: "Workshop" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "New appointment" }));
     expect(screen.getByRole("dialog")).toBeTruthy();
+    expect(screen.queryByRole("option", { name: "Workshop" })).toBeNull();
   });
 });
