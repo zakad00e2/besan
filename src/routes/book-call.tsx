@@ -4,6 +4,8 @@ import gsap from "gsap";
 import { ArrowLeft, Check, MessageCircle } from "lucide-react";
 import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
 import { Calendar } from "@/components/ui/calendar";
+import { formatBookingDate, appointmentTypes, timesByDay } from "@/features/book-call/booking-domain";
+import { submitBooking } from "@/features/book-call/booking.functions";
 
 export const Route = createFileRoute("/book-call")({
   component: BookCall,
@@ -19,18 +21,8 @@ export const Route = createFileRoute("/book-call")({
   }),
 });
 
-const appointmentTypes = ["New Design", "First Fitting", "Second Fitting", "Alteration", "Pickup"];
-
 const appointmentDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday"] as const;
 type AppointmentDay = (typeof appointmentDays)[number];
-
-const timesByDay: Record<AppointmentDay, string[]> = {
-  Monday: ["10:00", "12:30", "16:00"],
-  Tuesday: ["11:00", "14:00", "17:30"],
-  Wednesday: ["10:30", "13:00", "16:30"],
-  Thursday: ["12:00", "15:00", "18:00"],
-  Saturday: ["10:00", "12:00", "14:30"],
-};
 
 const dayNameFormatter = new Intl.DateTimeFormat("en-US", { weekday: "long" });
 const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
@@ -53,13 +45,15 @@ function getAppointmentDay(date: Date) {
     : undefined;
 }
 
-function BookCall() {
+export function BookCall() {
   const pageRef = useRef<HTMLDivElement>(null);
   const [appointmentType, setAppointmentType] = useState(appointmentTypes[0]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
 
   const today = startOfToday();
   const selectedDay = selectedDate ? getAppointmentDay(selectedDate) : undefined;
@@ -103,8 +97,9 @@ function BookCall() {
     return () => ctx.revert();
   }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (submitting) return;
     const data = new FormData(event.currentTarget);
     const fullName = String(data.get("fullName") || "").trim();
     const mobile = String(data.get("mobile") || "").trim();
@@ -115,8 +110,36 @@ function BookCall() {
       return;
     }
 
+    setSubmitting(true);
     setError("");
-    setSubmitted(true);
+    setFieldErrors({});
+    setSubmitted(false);
+    try {
+      const result = await submitBooking({
+        data: {
+          appointmentType,
+          appointmentDate: formatBookingDate(selectedDate),
+          appointmentTime: selectedTime,
+          fullName,
+          mobile,
+          notes: String(data.get("notes") || ""),
+        },
+      });
+      if (result.success) {
+        setSubmitted(true);
+      } else if (result.reason === "validation") {
+        setFieldErrors(result.fieldErrors);
+        setError("Please review the highlighted details.");
+      } else {
+        setError(
+          result.reason === "slot-unavailable"
+            ? "That time was just booked. Please choose another time."
+            : "We could not save your booking. Please try again.",
+        );
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -336,15 +359,15 @@ function BookCall() {
               </section>
 
               {error ? (
-                <p className="mt-6 border border-destructive/40 px-4 py-3 text-sm text-destructive">
+                <p role="alert" className="mt-6 border border-destructive/40 px-4 py-3 text-sm text-destructive">
                   {error}
                 </p>
               ) : null}
 
               {submitted ? (
-                <p className="mt-6 border border-foreground/40 bg-accent/30 px-4 py-4 text-sm leading-7">
+                <p role="status" className="mt-6 border border-foreground/40 bg-accent/30 px-4 py-4 text-sm leading-7">
                   Thank you. Your {appointmentType.toLowerCase()} request for {selectedDateLabel} at{" "}
-                  {selectedTime} has been prepared.
+                  {selectedTime} has been saved.
                 </p>
               ) : null}
 
@@ -358,10 +381,11 @@ function BookCall() {
                 </a>
                 <button
                   type="submit"
+                  disabled={submitting}
                   className="inline-flex items-center justify-center gap-3 border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.1em] text-background transition-opacity hover:opacity-85 active:translate-y-px"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  Confirm Booking
+                  {submitting ? "Saving booking…" : "Confirm Booking"}
                 </button>
               </div>
             </form>
