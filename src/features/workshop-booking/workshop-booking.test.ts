@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   getTomorrowDateMinimum,
   parseWorkshopBooking,
+  parseWorkshopBookingInput,
+  parseWorkshopBookingStatus,
   type WorkshopBookingFormValues,
+  workshopOptions,
 } from "./workshop-booking";
 
 const workshop = {
@@ -18,6 +21,43 @@ const validValues: WorkshopBookingFormValues = {
   participants: "2",
   notes: "  First workshop booking  ",
 };
+
+const validInput = {
+  workshopId: "mini-course",
+  workshopName: "Private mini course",
+  fullName: "Noor Al-Hashemi",
+  mobile: "+970 59 123 4567",
+  email: "noor@example.com",
+  date: "2026-07-13",
+  participants: 3,
+  notes: "Vegetarian lunch",
+};
+
+describe("parseWorkshopBookingInput", () => {
+  it("normalizes a valid server submission", () => {
+    expect(parseWorkshopBookingInput(validInput, new Date("2026-07-12T08:00:00Z"))).toEqual({
+      success: true,
+      data: { ...validInput, mobile: "+970591234567" },
+    });
+  });
+
+  it("rejects unknown and mismatched workshops", () => {
+    expect(
+      parseWorkshopBookingInput(
+        { ...validInput, workshopName: "Invented workshop" },
+        new Date("2026-07-12T08:00:00Z"),
+      ),
+    ).toMatchObject({ success: false, errors: { workshop: "Choose a valid workshop." } });
+    expect(workshopOptions).toHaveLength(3);
+  });
+});
+
+describe("parseWorkshopBookingStatus", () => {
+  it("accepts only supported statuses", () => {
+    expect(parseWorkshopBookingStatus("confirmed")).toEqual({ success: true, data: "confirmed" });
+    expect(parseWorkshopBookingStatus("refunded")).toEqual({ success: false });
+  });
+});
 
 describe("getTomorrowDateMinimum", () => {
   it("returns tomorrow in local YYYY-MM-DD format", () => {
