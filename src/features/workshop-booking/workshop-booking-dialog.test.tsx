@@ -210,6 +210,25 @@ describe("WorkshopBookingDialog", () => {
     );
   });
 
+  it("hides a storage error while a retry is pending", async () => {
+    const retrySubmission = deferred<{ success: true; bookingId: string }>();
+    vi.mocked(submitWorkshopBooking)
+      .mockResolvedValueOnce({ success: false, reason: "storage-error" })
+      .mockReturnValueOnce(retrySubmission.promise);
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
+
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+    await screen.findByRole("alert");
+
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect((screen.getByRole("button", { name: "Sending…" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
+  });
+
   it("reports a close request through the controlled dialog boundary", () => {
     const onOpenChange = vi.fn();
     render(<WorkshopBookingDialog workshop={workshop} onOpenChange={onOpenChange} />);

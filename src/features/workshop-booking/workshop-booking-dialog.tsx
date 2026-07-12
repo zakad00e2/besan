@@ -53,6 +53,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
     }
 
     setErrors({});
+    setSubmissionError(null);
     const submissionSession = submissionSessionRef.current;
     setSubmitting(true);
     try {
