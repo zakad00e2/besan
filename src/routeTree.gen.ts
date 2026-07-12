@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkshopsRouteImport } from './routes/workshops'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BookCallRouteImport } from './routes/book-call'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard/bookings'
@@ -32,6 +33,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const BookCallRoute = BookCallRouteImport.update({
   id: '/book-call',
   path: '/book-call',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -67,6 +73,7 @@ const DashboardCustomersIdRoute = DashboardCustomersIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/book-call': typeof BookCallRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/workshops': typeof WorkshopsRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/book-call': typeof BookCallRoute
   '/workshops': typeof WorkshopsRoute
   '/dashboard/availability': typeof DashboardAvailabilityRoute
@@ -89,6 +97,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/book-call': typeof BookCallRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/workshops': typeof WorkshopsRoute
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/book-call'
     | '/dashboard'
     | '/workshops'
@@ -113,6 +123,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/book-call'
     | '/workshops'
     | '/dashboard/availability'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/book-call'
     | '/dashboard'
     | '/workshops'
@@ -135,6 +147,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   BookCallRoute: typeof BookCallRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   WorkshopsRoute: typeof WorkshopsRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/book-call'
       fullPath: '/book-call'
       preLoaderRoute: typeof BookCallRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -230,6 +250,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   BookCallRoute: BookCallRoute,
   DashboardRoute: DashboardRouteWithChildren,
   WorkshopsRoute: WorkshopsRoute,
