@@ -4,7 +4,11 @@ import gsap from "gsap";
 import { ArrowLeft, Check, MessageCircle } from "lucide-react";
 import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
 import { Calendar } from "@/components/ui/calendar";
-import { formatBookingDate, appointmentTypes, timesByDay } from "@/features/book-call/booking-domain";
+import {
+  formatBookingDate,
+  appointmentTypes,
+  timesByDay,
+} from "@/features/book-call/booking-domain";
 import { submitBooking } from "@/features/book-call/booking.functions";
 
 export const Route = createFileRoute("/book-call")({
@@ -160,10 +164,7 @@ export function BookCall() {
                 <br />
                 Appointment
               </h1>
-              <p
-                data-book-copy
-                className="mt-8 max-w-lg text-base leading-8 text-muted-foreground"
-              >
+              <p data-book-copy className="mt-8 max-w-lg text-base leading-8 text-muted-foreground">
                 Choose the appointment type, day, and time that suits you.
               </p>
             </div>
@@ -359,13 +360,19 @@ export function BookCall() {
               </section>
 
               {error ? (
-                <p role="alert" className="mt-6 border border-destructive/40 px-4 py-3 text-sm text-destructive">
+                <p
+                  role="alert"
+                  className="mt-6 border border-destructive/40 px-4 py-3 text-sm text-destructive"
+                >
                   {error}
                 </p>
               ) : null}
 
               {submitted ? (
-                <p role="status" className="mt-6 border border-foreground/40 bg-accent/30 px-4 py-4 text-sm leading-7">
+                <p
+                  role="status"
+                  className="mt-6 border border-foreground/40 bg-accent/30 px-4 py-4 text-sm leading-7"
+                >
                   Thank you. Your {appointmentType.toLowerCase()} request for {selectedDateLabel} at{" "}
                   {selectedTime} has been saved.
                 </p>

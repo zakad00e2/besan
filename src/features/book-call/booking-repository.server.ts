@@ -7,9 +7,10 @@ export type QueryExecutor = <T extends Record<string, unknown>>(
 ) => Promise<T[]>;
 
 export type BookingRepository = {
-  create(booking: ValidatedBooking): Promise<
-    | { success: true; appointmentId: string }
-    | { success: false; reason: "slot-unavailable" }
+  create(
+    booking: ValidatedBooking,
+  ): Promise<
+    { success: true; appointmentId: string } | { success: false; reason: "slot-unavailable" }
   >;
   list(): Promise<BookingListItem[]>;
 };

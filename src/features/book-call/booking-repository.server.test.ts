@@ -68,6 +68,8 @@ describe("booking repository", () => {
         createdAt: "2026-07-01T10:00:00.000Z",
       },
     ]);
-    expect(execute).toHaveBeenCalledWith(expect.stringContaining("ORDER BY a.appointment_date DESC"));
+    expect(execute).toHaveBeenCalledWith(
+      expect.stringContaining("ORDER BY a.appointment_date DESC"),
+    );
   });
 });

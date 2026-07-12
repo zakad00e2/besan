@@ -8,5 +8,7 @@ export function requireConfiguredAdminEmail(email: string | undefined) {
 }
 
 export function isAdminEmail(email: string | undefined, configuredEmail: string | undefined) {
-  return Boolean(email && configuredEmail && normalizeEmail(email) === normalizeEmail(configuredEmail));
+  return Boolean(
+    email && configuredEmail && normalizeEmail(email) === normalizeEmail(configuredEmail),
+  );
 }

@@ -14,7 +14,9 @@ describe("submitBookingRequest", () => {
   it("does not write invalid booking input", async () => {
     const create = vi.fn();
 
-    await expect(submitBookingRequest({ ...validInput, mobile: "123" }, { create })).resolves.toMatchObject({
+    await expect(
+      submitBookingRequest({ ...validInput, mobile: "123" }, { create }),
+    ).resolves.toMatchObject({
       success: false,
       reason: "validation",
       fieldErrors: { mobile: expect.any(String) },

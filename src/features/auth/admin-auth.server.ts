@@ -14,7 +14,9 @@ export async function verifyAdminToken(token: string) {
       audience: origin,
       algorithms: ["EdDSA"],
     });
-    return { allowed: isAdminEmail(payload.email, requireConfiguredAdminEmail(process.env.ADMIN_EMAIL)) };
+    return {
+      allowed: isAdminEmail(payload.email, requireConfiguredAdminEmail(process.env.ADMIN_EMAIL)),
+    };
   } catch {
     return { allowed: false };
   }

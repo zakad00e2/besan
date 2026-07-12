@@ -20,5 +20,39 @@ function AuthPage() {
     setSaving(false);
   }
 
-  return <main className="flex min-h-screen items-center justify-center bg-background p-6"><form onSubmit={submit} className="w-full max-w-sm space-y-5 border border-foreground/30 p-8"><h1 className="font-serif text-4xl">Dashboard sign in</h1><label className="block text-sm">Email<input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full border border-foreground/40 bg-transparent p-3" /></label><label className="block text-sm">Password<input type="password" required value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full border border-foreground/40 bg-transparent p-3" /></label>{error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}<button disabled={saving} className="w-full bg-foreground p-3 text-background">{saving ? "Signing in…" : "Sign in"}</button></form></main>;
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-background p-6">
+      <form onSubmit={submit} className="w-full max-w-sm space-y-5 border border-foreground/30 p-8">
+        <h1 className="font-serif text-4xl">Dashboard sign in</h1>
+        <label className="block text-sm">
+          Email
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="mt-2 w-full border border-foreground/40 bg-transparent p-3"
+          />
+        </label>
+        <label className="block text-sm">
+          Password
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className="mt-2 w-full border border-foreground/40 bg-transparent p-3"
+          />
+        </label>
+        {error ? (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        ) : null}
+        <button disabled={saving} className="w-full bg-foreground p-3 text-background">
+          {saving ? "Signing in…" : "Sign in"}
+        </button>
+      </form>
+    </main>
+  );
 }
