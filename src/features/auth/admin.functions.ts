@@ -32,15 +32,27 @@ export const getBookings = createServerFn({ method: "POST" })
 
 type WorkshopBookingAdminDependencies = {
   verifyAdminToken: typeof verifyAdminToken;
-  repository: Pick<WorkshopBookingRepository, "list" | "updateStatus">;
+} & (
+  | { repository: Pick<WorkshopBookingRepository, "list" | "updateStatus"> }
+  | {
+      repository?: never;
+      getRepository: () => Pick<WorkshopBookingRepository, "list" | "updateStatus">;
+    }
+);
+
+const defaultWorkshopBookingAdminDependencies: WorkshopBookingAdminDependencies = {
+  verifyAdminToken,
+  getRepository: getNeonWorkshopBookingRepository,
 };
+
+function resolveWorkshopBookingRepository(dependencies: WorkshopBookingAdminDependencies) {
+  if (dependencies.repository) return dependencies.repository;
+  return dependencies.getRepository();
+}
 
 export async function listWorkshopBookingsForAdmin(
   token: string,
-  dependencies: WorkshopBookingAdminDependencies = {
-    verifyAdminToken,
-    repository: getNeonWorkshopBookingRepository(),
-  },
+  dependencies: WorkshopBookingAdminDependencies = defaultWorkshopBookingAdminDependencies,
 ): Promise<
   | { success: true; bookings: WorkshopBookingListItem[] }
   | { success: false; reason: "forbidden" | "load-error" }
@@ -54,7 +66,7 @@ export async function listWorkshopBookingsForAdmin(
   if (!access.allowed) return { success: false, reason: "forbidden" };
 
   try {
-    return { success: true, bookings: await dependencies.repository.list() };
+    return { success: true, bookings: await resolveWorkshopBookingRepository(dependencies).list() };
   } catch {
     return { success: false, reason: "load-error" };
   }
@@ -62,10 +74,7 @@ export async function listWorkshopBookingsForAdmin(
 
 export async function changeWorkshopBookingStatusForAdmin(
   input: { token: string; id: string; status: unknown },
-  dependencies: WorkshopBookingAdminDependencies = {
-    verifyAdminToken,
-    repository: getNeonWorkshopBookingRepository(),
-  },
+  dependencies: WorkshopBookingAdminDependencies = defaultWorkshopBookingAdminDependencies,
 ): Promise<
   | { success: true; booking: WorkshopBookingListItem }
   | { success: false; reason: "forbidden" | "invalid-status" | "not-found" | "update-error" }
@@ -82,7 +91,7 @@ export async function changeWorkshopBookingStatusForAdmin(
   if (!status.success) return { success: false, reason: "invalid-status" };
 
   try {
-    return await dependencies.repository.updateStatus(input.id, status.data);
+    return await resolveWorkshopBookingRepository(dependencies).updateStatus(input.id, status.data);
   } catch {
     return { success: false, reason: "update-error" };
   }

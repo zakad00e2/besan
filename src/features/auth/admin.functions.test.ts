@@ -41,6 +41,32 @@ describe("workshop booking admin functions", () => {
     expect(testDependencies.repository.list).not.toHaveBeenCalled();
   });
 
+  it("does not resolve the default repository before rejecting a forbidden token", async () => {
+    const previousDatabaseUrl = process.env.DATABASE_URL;
+    const previousAuthUrl = process.env.VITE_NEON_AUTH_URL;
+    delete process.env.DATABASE_URL;
+    process.env.VITE_NEON_AUTH_URL = "https://auth.example.test";
+
+    try {
+      await expect(listWorkshopBookingsForAdmin("invalid-token")).resolves.toEqual({
+        success: false,
+        reason: "forbidden",
+      });
+      await expect(
+        changeWorkshopBookingStatusForAdmin({
+          token: "invalid-token",
+          id: booking.id,
+          status: "confirmed",
+        }),
+      ).resolves.toEqual({ success: false, reason: "forbidden" });
+    } finally {
+      if (previousDatabaseUrl === undefined) delete process.env.DATABASE_URL;
+      else process.env.DATABASE_URL = previousDatabaseUrl;
+      if (previousAuthUrl === undefined) delete process.env.VITE_NEON_AUTH_URL;
+      else process.env.VITE_NEON_AUTH_URL = previousAuthUrl;
+    }
+  });
+
   it("lists workshop bookings after verifying an admin token", async () => {
     const testDependencies = dependencies();
 

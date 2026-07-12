@@ -69,6 +69,12 @@ describe("DashboardWorkshopBookings", () => {
     expect(document.querySelectorAll("article").length).toBeGreaterThan(0);
   });
 
+  it("renders booking notes in both desktop and mobile layouts", () => {
+    render(<DashboardWorkshopBookings bookings={bookings} onStatusChange={vi.fn()} />);
+
+    expect(screen.getAllByText("Vegetarian lunch").length).toBe(2);
+  });
+
   it("filters by both selects and calls for a validated status change", () => {
     const onStatusChange = vi.fn();
     render(<DashboardWorkshopBookings bookings={bookings} onStatusChange={onStatusChange} />);

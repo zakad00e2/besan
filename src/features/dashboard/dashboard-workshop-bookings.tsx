@@ -180,6 +180,7 @@ export function DashboardWorkshopBookings({
                     <th>Workshop</th>
                     <th>Date</th>
                     <th>Participants</th>
+                    <th>Notes</th>
                     <th>Status</th>
                     <th className="px-4">Update status</th>
                   </tr>
@@ -197,6 +198,9 @@ export function DashboardWorkshopBookings({
                         {booking.date}
                       </td>
                       <td className="text-slate-500">{booking.participants}</td>
+                      <td className="max-w-48 truncate text-slate-500" title={booking.notes}>
+                        {booking.notes || "—"}
+                      </td>
                       <td>
                         <StatusBadge status={booking.status} />
                       </td>
@@ -229,6 +233,7 @@ export function DashboardWorkshopBookings({
                     <span>{booking.email || "No email"}</span>
                     <span>{booking.participants} participants</span>
                   </div>
+                  <p className="text-xs text-slate-500">{booking.notes || "No notes"}</p>
                   <StatusSelect
                     booking={booking}
                     updating={updatingId === booking.id}
