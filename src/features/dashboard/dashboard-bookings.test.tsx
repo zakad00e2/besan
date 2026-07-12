@@ -5,18 +5,22 @@ import { DashboardBookings, filterAppointments, validateAppointment } from "./da
 
 afterEach(cleanup);
 
+const designAppointments = demoDashboardState.appointments.filter(
+  (appointment) => appointment.type === "design",
+);
+
 describe("booking helpers", () => {
   it("filters by customer query, type, and date", () => {
     expect(
-      filterAppointments(demoDashboardState.appointments, demoDashboardState.customers, {
+      filterAppointments(designAppointments, demoDashboardState.customers, {
         query: "Layan",
         type: "all",
         status: "all",
         date: "all",
       }),
-    ).toHaveLength(2);
+    ).toHaveLength(1);
     expect(
-      filterAppointments(demoDashboardState.appointments, demoDashboardState.customers, {
+      filterAppointments(designAppointments, demoDashboardState.customers, {
         query: "",
         type: "design",
         status: "all",
@@ -44,6 +48,7 @@ describe("DashboardBookings", () => {
         dispatch={vi.fn()}
       />,
     );
+    expect(screen.queryByText("Corset workshop")).toBeNull();
 
     fireEvent.change(screen.getByLabelText("Search bookings"), {
       target: { value: "+970 59 123 4567" },

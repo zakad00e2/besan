@@ -42,7 +42,7 @@ const pageTitles: Record<string, string> = {
 
 const pageDescriptions: Record<string, string> = {
   "/dashboard": "A quick view of your appointments and atelier bookings",
-  "/dashboard/bookings": "Manage design and workshop bookings in one place",
+  "/dashboard/bookings": "Manage design appointments in one place",
   "/dashboard/customers": "Customer profiles, production stages, and upcoming appointments",
   "/dashboard/workshop-bookings": "Workshop requests and participant details",
   "/dashboard/availability": "Set available time slots and reminder preferences",

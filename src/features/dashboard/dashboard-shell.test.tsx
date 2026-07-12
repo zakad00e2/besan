@@ -2,13 +2,15 @@ import { cleanup, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+let pathname = "/dashboard/workshop-bookings";
+
 vi.mock("@tanstack/react-router", () => ({
   Link: ({ to, children, ...props }: { to: string; children: ReactNode }) => (
     <a href={to} {...props}>
       {children}
     </a>
   ),
-  useLocation: () => ({ pathname: "/dashboard/workshop-bookings" }),
+  useLocation: () => ({ pathname }),
 }));
 
 import { DashboardShell } from "./dashboard-shell";
@@ -34,5 +36,17 @@ describe("DashboardShell", () => {
     expect(document.body.textContent).toContain("Demo version");
     expect(document.body.textContent).toContain("Reminders are not actually sent");
     expect(container.querySelector("aside")?.className).toContain("left-0");
+  });
+
+  it("describes general bookings as design appointments", () => {
+    pathname = "/dashboard/bookings";
+
+    render(
+      <DashboardShell>
+        <p>Content</p>
+      </DashboardShell>,
+    );
+
+    expect(document.body.textContent).toContain("Manage design appointments in one place");
   });
 });
