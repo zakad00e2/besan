@@ -7,12 +7,5 @@ export const Route = createFileRoute("/dashboard/")({ component: DashboardIndexR
 function DashboardIndexRoute() {
   const { state } = useDashboard();
 
-  return (
-    <DashboardOverview
-      customers={state.customers}
-      appointments={state.appointments}
-      scoreDist={state.scoreDist}
-      avgScore={state.avgScore}
-    />
-  );
+  return <DashboardOverview customers={state.customers} appointments={state.appointments} />;
 }

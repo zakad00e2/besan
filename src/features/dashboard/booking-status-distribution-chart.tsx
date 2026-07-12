@@ -35,15 +35,11 @@ export function BookingStatusDistributionChart({
 
   return (
     <article className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-none">
-      <h2 className="text-sm font-normal text-[var(--muted-foreground)]">
+      <h2 className="text-xs font-normal text-[var(--muted-foreground)]">
         Booking status distribution
       </h2>
       <p className="mt-1 text-3xl font-medium tabular-nums">{totalBookings}</p>
-      <div
-        className="mt-4 h-[200px] w-full"
-        role="img"
-        aria-label="Booking status distribution"
-      >
+      <div className="mt-4 h-[200px] w-full" role="img" aria-label="Booking status distribution">
         <dl className="sr-only">
           {chartData.map((entry) => (
             <div key={entry.gradientId}>

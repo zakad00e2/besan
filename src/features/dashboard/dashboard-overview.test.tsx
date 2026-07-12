@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { demoDashboardState } from "./dashboard-data";
 import { DashboardOverview } from "./dashboard-overview";
@@ -11,7 +11,6 @@ describe("DashboardOverview", () => {
       <DashboardOverview
         customers={demoDashboardState.customers}
         appointments={demoDashboardState.appointments}
-        scoreDist={demoDashboardState.scoreDist}
         now={new Date("2026-07-10T08:00:00.000Z")}
       />,
     );
@@ -26,7 +25,6 @@ describe("DashboardOverview", () => {
       <DashboardOverview
         customers={demoDashboardState.customers}
         appointments={demoDashboardState.appointments}
-        scoreDist={demoDashboardState.scoreDist}
         now={new Date("2026-07-10T08:00:00.000Z")}
       />,
     );
@@ -37,7 +35,14 @@ describe("DashboardOverview", () => {
     expect(screen.getByText("Total bookings")).toBeTruthy();
     expect(screen.getAllByText(/Compared with last month/).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Layan Mansour").length).toBeGreaterThan(0);
-    expect(screen.getByText("توزيع التقييمات")).toBeTruthy();
-    expect(screen.getByText("4.4")).toBeTruthy();
+    const chart = screen
+      .getByRole("heading", { name: "Booking status distribution" })
+      .closest("article");
+    expect(chart).toBeTruthy();
+    expect(within(chart!).getByText(String(demoDashboardState.appointments.length))).toBeTruthy();
+    expect(within(chart!).getByText("Confirmed")).toBeTruthy();
+    expect(within(chart!).getByText("Pending")).toBeTruthy();
+    expect(within(chart!).getByText("Completed")).toBeTruthy();
+    expect(within(chart!).getByText("Cancelled")).toBeTruthy();
   });
 });

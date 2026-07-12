@@ -178,5 +178,4 @@ export const demoDashboardState: DashboardState = {
   appointments,
   availability: createAvailabilitySlots(),
   reminderSettings: { customerWhatsapp: true, supervisorDashboard: true, hoursBefore: 24 },
-  scoreDist: { high: 8, good: 4, medium: 2, low: 1 },
 };

@@ -52,13 +52,6 @@ export type ReminderSettings = {
   hoursBefore: 24;
 };
 
-export type ScoreDistribution = {
-  high: number;
-  good: number;
-  medium: number;
-  low: number;
-};
-
 export type BookingStatusDistribution = Record<AppointmentStatus, number>;
 
 export type DashboardState = {
@@ -66,8 +59,6 @@ export type DashboardState = {
   appointments: Appointment[];
   availability: AvailabilitySlot[];
   reminderSettings: ReminderSettings;
-  scoreDist: ScoreDistribution;
-  avgScore?: number;
 };
 
 export type DashboardMetrics = {

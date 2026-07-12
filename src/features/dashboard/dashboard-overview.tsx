@@ -7,17 +7,18 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import reminderAvatar from "@/assets/reminder-avatar.jpg";
-import type { Appointment, Customer, ScoreDistribution } from "./dashboard-model";
+import type { Appointment, Customer } from "./dashboard-model";
 import {
   bookingTypeLabels,
   getDashboardMetrics,
   getDashboardMetricComparisons,
+  getBookingStatusDistribution,
   stageLabels,
   type CustomerStage,
 } from "./dashboard-model";
 import { cn } from "@/lib/utils";
 import { DashboardEmptyState, MetricCard, StatusBadge, dashboardToggleActiveClassName, dashboardToggleGroupClassName, dashboardToggleInactiveClassName } from "./dashboard-ui";
-import { ScoreDistributionChart } from "./score-distribution-chart";
+import { BookingStatusDistributionChart } from "./booking-status-distribution-chart";
 
 type ScheduleRange = "day" | "week";
 
@@ -73,14 +74,10 @@ function InsightCard({
 export function DashboardOverview({
   customers,
   appointments,
-  scoreDist,
-  avgScore,
   now = new Date(),
 }: {
   customers: Customer[];
   appointments: Appointment[];
-  scoreDist: ScoreDistribution;
-  avgScore?: number;
   now?: Date;
 }) {
   const [range, setRange] = useState<ScheduleRange>("day");
@@ -96,6 +93,7 @@ export function DashboardOverview({
     () => new Map(customers.map((customer) => [customer.id, customer])),
     [customers],
   );
+  const statusDist = useMemo(() => getBookingStatusDistribution(appointments), [appointments]);
   const dayKey = dateKey(now);
   const weekEnd = new Date(now);
   weekEnd.setUTCDate(weekEnd.getUTCDate() + 7);
@@ -189,7 +187,7 @@ export function DashboardOverview({
           </div>
         </InsightCard>
 
-        <ScoreDistributionChart scoreDist={scoreDist} avgScore={avgScore} />
+        <BookingStatusDistributionChart statusDist={statusDist} />
 
         <article className="min-h-[218px] rounded-[10px] border border-[#e6e6e8] bg-white p-4">
           <h2 className="text-[10px] font-medium text-[#85868c]">Needs follow-up</h2>
