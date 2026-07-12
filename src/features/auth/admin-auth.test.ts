@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { isAdminEmail, requireConfiguredAdminEmail } from "./admin-auth";
+import { DEFAULT_ADMIN_EMAIL, isAdminEmail, requireConfiguredAdminEmail } from "./admin-auth";
 
 describe("admin authorization", () => {
+  it("uses the current dashboard administrator", () => {
+    expect(DEFAULT_ADMIN_EMAIL).toBe("zeka12345678998765432@gmail.com");
+  });
+
   it("matches the configured email without casing or surrounding whitespace", () => {
     expect(isAdminEmail(" Z409483831@gmail.com ", "z409483831@gmail.com")).toBe(true);
   });

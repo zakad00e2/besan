@@ -1,3 +1,5 @@
+export const DEFAULT_ADMIN_EMAIL = "zeka12345678998765432@gmail.com";
+
 function normalizeEmail(email: string) {
   return email.trim().toLocaleLowerCase("en-US");
 }

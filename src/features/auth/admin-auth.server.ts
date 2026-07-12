@@ -1,5 +1,5 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
-import { isAdminEmail, requireConfiguredAdminEmail } from "./admin-auth";
+import { DEFAULT_ADMIN_EMAIL, isAdminEmail } from "./admin-auth";
 
 let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
 
@@ -15,7 +15,7 @@ export async function verifyAdminToken(token: string) {
       algorithms: ["EdDSA"],
     });
     return {
-      allowed: isAdminEmail(payload.email, requireConfiguredAdminEmail(process.env.ADMIN_EMAIL)),
+      allowed: isAdminEmail(payload.email, DEFAULT_ADMIN_EMAIL),
     };
   } catch {
     return { allowed: false };
