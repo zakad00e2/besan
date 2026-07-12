@@ -225,11 +225,7 @@ function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
                   <p className="font-serif text-3xl tracking-tight">{price.value}</p>
                 </div>
               ))}
-              <BookingButton
-                workshop={patternFoundation}
-                onBook={onBook}
-                className="lg:hidden"
-              />
+              <BookingButton workshop={patternFoundation} onBook={onBook} className="lg:hidden" />
             </div>
           </Reveal>
         </div>
@@ -367,11 +363,7 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
             <div>
               <p className="text-sm text-muted-foreground">Corset workshop price</p>
               <p className="mt-2 font-serif text-4xl">850 NIS</p>
-              <BookingButton
-                workshop={corsetWorkshop}
-                onBook={onBook}
-                className="lg:hidden"
-              />
+              <BookingButton workshop={corsetWorkshop} onBook={onBook} className="lg:hidden" />
             </div>
           </div>
         </Reveal>

@@ -50,7 +50,9 @@ describe("workshop booking repository", () => {
   it("stores a validated workshop booking in a parameterized query", async () => {
     const execute = vi.fn<QueryExecutor>().mockResolvedValue([{ id: "workshop-booking-1" }]);
 
-    await expect(createWorkshopBookingRepository(execute).create(validatedBooking)).resolves.toEqual({
+    await expect(
+      createWorkshopBookingRepository(execute).create(validatedBooking),
+    ).resolves.toEqual({
       id: "workshop-booking-1",
     });
     expect(execute).toHaveBeenCalledWith(

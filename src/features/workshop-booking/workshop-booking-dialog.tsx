@@ -100,8 +100,8 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
               Thank you
             </DialogTitle>
             <p role="status" className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
-              Your workshop request was sent to the atelier. We will be in touch soon to confirm
-              the details.
+              Your workshop request was sent to the atelier. We will be in touch soon to confirm the
+              details.
             </p>
             <DialogClose asChild>
               <button

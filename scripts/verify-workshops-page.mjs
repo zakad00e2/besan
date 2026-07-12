@@ -19,9 +19,8 @@ for (const expected of [
   "Mini course",
   "One day",
   "WorkshopBookingDialog",
-  "pattern-foundation",
-  "mini-course",
-  "corset-workshop",
+  "workshopOptions",
+  "[patternFoundation, miniCourse, corsetWorkshop] = workshopOptions",
 ]) {
   if (!routeSource.includes(expected)) {
     throw new Error(`Workshops page is missing expected content: ${expected}`);

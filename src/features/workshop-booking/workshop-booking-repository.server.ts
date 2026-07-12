@@ -17,8 +17,7 @@ export type WorkshopBookingRepository = {
     id: string,
     status: WorkshopBookingStatus,
   ): Promise<
-    | { success: true; booking: WorkshopBookingListItem }
-    | { success: false; reason: "not-found" }
+    { success: true; booking: WorkshopBookingListItem } | { success: false; reason: "not-found" }
   >;
 };
 
@@ -113,7 +112,10 @@ export function createWorkshopBookingRepository(execute: QueryExecutor): Worksho
       return rows.map(mapWorkshopBookingRow);
     },
     async updateStatus(id, status) {
-      const rows = await execute<WorkshopBookingRow>(updateWorkshopBookingStatusQuery, [id, status]);
+      const rows = await execute<WorkshopBookingRow>(updateWorkshopBookingStatusQuery, [
+        id,
+        status,
+      ]);
       const row = rows[0];
       return row
         ? { success: true, booking: mapWorkshopBookingRow(row) }

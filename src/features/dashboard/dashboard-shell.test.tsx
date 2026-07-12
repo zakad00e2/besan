@@ -28,9 +28,9 @@ describe("DashboardShell", () => {
     const root = container.firstElementChild;
     expect(root?.getAttribute("lang")).toBe("en");
     expect(root?.getAttribute("dir")).toBe("ltr");
-    expect(screen.getByRole("link", { name: "Workshop bookings" }).getAttribute("aria-current")).toBe(
-      "page",
-    );
+    expect(
+      screen.getByRole("link", { name: "Workshop bookings" }).getAttribute("aria-current"),
+    ).toBe("page");
     expect(document.body.textContent).toContain("Workshop requests and participant details");
     expect(screen.getByRole("button", { name: "Open menu" })).toBeTruthy();
     expect(document.body.textContent).toContain("Demo version");

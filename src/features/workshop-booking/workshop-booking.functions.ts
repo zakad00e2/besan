@@ -5,6 +5,4 @@ import { submitWorkshopBookingRequest } from "./workshop-booking-service";
 
 export const submitWorkshopBooking = createServerFn({ method: "POST" })
   .validator((data: WorkshopBookingInput) => data)
-  .handler(({ data }) =>
-    submitWorkshopBookingRequest(data, getNeonWorkshopBookingRepository()),
-  );
+  .handler(({ data }) => submitWorkshopBookingRequest(data, getNeonWorkshopBookingRepository()));
