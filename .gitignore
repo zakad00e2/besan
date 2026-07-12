@@ -17,6 +17,11 @@ dist-ssr
 *.local
 .superpowers/
 
+# Local environment secrets
+.env
+.env.*
+!.env.example
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
