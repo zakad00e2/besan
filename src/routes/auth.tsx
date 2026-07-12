@@ -4,7 +4,27 @@ import { authClient } from "@/features/auth/neon-auth-client";
 
 export const Route = createFileRoute("/auth")({ component: AuthPage });
 
-function AuthPage() {
+export function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeout = window.setTimeout(
+      () => reject(new Error("Authentication request timed out")),
+      timeoutMs,
+    );
+    promise.then(
+      (value) => {
+        window.clearTimeout(timeout);
+        resolve(value);
+      },
+      (error) => {
+        window.clearTimeout(timeout);
+        reject(error);
+      },
+    );
+  });
+}
+
+export function AuthPage() {
+  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,16 +34,33 @@ function AuthPage() {
     event.preventDefault();
     setSaving(true);
     setError("");
-    const { error: signInError } = await authClient.signIn.email({ email, password });
-    if (signInError) setError(signInError.message || "Could not sign in.");
-    else window.location.assign("/dashboard/bookings");
-    setSaving(false);
+    try {
+      const result = await withTimeout(
+        mode === "sign-in"
+          ? authClient.signIn.email({ email, password })
+          : authClient.signUp.email({ email, password, name: "Besan dashboard admin" }),
+        15_000,
+      );
+      if (result.error) {
+        setError(
+          result.error.message ||
+            (mode === "sign-in" ? "Could not sign in." : "Could not create the account."),
+        );
+      } else window.location.assign("/dashboard/bookings");
+    } catch (signInError) {
+      console.error(signInError);
+      setError("Could not sign in. Please check your connection and try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <form onSubmit={submit} className="w-full max-w-sm space-y-5 border border-foreground/30 p-8">
-        <h1 className="font-serif text-4xl">Dashboard sign in</h1>
+        <h1 className="font-serif text-4xl">
+          {mode === "sign-in" ? "Dashboard sign in" : "Create admin account"}
+        </h1>
         <label className="block text-sm">
           Email
           <input
@@ -50,7 +87,18 @@ function AuthPage() {
           </p>
         ) : null}
         <button disabled={saving} className="w-full bg-foreground p-3 text-background">
-          {saving ? "Signing in…" : "Sign in"}
+          {saving ? "Please wait…" : mode === "sign-in" ? "Sign in" : "Create account"}
+        </button>
+        <button
+          type="button"
+          disabled={saving}
+          onClick={() => {
+            setError("");
+            setMode((current) => (current === "sign-in" ? "sign-up" : "sign-in"));
+          }}
+          className="w-full text-sm underline underline-offset-4"
+        >
+          {mode === "sign-in" ? "First time? Create the admin account" : "Back to sign in"}
         </button>
       </form>
     </main>
