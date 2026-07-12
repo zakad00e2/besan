@@ -14,6 +14,7 @@ import {
   type WorkshopBookingFormValues,
   type WorkshopOption,
 } from "./workshop-booking";
+import { submitWorkshopBooking } from "./workshop-booking.functions";
 
 type WorkshopBookingDialogProps = {
   workshop: WorkshopOption | null;
@@ -33,23 +34,35 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<WorkshopBookingErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   function updateValue(field: keyof WorkshopBookingFormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const result = parseWorkshopBooking(workshop, values);
+    const parsed = parseWorkshopBooking(workshop, values);
 
-    if (!result.success) {
-      setErrors(result.errors);
+    if (!parsed.success) {
+      setErrors(parsed.errors);
       return;
     }
 
     setErrors({});
-    setSubmitted(true);
+    setSubmitting(true);
+    const result = await submitWorkshopBooking({ data: parsed.data });
+
+    if (result.success) {
+      setSubmitted(true);
+    } else if (result.reason === "validation") {
+      setErrors(result.fieldErrors);
+    } else {
+      setSubmissionError("We could not send your request. Please try again.");
+    }
+    setSubmitting(false);
   }
 
   function handleOpenChange(open: boolean) {
@@ -57,6 +70,8 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
       setValues(initialValues);
       setErrors({});
       setSubmitted(false);
+      setSubmitting(false);
+      setSubmissionError(null);
     }
     onOpenChange(open);
   }
@@ -67,13 +82,13 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
         {submitted ? (
           <div className="flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center sm:px-10">
             <Check className="h-8 w-8" aria-hidden="true" />
-            <p className="mt-5 text-xs tracking-[0.2em] text-muted-foreground">DEMO CONFIRMATION</p>
+            <p className="mt-5 text-xs tracking-[0.2em] text-muted-foreground">REQUEST SENT</p>
             <DialogTitle className="mt-3 font-serif text-4xl font-normal tracking-tighter">
-              Booking prepared
+              Thank you
             </DialogTitle>
             <p role="status" className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
-              Your {workshop?.name} details are valid. This demo request has not been sent to the
-              atelier.
+              Your workshop request was sent to the atelier. We will be in touch soon to confirm
+              the details.
             </p>
             <DialogClose asChild>
               <button
@@ -156,12 +171,19 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
               </Field>
             </div>
 
+            {submissionError ? (
+              <p role="alert" className="px-6 pb-3 text-sm text-destructive sm:px-8">
+                {submissionError}
+              </p>
+            ) : null}
+
             <div className="flex justify-end border-t border-foreground/30 px-6 py-3 sm:px-8">
               <button
                 type="submit"
+                disabled={submitting}
                 className="w-full border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.12em] text-background transition-opacity hover:opacity-85 sm:w-auto"
               >
-                Prepare demo booking
+                {submitting ? "Sending…" : "Send booking request"}
               </button>
             </div>
           </form>

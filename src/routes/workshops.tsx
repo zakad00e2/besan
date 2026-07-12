@@ -6,7 +6,7 @@ import workshopMiniCourse from "@/assets/workshop-mini-course.jpg";
 import workshopPatternFoundation from "@/assets/workshop-pattern-foundation.jpg";
 import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
 import { WorkshopBookingDialog } from "@/features/workshop-booking/workshop-booking-dialog";
-import type { WorkshopOption } from "@/features/workshop-booking/workshop-booking";
+import { workshopOptions, type WorkshopOption } from "@/features/workshop-booking/workshop-booking";
 
 export const Route = createFileRoute("/workshops")({
   component: Workshops,
@@ -54,20 +54,7 @@ const corsetWorkshopDetails = [
   },
 ];
 
-const workshops = {
-  patternFoundation: {
-    id: "pattern-foundation",
-    name: "Pattern foundation",
-  },
-  miniCourse: {
-    id: "mini-course",
-    name: "Private mini course",
-  },
-  corsetWorkshop: {
-    id: "corset-workshop",
-    name: "One-day corset workshop",
-  },
-} satisfies Record<string, WorkshopOption>;
+const [patternFoundation, miniCourse, corsetWorkshop] = workshopOptions;
 
 type BookWorkshop = (workshop: WorkshopOption) => void;
 
@@ -183,7 +170,7 @@ function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
                     First workshop
                   </h3>
                   <BookingButton
-                    workshop={workshops.patternFoundation}
+                    workshop={patternFoundation}
                     onBook={onBook}
                     className="hidden shrink-0 lg:inline-flex lg:mt-0"
                   />
@@ -239,7 +226,7 @@ function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
                 </div>
               ))}
               <BookingButton
-                workshop={workshops.patternFoundation}
+                workshop={patternFoundation}
                 onBook={onBook}
                 className="lg:hidden"
               />
@@ -281,7 +268,7 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
                   Private mini course
                 </h3>
                 <BookingButton
-                  workshop={workshops.miniCourse}
+                  workshop={miniCourse}
                   onBook={onBook}
                   className="hidden shrink-0 lg:inline-flex lg:mt-0"
                 />
@@ -311,7 +298,7 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
                 </p>
               </div>
             </div>
-            <BookingButton workshop={workshops.miniCourse} onBook={onBook} className="lg:hidden" />
+            <BookingButton workshop={miniCourse} onBook={onBook} className="lg:hidden" />
           </div>
         </Reveal>
       </div>
@@ -352,7 +339,7 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
                   Corset Atelier
                 </h3>
                 <BookingButton
-                  workshop={workshops.corsetWorkshop}
+                  workshop={corsetWorkshop}
                   onBook={onBook}
                   className="hidden shrink-0 lg:inline-flex lg:mt-0"
                 />
@@ -381,7 +368,7 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
               <p className="text-sm text-muted-foreground">Corset workshop price</p>
               <p className="mt-2 font-serif text-4xl">850 NIS</p>
               <BookingButton
-                workshop={workshops.corsetWorkshop}
+                workshop={corsetWorkshop}
                 onBook={onBook}
                 className="lg:hidden"
               />

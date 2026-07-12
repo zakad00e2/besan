@@ -1,6 +1,11 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { submitWorkshopBooking } from "./workshop-booking.functions";
 import { WorkshopBookingDialog } from "./workshop-booking-dialog";
+
+vi.mock("./workshop-booking.functions", () => ({
+  submitWorkshopBooking: vi.fn(),
+}));
 
 afterEach(cleanup);
 
@@ -16,6 +21,29 @@ function futureDate() {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+function fillValidForm() {
+  fireEvent.change(screen.getByLabelText("Full name"), {
+    target: { value: "Noor Al-Hashemi" },
+  });
+  fireEvent.change(screen.getByLabelText("Mobile number"), {
+    target: { value: "0501234567" },
+  });
+  fireEvent.change(screen.getByLabelText("Workshop date"), {
+    target: { value: futureDate() },
+  });
+  fireEvent.change(screen.getByLabelText("Number of participants"), {
+    target: { value: "3" },
+  });
+}
+
+function deferred<T>() {
+  let resolve: (value: T) => void;
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+  return { promise, resolve: (value: T) => resolve(value) };
 }
 
 describe("WorkshopBookingDialog", () => {
@@ -53,7 +81,7 @@ describe("WorkshopBookingDialog", () => {
 
     const mobile = screen.getByLabelText("Mobile number") as HTMLInputElement;
     fireEvent.change(mobile, { target: { value: "0501234567" } });
-    fireEvent.click(screen.getByRole("button", { name: "Prepare demo booking" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
 
     expect(mobile.value).toBe("0501234567");
     expect(screen.getByText("Enter your full name.")).toBeTruthy();
@@ -62,25 +90,73 @@ describe("WorkshopBookingDialog", () => {
     expect(screen.getByLabelText("Workshop date")).toBeTruthy();
   });
 
-  it("shows an explicit demo-only confirmation after valid submission", () => {
+  it("shows a real confirmation after persistence succeeds", async () => {
+    vi.mocked(submitWorkshopBooking).mockResolvedValue({
+      success: true,
+      bookingId: "workshop-booking-1",
+    });
     render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
 
-    fireEvent.change(screen.getByLabelText("Full name"), {
-      target: { value: "Noor Al-Hashemi" },
-    });
-    fireEvent.change(screen.getByLabelText("Mobile number"), {
-      target: { value: "0501234567" },
-    });
-    fireEvent.change(screen.getByLabelText("Workshop date"), {
-      target: { value: futureDate() },
-    });
-    fireEvent.change(screen.getByLabelText("Number of participants"), {
-      target: { value: "3" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Prepare demo booking" }));
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
 
-    expect(screen.getByRole("status").textContent).toContain(
-      "This demo request has not been sent to the atelier.",
+    expect((await screen.findByRole("status")).textContent).toContain(
+      "Your workshop request was sent",
+    );
+    expect(submitWorkshopBooking).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        workshopId: "mini-course",
+        fullName: "Noor Al-Hashemi",
+        participants: 3,
+      }),
+    });
+  });
+
+  it("disables the submit button while persistence is pending", () => {
+    const pendingSubmission = deferred<{ success: true; bookingId: string }>();
+    vi.mocked(submitWorkshopBooking).mockReturnValue(pendingSubmission.promise);
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
+
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+
+    expect((screen.getByRole("button", { name: "Sending…" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
+  });
+
+  it("shows returned field errors after server validation fails", async () => {
+    vi.mocked(submitWorkshopBooking).mockResolvedValue({
+      success: false,
+      reason: "validation",
+      fieldErrors: { mobile: "Use a valid mobile number." },
+    });
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
+
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+
+    expect(await screen.findByText("Use a valid mobile number.")).toBeTruthy();
+    expect(screen.getByLabelText("Mobile number").getAttribute("aria-invalid")).toBe("true");
+  });
+
+  it("preserves values and allows retry after storage failure", async () => {
+    vi.mocked(submitWorkshopBooking)
+      .mockResolvedValueOnce({ success: false, reason: "storage-error" })
+      .mockResolvedValueOnce({ success: true, bookingId: "workshop-booking-1" });
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
+
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+
+    expect((await screen.findByRole("alert")).textContent).toContain(
+      "We could not send your request. Please try again.",
+    );
+    expect((screen.getByLabelText("Full name") as HTMLInputElement).value).toBe("Noor Al-Hashemi");
+
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+    expect((await screen.findByRole("status")).textContent).toContain(
+      "Your workshop request was sent",
     );
   });
 
