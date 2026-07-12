@@ -1,4 +1,4 @@
-import { cloneElement, useState, type FormEvent, type ReactElement } from "react";
+import { cloneElement, useRef, useState, type FormEvent, type ReactElement } from "react";
 import { Check } from "lucide-react";
 import {
   Dialog,
@@ -36,6 +36,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const submissionSessionRef = useRef(0);
 
   function updateValue(field: keyof WorkshopBookingFormValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));
@@ -52,21 +53,33 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
     }
 
     setErrors({});
+    const submissionSession = submissionSessionRef.current;
     setSubmitting(true);
-    const result = await submitWorkshopBooking({ data: parsed.data });
+    try {
+      const result = await submitWorkshopBooking({ data: parsed.data });
+      if (submissionSession !== submissionSessionRef.current) return;
 
-    if (result.success) {
-      setSubmitted(true);
-    } else if (result.reason === "validation") {
-      setErrors(result.fieldErrors);
-    } else {
-      setSubmissionError("We could not send your request. Please try again.");
+      if (result.success) {
+        setSubmitted(true);
+      } else if (result.reason === "validation") {
+        setErrors(result.fieldErrors);
+      } else {
+        setSubmissionError("We could not send your request. Please try again.");
+      }
+    } catch {
+      if (submissionSession === submissionSessionRef.current) {
+        setSubmissionError("We could not send your request. Please try again.");
+      }
+    } finally {
+      if (submissionSession === submissionSessionRef.current) {
+        setSubmitting(false);
+      }
     }
-    setSubmitting(false);
   }
 
   function handleOpenChange(open: boolean) {
     if (!open) {
+      submissionSessionRef.current += 1;
       setValues(initialValues);
       setErrors({});
       setSubmitted(false);

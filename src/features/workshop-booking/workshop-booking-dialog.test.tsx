@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { submitWorkshopBooking } from "./workshop-booking.functions";
 import { WorkshopBookingDialog } from "./workshop-booking-dialog";
@@ -39,11 +39,13 @@ function fillValidForm() {
 }
 
 function deferred<T>() {
-  let resolve: (value: T) => void;
-  const promise = new Promise<T>((resolvePromise) => {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
     resolve = resolvePromise;
+    reject = rejectPromise;
   });
-  return { promise, resolve: (value: T) => resolve(value) };
+  return { promise, resolve, reject };
 }
 
 describe("WorkshopBookingDialog", () => {
@@ -123,6 +125,54 @@ describe("WorkshopBookingDialog", () => {
     expect((screen.getByRole("button", { name: "Sending…" }) as HTMLButtonElement).disabled).toBe(
       true,
     );
+  });
+
+  it("recovers from a rejected persistence promise", async () => {
+    const rejectedSubmission = deferred<{ success: true; bookingId: string }>();
+    vi.mocked(submitWorkshopBooking).mockReturnValue(rejectedSubmission.promise);
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
+
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+
+    await act(async () => {
+      rejectedSubmission.reject(new Error("offline"));
+      await rejectedSubmission.promise.catch(() => undefined);
+    });
+
+    expect((await screen.findByRole("alert")).textContent).toContain(
+      "We could not send your request. Please try again.",
+    );
+    expect(
+      (screen.getByRole("button", { name: "Send booking request" }) as HTMLButtonElement).disabled,
+    ).toBe(false);
+  });
+
+  it("ignores a pending submission that resolves after the dialog closes", async () => {
+    const pendingSubmission = deferred<{ success: true; bookingId: string }>();
+    vi.mocked(submitWorkshopBooking).mockReturnValue(pendingSubmission.promise);
+    const onOpenChange = vi.fn();
+    const { rerender } = render(
+      <WorkshopBookingDialog workshop={workshop} onOpenChange={onOpenChange} />,
+    );
+
+    fillValidForm();
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    rerender(<WorkshopBookingDialog workshop={null} onOpenChange={onOpenChange} />);
+
+    await act(async () => {
+      pendingSubmission.resolve({ success: true, bookingId: "workshop-booking-1" });
+      await pendingSubmission.promise;
+    });
+
+    rerender(<WorkshopBookingDialog workshop={workshop} onOpenChange={onOpenChange} />);
+
+    expect(screen.queryByRole("status")).toBeNull();
+    expect((screen.getByLabelText("Full name") as HTMLInputElement).value).toBe("");
+    expect(
+      (screen.getByRole("button", { name: "Send booking request" }) as HTMLButtonElement).disabled,
+    ).toBe(false);
   });
 
   it("shows returned field errors after server validation fails", async () => {
