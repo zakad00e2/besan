@@ -1,7 +1,7 @@
 # Editorial Motion System Design
 
-**Date:** 2026-07-12  
-**Status:** Approved for implementation planning  
+**Date:** 2026-07-12
+**Status:** Approved for implementation planning
 **Scope:** Public marketing pages, workshop booking flow, appointment booking flow, and live dashboard motion primitives
 
 ## Objective
