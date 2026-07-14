@@ -1,14 +1,10 @@
-export const customerStages = [
-  "new-inquiry",
-  "initial-appointment",
-  "measurements-taken",
-  "design-production",
-  "fitting",
-  "ready-delivery",
-  "completed",
-] as const;
+import {
+  customerStages,
+  type CustomerStage,
+} from "@/features/book-call/booking-domain";
 
-export type CustomerStage = (typeof customerStages)[number];
+export { customerStages };
+export type { CustomerStage };
 export type BookingType = "workshop" | "design";
 export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled";
 export type ReminderStatus = "not-scheduled" | "scheduled" | "sent";
@@ -121,6 +117,7 @@ function countNeedsFollowUpAt(customers: Customer[], asOf: Date) {
 export const stageLabels: Record<CustomerStage, string> = {
   "new-inquiry": "New inquiry",
   "initial-appointment": "Initial appointment",
+  "measurements-appointment": "Measurements appointment",
   "measurements-taken": "Measurements taken",
   "design-production": "Design and production",
   fitting: "Fitting",

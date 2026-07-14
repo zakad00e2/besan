@@ -58,6 +58,7 @@ describe("createAvailabilitySlots", () => {
 describe("dashboard display content", () => {
   it("provides English labels and demo data", () => {
     expect(stageLabels["new-inquiry"]).toBe("New inquiry");
+    expect(stageLabels["measurements-appointment"]).toBe("Measurements appointment");
     expect(bookingTypeLabels.workshop).toBe("Workshop");
     expect(appointmentStatusLabels.confirmed).toBe("Confirmed");
     expect(reminderStatusLabels.scheduled).toBe("Scheduled");
