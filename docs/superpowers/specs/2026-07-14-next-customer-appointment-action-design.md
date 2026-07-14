@@ -1,6 +1,6 @@
 # Next Customer Appointment Action Design
 
-**Date:** 2026-07-14  
+**Date:** 2026-07-14
 **Status:** Approved design
 
 ## Goal
