@@ -4,11 +4,9 @@ import gsap from "gsap";
 import { ArrowLeft, Check, MessageCircle } from "lucide-react";
 import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  formatBookingDate,
-  appointmentTypes,
-} from "@/features/book-call/booking-domain";
+import { formatBookingDate, appointmentTypes } from "@/features/book-call/booking-domain";
 import { submitBooking } from "@/features/book-call/booking.functions";
+import { useBookingAvailability } from "@/features/book-call/use-booking-availability";
 
 export const Route = createFileRoute("/book-call")({
   component: BookCall,
@@ -24,17 +22,6 @@ export const Route = createFileRoute("/book-call")({
   }),
 });
 
-const appointmentDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday"] as const;
-type AppointmentDay = (typeof appointmentDays)[number];
-
-const timesByDay: Record<AppointmentDay, readonly string[]> = {
-  Monday: ["10:00", "12:30", "16:00"],
-  Tuesday: ["11:00", "14:00", "17:30"],
-  Wednesday: ["10:30", "13:00", "16:30"],
-  Thursday: ["12:00", "15:00", "18:00"],
-  Saturday: ["10:00", "12:00", "14:30"],
-};
-const dayNameFormatter = new Intl.DateTimeFormat("en-US", { weekday: "long" });
 const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
   weekday: "long",
   month: "long",
@@ -42,21 +29,9 @@ const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
-function startOfToday() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
-}
-
-function getAppointmentDay(date: Date) {
-  const dayName = dayNameFormatter.format(date);
-  return appointmentDays.includes(dayName as AppointmentDay)
-    ? (dayName as AppointmentDay)
-    : undefined;
-}
-
 export function BookCall() {
   const pageRef = useRef<HTMLDivElement>(null);
+  const availability = useBookingAvailability();
   const [appointmentType, setAppointmentType] = useState(appointmentTypes[0]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState("");
@@ -65,10 +40,13 @@ export function BookCall() {
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
 
-  const today = startOfToday();
-  const selectedDay = selectedDate ? getAppointmentDay(selectedDate) : undefined;
+  const selectedDateKey = selectedDate ? formatBookingDate(selectedDate) : "";
   const selectedDateLabel = selectedDate ? dateLabelFormatter.format(selectedDate) : "";
-  const availableTimes = selectedDay ? timesByDay[selectedDay] : [];
+  const availableTimes = availability.slots.map((slot) => slot.startsAt);
+
+  useEffect(() => {
+    void availability.loadMonth(new Date());
+  }, [availability.loadMonth]);
 
   useEffect(() => {
     const root = pageRef.current;
@@ -114,7 +92,7 @@ export function BookCall() {
     const fullName = String(data.get("fullName") || "").trim();
     const mobile = String(data.get("mobile") || "").trim();
 
-    if (!selectedDate || !selectedDay || !selectedTime || !fullName || !mobile) {
+    if (!selectedDate || !selectedTime || !fullName || !mobile) {
       setSubmitted(false);
       setError("Please complete your day, time, full name, and mobile number.");
       return;
@@ -140,12 +118,12 @@ export function BookCall() {
       } else if (result.reason === "validation") {
         setFieldErrors(result.fieldErrors);
         setError("Please review the highlighted details.");
+      } else if (result.reason === "slot-unavailable") {
+        setSelectedTime("");
+        await availability.loadDate(formatBookingDate(selectedDate));
+        setError("That time is no longer available. Please choose another time.");
       } else {
-        setError(
-          result.reason === "slot-unavailable"
-            ? "That time was just booked. Please choose another time."
-            : "We could not save your booking. Please try again.",
-        );
+        setError("We could not save your booking. Please try again.");
       }
     } finally {
       setSubmitting(false);
@@ -190,7 +168,7 @@ export function BookCall() {
                         key={type}
                         type="button"
                         onClick={() => setAppointmentType(type)}
-                        className={`flex items-center justify-between border px-4 py-4 text-left text-sm transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:translate-y-px ${
+                        className={`flex items-center justify-between border px-4 py-4 text-left text-sm transition-all duration-200 active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
                           selected
                             ? "border-foreground bg-foreground text-background"
                             : "border-foreground/40 hover:border-foreground hover:bg-accent/35"
@@ -219,8 +197,16 @@ export function BookCall() {
                           setSelectedDate(date);
                           setSelectedTime("");
                           setSubmitted(false);
+                          if (date) void availability.loadDate(formatBookingDate(date));
                         }}
-                        disabled={(date) => date < today || !getAppointmentDay(date)}
+                        onMonthChange={(month) => {
+                          setSelectedDate(undefined);
+                          setSelectedTime("");
+                          void availability.loadMonth(month);
+                        }}
+                        disabled={(date) =>
+                          !availability.openDates.includes(formatBookingDate(date))
+                        }
                         showOutsideDays={false}
                         className="mx-auto w-full p-0 [--cell-size:2.25rem] sm:[--cell-size:3rem] lg:max-w-[23rem] lg:[--cell-size:2.5rem]"
                         classNames={{
@@ -242,7 +228,7 @@ export function BookCall() {
                         }}
                       />
                       <p className="mt-4 border-t border-foreground/20 pt-4 text-sm leading-7 text-muted-foreground">
-                        Available days are Monday to Thursday and Saturday.
+                        Choose any highlighted date to see its current times.
                         {selectedDateLabel ? (
                           <span className="block text-foreground">
                             Selected: {selectedDateLabel}
@@ -255,8 +241,33 @@ export function BookCall() {
                       <h3 className="font-serif text-2xl leading-none tracking-tighter">
                         Available Times
                       </h3>
-                      {selectedDay ? (
-                        <div className="mt-6 grid grid-cols-1 gap-3 xl:grid-cols-2">
+                      {availability.error ? (
+                        <div role="alert" className="mt-6 space-y-3 text-sm text-destructive">
+                          <p>{availability.error}</p>
+                          <button
+                            type="button"
+                            className="underline"
+                            onClick={() => {
+                              if (selectedDateKey) void availability.loadDate(selectedDateKey);
+                              else void availability.loadMonth(new Date());
+                            }}
+                          >
+                            Try again
+                          </button>
+                        </div>
+                      ) : availability.slotsLoading ? (
+                        <p className="mt-6 text-sm text-muted-foreground">
+                          Loading available timesâ€¦
+                        </p>
+                      ) : selectedDate && availableTimes.length === 0 ? (
+                        <p className="mt-6 text-sm text-muted-foreground">
+                          No times remain on this date.
+                        </p>
+                      ) : selectedDate ? (
+                        <div
+                          data-motion-state="availability"
+                          className="motion-state-enter mt-6 grid grid-cols-1 gap-3 xl:grid-cols-2"
+                        >
                           {availableTimes.map((time) => {
                             const selected = selectedTime === time;
                             return (
@@ -267,7 +278,7 @@ export function BookCall() {
                                   setSelectedTime(time);
                                   setSubmitted(false);
                                 }}
-                                className={`border px-4 py-4 text-xl font-normal tabular-nums transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:translate-y-px ${
+                                className={`border px-4 py-4 text-xl font-normal tabular-nums transition-all duration-200 active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
                                   selected
                                     ? "border-foreground bg-foreground text-background"
                                     : "border-foreground/40 hover:border-foreground hover:bg-accent/35"
@@ -292,8 +303,31 @@ export function BookCall() {
                     Available Times
                   </legend>
                   <div className="mt-6 border border-foreground/40 p-3 sm:p-5">
-                    {selectedDay ? (
-                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-2">
+                    {availability.error ? (
+                      <div role="alert" className="mt-6 space-y-3 text-sm text-destructive">
+                        <p>{availability.error}</p>
+                        <button
+                          type="button"
+                          className="underline"
+                          onClick={() => {
+                            if (selectedDateKey) void availability.loadDate(selectedDateKey);
+                            else void availability.loadMonth(new Date());
+                          }}
+                        >
+                          Try again
+                        </button>
+                      </div>
+                    ) : availability.slotsLoading ? (
+                      <p className="mt-6 text-sm text-muted-foreground">Loading available timesâ€¦</p>
+                    ) : selectedDate && availableTimes.length === 0 ? (
+                      <p className="mt-6 text-sm text-muted-foreground">
+                        No times remain on this date.
+                      </p>
+                    ) : selectedDate ? (
+                      <div
+                        data-motion-state="availability"
+                        className="motion-state-enter grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-2"
+                      >
                         {availableTimes.map((time) => {
                           const selected = selectedTime === time;
                           return (
@@ -304,7 +338,7 @@ export function BookCall() {
                                 setSelectedTime(time);
                                 setSubmitted(false);
                               }}
-                              className={`border px-4 py-4 text-xl font-normal tabular-nums transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:translate-y-px ${
+                              className={`border px-4 py-4 text-xl font-normal tabular-nums transition-all duration-200 active:translate-y-px focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
                                 selected
                                   ? "border-foreground bg-foreground text-background"
                                   : "border-foreground/40 hover:border-foreground hover:bg-accent/35"
@@ -398,7 +432,7 @@ export function BookCall() {
                   className="inline-flex items-center justify-center gap-3 border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.1em] text-background transition-opacity hover:opacity-85 active:translate-y-px"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  {submitting ? "Saving booking…" : "Confirm Booking"}
+                  {submitting ? "Saving bookingâ€¦" : "Confirm Booking"}
                 </button>
               </div>
             </form>
