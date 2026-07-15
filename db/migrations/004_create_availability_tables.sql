@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.weekly_availability_windows (
   CHECK (mod(extract(minute FROM ends_at)::integer, 30) = 0),
   CHECK (extract(epoch FROM (ends_at - starts_at)) >= 3600),
   CHECK (mod(extract(epoch FROM (ends_at - starts_at))::integer, 3600) = 0),
-  EXCLUDE USING gist (
+  CONSTRAINT weekly_availability_windows_no_overlap EXCLUDE USING gist (
     weekday WITH =,
     tsrange(date '2000-01-01' + starts_at, date '2000-01-01' + ends_at, '[)') WITH &&
   )
@@ -61,7 +61,8 @@ CREATE TABLE IF NOT EXISTS public.availability_date_overrides (
   updated_at timestamptz NOT NULL DEFAULT now(),
   CHECK (ends_on >= starts_on),
   CHECK (kind <> 'custom-hours' OR starts_on = ends_on),
-  EXCLUDE USING gist (daterange(starts_on, ends_on, '[]') WITH &&)
+  CONSTRAINT availability_date_overrides_no_overlap
+    EXCLUDE USING gist (daterange(starts_on, ends_on, '[]') WITH &&)
 );
 
 CREATE TABLE IF NOT EXISTS public.availability_date_windows (
@@ -76,7 +77,7 @@ CREATE TABLE IF NOT EXISTS public.availability_date_windows (
   CHECK (mod(extract(minute FROM ends_at)::integer, 30) = 0),
   CHECK (extract(epoch FROM (ends_at - starts_at)) >= 3600),
   CHECK (mod(extract(epoch FROM (ends_at - starts_at))::integer, 3600) = 0),
-  EXCLUDE USING gist (
+  CONSTRAINT availability_date_windows_no_overlap EXCLUDE USING gist (
     override_id WITH =,
     tsrange(date '2000-01-01' + starts_at, date '2000-01-01' + ends_at, '[)') WITH &&
   )
