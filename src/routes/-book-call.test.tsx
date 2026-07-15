@@ -131,4 +131,28 @@ describe("book-call route", () => {
       await Promise.resolve();
     });
   });
+
+  it("keeps the displayed month and availability loader unchanged while booking submission is pending", async () => {
+    const pendingSubmission = deferred<{ success: false; reason: "slot-unavailable" }>();
+    submitBooking.mockImplementationOnce(() => pendingSubmission.promise);
+    render(<BookCall />);
+
+    selectJulyNineteenth();
+    fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
+    fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Noor Al-Hashemi" } });
+    fireEvent.change(screen.getByLabelText("Mobile Number"), {
+      target: { value: "+970591234567" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm Booking" }));
+
+    fireEvent.click(screen.getByRole("button", { name: /go to the next month/i }));
+
+    expect(screen.getByRole("button", { name: /sunday, july 19th, 2026/i })).toBeTruthy();
+    expect(availability.loadMonth).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      pendingSubmission.resolve({ success: false, reason: "slot-unavailable" });
+      await Promise.resolve();
+    });
+  });
 });

@@ -35,6 +35,7 @@ export function BookCall() {
   const [appointmentType, setAppointmentType] = useState(appointmentTypes[0]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedTime, setSelectedTime] = useState("");
+  const [displayedMonth, setDisplayedMonth] = useState(() => new Date());
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -192,6 +193,7 @@ export function BookCall() {
                     <div className="min-w-0">
                       <Calendar
                         mode="single"
+                        month={displayedMonth}
                         selected={selectedDate}
                         onSelect={(date) => {
                           if (submitting) return;
@@ -202,6 +204,7 @@ export function BookCall() {
                         }}
                         onMonthChange={(month) => {
                           if (submitting) return;
+                          setDisplayedMonth(month);
                           setSelectedDate(undefined);
                           setSelectedTime("");
                           void availability.loadMonth(month);
