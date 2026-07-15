@@ -215,9 +215,7 @@ export function parseWorkshopBookingStatus(
   return parsed.success ? { success: true, data: parsed.data } : { success: false };
 }
 
-export function parseWorkshopBookingAdminUpdate(
-  input: unknown,
-):
+export function parseWorkshopBookingAdminUpdate(input: unknown):
   | { success: true; data: WorkshopBookingAdminUpdateInput }
   | {
       success: false;

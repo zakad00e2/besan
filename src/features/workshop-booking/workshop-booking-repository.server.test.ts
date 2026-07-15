@@ -110,9 +110,9 @@ describe("workshop booking repository", () => {
   });
 
   it("updates the editable workshop booking fields and maps the returned row", async () => {
-    const execute = vi.fn<QueryExecutor>().mockResolvedValue([
-      { ...workshopBookingRow, full_name: "Noor Khalil", participants: 4 },
-    ]);
+    const execute = vi
+      .fn<QueryExecutor>()
+      .mockResolvedValue([{ ...workshopBookingRow, full_name: "Noor Khalil", participants: 4 }]);
 
     await expect(
       createWorkshopBookingRepository(execute).update("workshop-booking-1", updateInput),
@@ -120,14 +120,10 @@ describe("workshop booking repository", () => {
       success: true,
       booking: { ...mappedWorkshopBooking, fullName: "Noor Khalil", participants: 4 },
     });
-    expect(execute).toHaveBeenCalledWith(expect.stringContaining("UPDATE public.workshop_bookings"), [
-      "workshop-booking-1",
-      "Noor Khalil",
-      "+970591234567",
-      "noor@example.com",
-      "2026-07-13",
-      4,
-    ]);
+    expect(execute).toHaveBeenCalledWith(
+      expect.stringContaining("UPDATE public.workshop_bookings"),
+      ["workshop-booking-1", "Noor Khalil", "+970591234567", "noor@example.com", "2026-07-13", 4],
+    );
   });
 
   it("deletes an existing workshop booking", async () => {
@@ -136,8 +132,9 @@ describe("workshop booking repository", () => {
     await expect(
       createWorkshopBookingRepository(execute).delete("workshop-booking-1"),
     ).resolves.toEqual({ success: true });
-    expect(execute).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM public.workshop_bookings"), [
-      "workshop-booking-1",
-    ]);
+    expect(execute).toHaveBeenCalledWith(
+      expect.stringContaining("DELETE FROM public.workshop_bookings"),
+      ["workshop-booking-1"],
+    );
   });
 });
