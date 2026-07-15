@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { parseWeeklySchedule } from "@/features/availability/availability-domain";
 import type { AvailabilityMutationResult } from "@/features/availability/availability-service";
 import type {
   AvailabilityConfiguration,
@@ -97,6 +98,7 @@ export function DashboardAvailability({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [retry, setRetry] = useState<ConflictRetry>();
   const [alert, setAlert] = useState("");
+  const [weeklyFieldErrors, setWeeklyFieldErrors] = useState<Record<string, string>>({});
   useEffect(() => setDraft(configuration.weekly), [configuration]);
   const updateDay = (
     weekday: number,
@@ -114,8 +116,12 @@ export function DashboardAvailability({
     }
     if (value.reason === "conflicts" && next)
       setRetry({ ...next, conflicts: value.conflicts } as ConflictRetry);
-    else if (value.reason === "validation") setAlert(Object.values(value.fieldErrors).join(" "));
-    else
+    else if (value.reason === "validation") {
+      if (next?.kind === "weekly") {
+        setWeeklyFieldErrors(value.fieldErrors);
+        setAlert(value.fieldErrors.schedule || "");
+      } else setAlert(Object.values(value.fieldErrors).join(" "));
+    } else
       setAlert(
         value.reason === "overlap"
           ? "This exception overlaps an existing exception."
@@ -124,6 +130,14 @@ export function DashboardAvailability({
   };
   const saveWeekly = () => {
     const input = { days: draft };
+    const parsed = parseWeeklySchedule(input);
+    if (!parsed.success) {
+      setWeeklyFieldErrors(parsed.fieldErrors);
+      setAlert(parsed.fieldErrors.schedule || "");
+      return;
+    }
+    setWeeklyFieldErrors({});
+    setAlert("");
     void process(onSaveWeekly(input, false), { kind: "weekly", input });
   };
   const saveException = () => {
@@ -169,6 +183,9 @@ export function DashboardAvailability({
         <div className="mt-5 space-y-3">
           {weekdayLabels.map((label, weekday) => {
             const day = draft.find((item) => item.weekday === weekday)!;
+            const dayErrors = Object.entries(weeklyFieldErrors)
+              .filter(([field]) => field.startsWith(`days.${weekday}.`))
+              .map(([, message]) => message);
             return (
               <div key={label} className="rounded-lg border border-slate-100 p-3">
                 <div className="flex items-center justify-between">
@@ -245,6 +262,11 @@ export function DashboardAvailability({
                 >
                   Add {label} hours
                 </Button>
+                {dayErrors.map((message) => (
+                  <p key={message} role="alert" className="mt-2 text-sm text-rose-600">
+                    {label}: {message}
+                  </p>
+                ))}
               </div>
             );
           })}
@@ -323,6 +345,16 @@ export function DashboardAvailability({
             checked={reminderSettings.customerWhatsapp}
             onCheckedChange={(customerWhatsapp) =>
               onReminderChange({ ...reminderSettings, customerWhatsapp })
+            }
+          />
+        </label>
+        <label className="mt-4 flex items-center justify-between gap-4">
+          <span className="text-sm font-medium">Notify supervisor in the dashboard</span>
+          <Switch
+            aria-label="Notify supervisor in the dashboard"
+            checked={reminderSettings.supervisorDashboard}
+            onCheckedChange={(supervisorDashboard) =>
+              onReminderChange({ ...reminderSettings, supervisorDashboard })
             }
           />
         </label>

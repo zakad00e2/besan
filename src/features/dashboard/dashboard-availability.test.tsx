@@ -53,6 +53,12 @@ describe("DashboardAvailability", () => {
     expect(screen.getByText(/Asia\/Jerusalem/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Add Sunday hours" }));
     expect(screen.getAllByLabelText("Sunday start time")).toHaveLength(2);
+    fireEvent.change(screen.getAllByLabelText("Sunday start time")[1], {
+      target: { value: "17:00" },
+    });
+    fireEvent.change(screen.getAllByLabelText("Sunday end time")[1], {
+      target: { value: "18:00" },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Save weekly schedule" }));
     expect(onSaveWeekly).toHaveBeenCalledWith(
       expect.objectContaining({ days: expect.any(Array) }),
@@ -65,6 +71,29 @@ describe("DashboardAvailability", () => {
       hoursBefore: 24,
     });
     expect(screen.getByText("Reminder delivery is simulated.")).toBeTruthy();
+  });
+
+  it("blocks an invalid weekly schedule and identifies the affected day", () => {
+    const { onSaveWeekly } = renderEditor();
+    fireEvent.change(screen.getByLabelText("Sunday end time"), { target: { value: "11:30" } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Save weekly schedule" }));
+
+    expect(onSaveWeekly).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert").textContent).toContain("Sunday");
+    expect(screen.getByRole("alert").textContent).toContain("at least 60 minutes");
+  });
+
+  it("updates the supervisor reminder without dropping the other reminder settings", () => {
+    const { onReminderChange } = renderEditor();
+
+    fireEvent.click(screen.getByLabelText("Notify supervisor in the dashboard"));
+
+    expect(onReminderChange).toHaveBeenCalledWith({
+      customerWhatsapp: true,
+      supervisorDashboard: false,
+      hoursBefore: 24,
+    });
   });
 
   it("saves an inclusive travel closure", () => {
