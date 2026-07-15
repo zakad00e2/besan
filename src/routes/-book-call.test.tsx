@@ -32,6 +32,18 @@ function selectJulyNineteenth() {
   fireEvent.click(screen.getByRole("button", { name: /sunday, july 19th, 2026/i }));
 }
 
+function selectJulyTwentieth() {
+  fireEvent.click(screen.getByRole("button", { name: /monday, july 20th, 2026/i }));
+}
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+  return { promise, resolve };
+}
+
 describe("book-call route", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -93,5 +105,30 @@ describe("book-call route", () => {
     expect(screen.getAllByRole("button", { name: "11:00" })[0].className).not.toContain(
       "bg-foreground",
     );
+  });
+
+  it("prevents changing the selected calendar date while booking submission is pending", async () => {
+    const pendingSubmission = deferred<{ success: false; reason: "slot-unavailable" }>();
+    submitBooking.mockImplementationOnce(() => pendingSubmission.promise);
+    availability.openDates = ["2026-07-19", "2026-07-20"];
+    render(<BookCall />);
+
+    selectJulyNineteenth();
+    fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
+    fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Noor Al-Hashemi" } });
+    fireEvent.change(screen.getByLabelText("Mobile Number"), {
+      target: { value: "+970591234567" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm Booking" }));
+
+    selectJulyTwentieth();
+
+    expect(availability.loadDate).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(/selected: sunday, july 19, 2026/i)).toBeTruthy();
+
+    await act(async () => {
+      pendingSubmission.resolve({ success: false, reason: "slot-unavailable" });
+      await Promise.resolve();
+    });
   });
 });

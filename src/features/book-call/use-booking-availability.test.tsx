@@ -107,6 +107,31 @@ describe("useBookingAvailability", () => {
     expect(result.current.openDates).toEqual(["2026-08-03"]);
   });
 
+  it("does not show an earlier month failure after a newer date load succeeds", async () => {
+    const monthLoad = deferred<{ success: false; reason: "load-error" }>();
+    getPublicAvailabilityMonth.mockImplementationOnce(() => monthLoad.promise);
+    getPublicAvailabilityDay.mockResolvedValueOnce({
+      success: true,
+      slots: [{ startsAt: "14:00", endsAt: "15:00" }],
+    });
+    const { result } = renderHook(() => useBookingAvailability());
+
+    let pendingMonthLoad!: Promise<void>;
+    act(() => {
+      pendingMonthLoad = result.current.loadMonth(new Date(2026, 6, 1));
+    });
+    await act(async () => {
+      await result.current.loadDate("2026-07-20");
+    });
+    await act(async () => {
+      monthLoad.resolve({ success: false, reason: "load-error" });
+      await pendingMonthLoad;
+    });
+
+    expect(result.current.error).toBe("");
+    expect(result.current.slots).toEqual([{ startsAt: "14:00", endsAt: "15:00" }]);
+  });
+
   it.each([
     ["month", "loadMonth", () => new Date(2026, 6, 1), getPublicAvailabilityMonth, "openDates"],
     ["date", "loadDate", () => "2026-07-19", getPublicAvailabilityDay, "slots"],

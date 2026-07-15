@@ -17,14 +17,16 @@ export function useBookingAvailability() {
   const [error, setError] = useState("");
   const latestMonthRequest = useRef(0);
   const latestDateRequest = useRef(0);
+  const latestAvailabilityRequest = useRef(0);
 
   const loadMonth = useCallback(async (month: Date) => {
-    const requestId = ++latestMonthRequest.current;
+    const monthRequestId = ++latestMonthRequest.current;
+    const requestId = ++latestAvailabilityRequest.current;
     setMonthLoading(true);
     setError("");
     try {
       const result = await getPublicAvailabilityMonth({ data: { month: monthKey(month) } });
-      if (requestId !== latestMonthRequest.current) return;
+      if (requestId !== latestAvailabilityRequest.current) return;
       if (!result.success) {
         setOpenDates([]);
         setError("Could not load available appointments.");
@@ -32,21 +34,22 @@ export function useBookingAvailability() {
       }
       setOpenDates(result.openDates);
     } catch {
-      if (requestId !== latestMonthRequest.current) return;
+      if (requestId !== latestAvailabilityRequest.current) return;
       setOpenDates([]);
       setError("Could not load available appointments.");
     } finally {
-      if (requestId === latestMonthRequest.current) setMonthLoading(false);
+      if (monthRequestId === latestMonthRequest.current) setMonthLoading(false);
     }
   }, []);
 
   const loadDate = useCallback(async (date: string) => {
-    const requestId = ++latestDateRequest.current;
+    const dateRequestId = ++latestDateRequest.current;
+    const requestId = ++latestAvailabilityRequest.current;
     setSlotsLoading(true);
     setError("");
     try {
       const result = await getPublicAvailabilityDay({ data: { date } });
-      if (requestId !== latestDateRequest.current) return;
+      if (requestId !== latestAvailabilityRequest.current) return;
       if (!result.success) {
         setSlots([]);
         setError("Could not load available appointments.");
@@ -54,11 +57,11 @@ export function useBookingAvailability() {
       }
       setSlots(result.slots);
     } catch {
-      if (requestId !== latestDateRequest.current) return;
+      if (requestId !== latestAvailabilityRequest.current) return;
       setSlots([]);
       setError("Could not load available appointments.");
     } finally {
-      if (requestId === latestDateRequest.current) setSlotsLoading(false);
+      if (dateRequestId === latestDateRequest.current) setSlotsLoading(false);
     }
   }, []);
 
