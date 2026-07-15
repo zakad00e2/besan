@@ -1,10 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getWorkshopBookings, updateWorkshopBookingStatus } from "@/features/auth/admin.functions";
+import {
+  deleteWorkshopBooking,
+  getWorkshopBookings,
+  updateWorkshopBooking,
+  updateWorkshopBookingStatus,
+} from "@/features/auth/admin.functions";
 import { authClient, neonAuth } from "@/features/auth/neon-auth-client";
 import { DashboardWorkshopBookings } from "@/features/dashboard/dashboard-workshop-bookings";
 import type {
   WorkshopBookingListItem,
+  WorkshopBookingAdminUpdateInput,
   WorkshopBookingStatus,
 } from "@/features/workshop-booking/workshop-booking";
 
@@ -19,6 +25,10 @@ function DashboardWorkshopBookingsRoute() {
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [updateError, setUpdateError] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editError, setEditError] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     if (!session?.user) {
@@ -89,6 +99,64 @@ function DashboardWorkshopBookingsRoute() {
     }
   }
 
+  async function handleEdit(id: string, input: WorkshopBookingAdminUpdateInput) {
+    setEditingId(id);
+    setEditError("");
+    try {
+      const token = await neonAuth.getJWTToken();
+      if (!token) {
+        setEditError("Please sign in again before editing this booking.");
+        return;
+      }
+      const result = await updateWorkshopBooking({ data: { token, id, input } });
+      if (!result.success) {
+        setEditError(
+          result.reason === "forbidden"
+            ? "You do not have access to edit workshop bookings."
+            : result.reason === "not-found"
+              ? "This workshop booking no longer exists."
+              : "Could not update this workshop booking.",
+        );
+        return;
+      }
+      setBookings((current) =>
+        current.map((booking) => (booking.id === result.booking.id ? result.booking : booking)),
+      );
+    } catch {
+      setEditError("Could not update this workshop booking.");
+    } finally {
+      setEditingId(null);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    setDeletingId(id);
+    setDeleteError("");
+    try {
+      const token = await neonAuth.getJWTToken();
+      if (!token) {
+        setDeleteError("Please sign in again before deleting this booking.");
+        return;
+      }
+      const result = await deleteWorkshopBooking({ data: { token, id } });
+      if (!result.success) {
+        setDeleteError(
+          result.reason === "forbidden"
+            ? "You do not have access to delete workshop bookings."
+            : result.reason === "not-found"
+              ? "This workshop booking no longer exists."
+              : "Could not delete this workshop booking.",
+        );
+        return;
+      }
+      setBookings((current) => current.filter((booking) => booking.id !== id));
+    } catch {
+      setDeleteError("Could not delete this workshop booking.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   if (!session?.user)
     return (
       <a href="/auth" className="text-sm text-violet-700 underline">
@@ -107,6 +175,12 @@ function DashboardWorkshopBookingsRoute() {
     <DashboardWorkshopBookings
       bookings={bookings}
       onStatusChange={handleStatusChange}
+      onEdit={handleEdit}
+      editingId={editingId}
+      editError={editError}
+      onDelete={handleDelete}
+      deletingId={deletingId}
+      deleteError={deleteError}
       updatingId={updatingId}
       updateError={updateError}
     />

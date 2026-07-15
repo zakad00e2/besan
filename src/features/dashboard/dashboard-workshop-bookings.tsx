@@ -1,7 +1,25 @@
-import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Bell, MessageCircle, Pencil, Search, Trash2 } from "lucide-react";
+import { useMemo, useState, type FormEvent } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   workshopBookingStatuses,
+  type WorkshopBookingAdminUpdateInput,
   type WorkshopBookingListItem,
   type WorkshopBookingStatus,
 } from "@/features/workshop-booking/workshop-booking";
@@ -19,6 +37,21 @@ const statusLabels: Record<WorkshopBookingStatus, string> = {
   completed: "Completed",
   cancelled: "Cancelled",
 };
+
+const tableActionGroupClassName =
+  "inline-flex items-center overflow-hidden rounded-lg border border-[#e8e8ec] bg-white shadow-[0_1px_2px_rgba(24,24,27,0.03)]";
+const tableActionButtonClassName =
+  "inline-flex size-7 items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-400 disabled:cursor-wait disabled:opacity-60";
+const tableActionDividerClassName = "h-4 w-px shrink-0 bg-[#ececef]";
+
+function getWorkshopActionLinks(booking: WorkshopBookingListItem) {
+  const whatsappNumber = booking.mobile.replace(/\D/g, "");
+  const reminderMessage = `Hi ${booking.fullName}, this is a reminder for your ${booking.workshopName} workshop on ${booking.date}.`;
+  return {
+    reminderHref: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(reminderMessage)}`,
+    messageHref: `https://wa.me/${whatsappNumber}`,
+  };
+}
 
 export function filterWorkshopBookings(
   bookings: WorkshopBookingListItem[],
@@ -69,11 +102,23 @@ function StatusSelect({
 export function DashboardWorkshopBookings({
   bookings,
   onStatusChange,
+  onEdit = () => undefined,
+  editingId = null,
+  editError = "",
+  onDelete = () => undefined,
+  deletingId = null,
+  deleteError = "",
   updatingId = null,
   updateError = "",
 }: {
   bookings: WorkshopBookingListItem[];
   onStatusChange: (id: string, status: WorkshopBookingStatus) => void;
+  onEdit?: (id: string, input: WorkshopBookingAdminUpdateInput) => void | Promise<void>;
+  editingId?: string | null;
+  editError?: string;
+  onDelete?: (id: string) => void | Promise<void>;
+  deletingId?: string | null;
+  deleteError?: string;
   updatingId?: string | null;
   updateError?: string;
 }) {
@@ -81,6 +126,16 @@ export function DashboardWorkshopBookings({
     query: "",
     workshopId: "all",
     status: "all",
+  });
+  const [editingBooking, setEditingBooking] = useState<WorkshopBookingListItem | null>(null);
+  const [deletingBooking, setDeletingBooking] = useState<WorkshopBookingListItem | null>(null);
+  const [editFormError, setEditFormError] = useState("");
+  const [editForm, setEditForm] = useState<WorkshopBookingAdminUpdateInput>({
+    fullName: "",
+    mobile: "",
+    email: "",
+    date: "",
+    participants: 1,
   });
   const visibleBookings = useMemo(
     () => filterWorkshopBookings(bookings, filters),
@@ -93,6 +148,42 @@ export function DashboardWorkshopBookings({
       ),
     [bookings],
   );
+
+  function openEdit(booking: WorkshopBookingListItem) {
+    setEditForm({
+      fullName: booking.fullName,
+      mobile: booking.mobile,
+      email: booking.email,
+      date: booking.date,
+      participants: booking.participants,
+    });
+    setEditFormError("");
+    setEditingBooking(booking);
+  }
+
+  function submitEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editingBooking) return;
+    const input = {
+      ...editForm,
+      fullName: editForm.fullName.trim(),
+      mobile: editForm.mobile.trim(),
+      email: editForm.email.trim(),
+      participants: Number(editForm.participants),
+    };
+    if (
+      !input.fullName ||
+      !input.mobile ||
+      !input.date ||
+      !Number.isInteger(input.participants) ||
+      input.participants < 1
+    ) {
+      setEditFormError("Complete the required fields with a valid participant count.");
+      return;
+    }
+    void onEdit(editingBooking.id, input);
+    setEditingBooking(null);
+  }
 
   return (
     <section className="space-y-5" dir="ltr">
@@ -159,6 +250,16 @@ export function DashboardWorkshopBookings({
           {updateError}
         </p>
       )}
+      {editError && (
+        <p role="alert" className="text-sm text-rose-600">
+          {editError}
+        </p>
+      )}
+      {deleteError && (
+        <p role="alert" className="text-sm text-rose-600">
+          {deleteError}
+        </p>
+      )}
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
         {visibleBookings.length === 0 ? (
@@ -181,8 +282,8 @@ export function DashboardWorkshopBookings({
                     <th>Date</th>
                     <th>Participants</th>
                     <th>Notes</th>
-                    <th>Status</th>
                     <th className="px-4">Update status</th>
+                    <th className="px-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -201,15 +302,59 @@ export function DashboardWorkshopBookings({
                       <td className="max-w-48 truncate text-slate-500" title={booking.notes}>
                         {booking.notes || "—"}
                       </td>
-                      <td>
-                        <StatusBadge status={booking.status} />
-                      </td>
                       <td className="px-4 py-3">
                         <StatusSelect
                           booking={booking}
                           updating={updatingId === booking.id}
                           onStatusChange={onStatusChange}
                         />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className={tableActionGroupClassName}>
+                          <a
+                            href={getWorkshopActionLinks(booking).reminderHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`Send reminder to ${booking.fullName}`}
+                            title="Send reminder"
+                            className={`${tableActionButtonClassName} text-amber-600 hover:bg-amber-50`}
+                          >
+                            <Bell className="size-3.5" aria-hidden="true" />
+                          </a>
+                          <span className={tableActionDividerClassName} aria-hidden="true" />
+                          <a
+                            href={getWorkshopActionLinks(booking).messageHref}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`Message ${booking.fullName} on WhatsApp`}
+                            title="Message on WhatsApp"
+                            className={`${tableActionButtonClassName} text-emerald-600 hover:bg-emerald-50`}
+                          >
+                            <MessageCircle className="size-3.5" aria-hidden="true" />
+                          </a>
+                          <span className={tableActionDividerClassName} aria-hidden="true" />
+                          <button
+                            type="button"
+                            aria-label={`Edit ${booking.fullName}`}
+                            title="Edit booking"
+                            disabled={editingId === booking.id || deletingId === booking.id}
+                            onClick={() => openEdit(booking)}
+                            className={`${tableActionButtonClassName} text-violet-600 hover:bg-violet-50`}
+                          >
+                            <Pencil className="size-3.5" aria-hidden="true" />
+                          </button>
+                          <span className={tableActionDividerClassName} aria-hidden="true" />
+                          <button
+                            type="button"
+                            aria-label={`Delete ${booking.fullName}`}
+                            title="Delete booking"
+                            disabled={editingId === booking.id || deletingId === booking.id}
+                            onClick={() => setDeletingBooking(booking)}
+                            className={`${tableActionButtonClassName} text-rose-600 hover:bg-rose-50`}
+                          >
+                            <Trash2 className="size-3.5" aria-hidden="true" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -239,12 +384,169 @@ export function DashboardWorkshopBookings({
                     updating={updatingId === booking.id}
                     onStatusChange={onStatusChange}
                   />
+                  <div className="flex flex-wrap gap-2">
+                    <a
+                      href={getWorkshopActionLinks(booking).reminderHref}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Send reminder to ${booking.fullName}`}
+                      className="text-xs text-amber-700 hover:underline"
+                    >
+                      Send reminder
+                    </a>
+                    <a
+                      href={getWorkshopActionLinks(booking).messageHref}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Message ${booking.fullName} on WhatsApp`}
+                      className="text-xs text-emerald-700 hover:underline"
+                    >
+                      WhatsApp
+                    </a>
+                    <button
+                      type="button"
+                      aria-label={`Edit ${booking.fullName}`}
+                      disabled={editingId === booking.id || deletingId === booking.id}
+                      onClick={() => openEdit(booking)}
+                      className="text-xs text-violet-700 hover:underline disabled:opacity-60"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Delete ${booking.fullName}`}
+                      disabled={editingId === booking.id || deletingId === booking.id}
+                      onClick={() => setDeletingBooking(booking)}
+                      className="text-xs text-rose-700 hover:underline disabled:opacity-60"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </article>
               ))}
             </div>
           </>
         )}
       </div>
+
+      <Dialog
+        open={Boolean(editingBooking)}
+        onOpenChange={(open) => !open && setEditingBooking(null)}
+      >
+        <DialogContent dir="ltr" className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle>Edit workshop booking</DialogTitle>
+            <DialogDescription>
+              Update the customer and attendance details for this workshop.
+            </DialogDescription>
+          </DialogHeader>
+          <form className="space-y-3" onSubmit={submitEdit}>
+            <label className="block text-sm text-slate-700">
+              Full name
+              <input
+                aria-label="Full name"
+                value={editForm.fullName}
+                onChange={(event) => setEditForm({ ...editForm, fullName: event.target.value })}
+                className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
+                required
+              />
+            </label>
+            <label className="block text-sm text-slate-700">
+              Mobile
+              <input
+                aria-label="Mobile"
+                value={editForm.mobile}
+                onChange={(event) => setEditForm({ ...editForm, mobile: event.target.value })}
+                className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
+                required
+              />
+            </label>
+            <label className="block text-sm text-slate-700">
+              Email
+              <input
+                aria-label="Email"
+                type="email"
+                value={editForm.email}
+                onChange={(event) => setEditForm({ ...editForm, email: event.target.value })}
+                className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
+              />
+            </label>
+            <label className="block text-sm text-slate-700">
+              Date
+              <input
+                aria-label="Date"
+                type="date"
+                value={editForm.date}
+                onChange={(event) => setEditForm({ ...editForm, date: event.target.value })}
+                className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
+                required
+              />
+            </label>
+            <label className="block text-sm text-slate-700">
+              Participants
+              <input
+                aria-label="Participants"
+                type="number"
+                min="1"
+                step="1"
+                value={editForm.participants}
+                onChange={(event) =>
+                  setEditForm({ ...editForm, participants: Number(event.target.value) })
+                }
+                className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
+                required
+              />
+            </label>
+            {editFormError && (
+              <p role="alert" className="text-sm text-rose-600">
+                {editFormError}
+              </p>
+            )}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingBooking(null)}
+                className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={editingId === editingBooking?.id}
+                className="rounded-lg bg-violet-600 px-3 py-2 text-sm text-white disabled:opacity-60"
+              >
+                Save changes
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={Boolean(deletingBooking)}
+        onOpenChange={(open) => !open && setDeletingBooking(null)}
+      >
+        <AlertDialogContent dir="ltr" className="max-w-md bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete workshop booking?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the booking for {deletingBooking?.fullName}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deletingId === deletingBooking?.id}
+              onClick={() => {
+                if (deletingBooking) void onDelete(deletingBooking.id);
+              }}
+              className="bg-rose-600 text-white hover:bg-rose-700"
+            >
+              Delete booking
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

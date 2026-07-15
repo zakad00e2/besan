@@ -114,4 +114,40 @@ describe("DashboardWorkshopBookings", () => {
     expect(statusSelect).toHaveProperty("disabled", true);
     expect(screen.getByRole("alert").textContent).toBe("Could not update this workshop booking.");
   });
+
+  it("renders actions and submits an edit or confirmed deletion", () => {
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+    render(
+      <DashboardWorkshopBookings
+        bookings={bookings}
+        onStatusChange={vi.fn()}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />,
+    );
+
+    expect(screen.getByRole("columnheader", { name: "Actions" })).toBeTruthy();
+    expect(
+      screen.getAllByLabelText("Send reminder to Noor Al-Hashemi")[0].getAttribute("href"),
+    ).toContain("https://wa.me/970591234567?text=");
+    expect(
+      screen.getAllByLabelText("Message Noor Al-Hashemi on WhatsApp")[0].getAttribute("href"),
+    ).toBe("https://wa.me/970591234567");
+
+    fireEvent.click(screen.getAllByLabelText("Edit Noor Al-Hashemi")[0]);
+    fireEvent.change(screen.getByLabelText("Participants"), { target: { value: "4" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(onEdit).toHaveBeenCalledWith("workshop-booking-1", {
+      fullName: "Noor Al-Hashemi",
+      mobile: "+970591234567",
+      email: "noor@example.com",
+      date: "2026-07-13",
+      participants: 4,
+    });
+
+    fireEvent.click(screen.getAllByLabelText("Delete Noor Al-Hashemi")[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Delete booking" }));
+    expect(onDelete).toHaveBeenCalledWith("workshop-booking-1");
+  });
 });
