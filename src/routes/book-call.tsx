@@ -194,18 +194,20 @@ export function BookCall() {
                         mode="single"
                         selected={selectedDate}
                         onSelect={(date) => {
+                          if (submitting) return;
                           setSelectedDate(date);
                           setSelectedTime("");
                           setSubmitted(false);
                           if (date) void availability.loadDate(formatBookingDate(date));
                         }}
                         onMonthChange={(month) => {
+                          if (submitting) return;
                           setSelectedDate(undefined);
                           setSelectedTime("");
                           void availability.loadMonth(month);
                         }}
                         disabled={(date) =>
-                          !availability.openDates.includes(formatBookingDate(date))
+                          submitting || !availability.openDates.includes(formatBookingDate(date))
                         }
                         showOutsideDays={false}
                         className="mx-auto w-full p-0 [--cell-size:2.25rem] sm:[--cell-size:3rem] lg:max-w-[23rem] lg:[--cell-size:2.5rem]"
@@ -257,7 +259,7 @@ export function BookCall() {
                         </div>
                       ) : availability.slotsLoading ? (
                         <p className="mt-6 text-sm text-muted-foreground">
-                          Loading available timesâ€¦
+                          Loading available times…
                         </p>
                       ) : selectedDate && availableTimes.length === 0 ? (
                         <p className="mt-6 text-sm text-muted-foreground">
@@ -318,7 +320,7 @@ export function BookCall() {
                         </button>
                       </div>
                     ) : availability.slotsLoading ? (
-                      <p className="mt-6 text-sm text-muted-foreground">Loading available timesâ€¦</p>
+                      <p className="mt-6 text-sm text-muted-foreground">Loading available times…</p>
                     ) : selectedDate && availableTimes.length === 0 ? (
                       <p className="mt-6 text-sm text-muted-foreground">
                         No times remain on this date.
@@ -432,7 +434,7 @@ export function BookCall() {
                   className="inline-flex items-center justify-center gap-3 border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.1em] text-background transition-opacity hover:opacity-85 active:translate-y-px"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  {submitting ? "Saving bookingâ€¦" : "Confirm Booking"}
+                  {submitting ? "Saving booking…" : "Confirm Booking"}
                 </button>
               </div>
             </form>
