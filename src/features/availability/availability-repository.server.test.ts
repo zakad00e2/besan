@@ -70,12 +70,15 @@ describe("availability repository", () => {
     );
   });
 
-  it("upserts an override and its windows in one statement", async () => {
+  it("upserts an override and its windows atomically", async () => {
     const execute = vi.fn<AvailabilityQueryExecutor>().mockResolvedValue([
       {
         id: "11111111-1111-4111-8111-111111111111",
       },
     ]);
+    const transaction = vi
+      .fn()
+      .mockResolvedValue([[], [{ id: "11111111-1111-4111-8111-111111111111" }], []]);
     const input = {
       kind: "custom-hours" as const,
       startsOn: "2026-07-16",
@@ -83,30 +86,65 @@ describe("availability repository", () => {
       note: "Thursday opening",
       windows: [{ startsAt: "11:30", endsAt: "13:30" }],
     };
-    await expect(createAvailabilityRepository(execute).saveOverride(input)).resolves.toEqual({
+    await expect(
+      createAvailabilityRepository(execute, transaction).saveOverride(input),
+    ).resolves.toEqual({
       success: true,
       id: "11111111-1111-4111-8111-111111111111",
     });
-    expect(execute).toHaveBeenCalledWith(
-      expect.stringMatching(/availability_date_overrides[\s\S]+availability_date_windows/),
-      [
-        null,
-        "custom-hours",
-        "2026-07-16",
-        "2026-07-16",
-        "Thursday opening",
-        JSON.stringify(input.windows),
-      ],
-    );
+    expect(transaction).toHaveBeenCalledOnce();
+  });
+
+  it("removes custom-hour windows before changing an override to closed", async () => {
+    const execute = vi.fn<AvailabilityQueryExecutor>();
+    const transaction = vi
+      .fn()
+      .mockResolvedValue([
+        [{ id: "window-1" }],
+        [{ id: "11111111-1111-4111-8111-111111111111" }],
+        [],
+      ]);
+    await expect(
+      createAvailabilityRepository(execute, transaction).saveOverride({
+        id: "11111111-1111-4111-8111-111111111111",
+        kind: "closed",
+        startsOn: "2026-07-16",
+        endsOn: "2026-07-16",
+        note: "Closed for repairs",
+        windows: [],
+      }),
+    ).resolves.toEqual({ success: true, id: "11111111-1111-4111-8111-111111111111" });
+
+    expect(transaction).toHaveBeenCalledWith([
+      expect.objectContaining({
+        query: expect.stringContaining("DELETE FROM public.availability_date_windows"),
+        params: ["11111111-1111-4111-8111-111111111111"],
+      }),
+      expect.objectContaining({
+        query: expect.stringContaining("INSERT INTO public.availability_date_overrides"),
+        params: [
+          "11111111-1111-4111-8111-111111111111",
+          "closed",
+          "2026-07-16",
+          "2026-07-16",
+          "Closed for repairs",
+        ],
+      }),
+      expect.objectContaining({
+        query: expect.stringContaining("INSERT INTO public.availability_date_windows"),
+        params: ["11111111-1111-4111-8111-111111111111", "[]"],
+      }),
+    ]);
   });
 
   it("maps a concurrent override-range conflict", async () => {
-    const execute = vi.fn<AvailabilityQueryExecutor>().mockRejectedValue({
+    const execute = vi.fn<AvailabilityQueryExecutor>();
+    const transaction = vi.fn().mockRejectedValue({
       code: "23P01",
       constraint: "availability_date_overrides_no_overlap",
     });
     await expect(
-      createAvailabilityRepository(execute).saveOverride({
+      createAvailabilityRepository(execute, transaction).saveOverride({
         kind: "closed",
         startsOn: "2026-08-10",
         endsOn: "2026-08-20",

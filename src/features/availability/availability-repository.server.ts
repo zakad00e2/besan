@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { randomUUID } from "node:crypto";
 import type {
   AvailabilityConfiguration,
   AvailabilityOverrideInput,
@@ -10,6 +11,12 @@ export type AvailabilityQueryExecutor = <T extends Record<string, unknown>>(
   query: string,
   params?: unknown[],
 ) => Promise<T[]>;
+
+type AvailabilityTransactionQuery = { query: string; params?: unknown[] };
+
+type AvailabilityTransactionExecutor = (
+  queries: AvailabilityTransactionQuery[],
+) => Promise<Record<string, unknown>[][]>;
 
 export type SaveOverrideResult =
   { success: true; id: string } | { success: false; reason: "overlap" };
@@ -126,37 +133,32 @@ CROSS JOIN LATERAL jsonb_array_elements(payload.day->'windows')
   WITH ORDINALITY AS window(value, ordinality)
 WHERE (SELECT count(*) FROM deleted_windows) >= 0`;
 
+const removeOverrideWindowsQuery = `
+DELETE FROM public.availability_date_windows
+WHERE override_id = $1::uuid
+RETURNING id`;
+
 const saveOverrideQuery = `
-WITH removed_windows AS (
-  DELETE FROM public.availability_date_windows
-  WHERE override_id = $1::uuid
-  RETURNING id
-),
-saved_override AS (
-  INSERT INTO public.availability_date_overrides (id, kind, starts_on, ends_on, note)
-  VALUES (COALESCE($1::uuid, gen_random_uuid()), $2, $3::date, $4::date, $5)
-  ON CONFLICT (id) DO UPDATE
-    SET kind = EXCLUDED.kind,
-        starts_on = EXCLUDED.starts_on,
-        ends_on = EXCLUDED.ends_on,
-        note = EXCLUDED.note,
-        updated_at = now()
-  RETURNING id
-),
-saved_windows AS (
-  INSERT INTO public.availability_date_windows (override_id, starts_at, ends_at, sort_order)
-  SELECT
-    saved_override.id,
-    (window.value->>'startsAt')::time,
-    (window.value->>'endsAt')::time,
-    (window.ordinality - 1)::smallint
-  FROM saved_override
-  CROSS JOIN LATERAL jsonb_array_elements($6::jsonb)
-    WITH ORDINALITY AS window(value, ordinality)
-  WHERE (SELECT count(*) FROM removed_windows) >= 0
-  RETURNING id
-)
-SELECT id FROM saved_override`;
+INSERT INTO public.availability_date_overrides (id, kind, starts_on, ends_on, note)
+VALUES (COALESCE($1::uuid, gen_random_uuid()), $2, $3::date, $4::date, $5)
+ON CONFLICT (id) DO UPDATE
+  SET kind = EXCLUDED.kind,
+      starts_on = EXCLUDED.starts_on,
+      ends_on = EXCLUDED.ends_on,
+      note = EXCLUDED.note,
+      updated_at = now()
+RETURNING id`;
+
+const saveOverrideWindowsQuery = `
+INSERT INTO public.availability_date_windows (override_id, starts_at, ends_at, sort_order)
+SELECT
+  $1::uuid,
+  (window.value->>'startsAt')::time,
+  (window.value->>'endsAt')::time,
+  (window.ordinality - 1)::smallint
+FROM jsonb_array_elements($2::jsonb)
+  WITH ORDINALITY AS window(value, ordinality)
+RETURNING id`;
 
 const deleteOverrideQuery = `
 DELETE FROM public.availability_date_overrides
@@ -176,6 +178,7 @@ function isOverrideOverlap(error: unknown) {
 
 export function createAvailabilityRepository(
   execute: AvailabilityQueryExecutor,
+  executeTransaction?: AvailabilityTransactionExecutor,
 ): AvailabilityRepository {
   return {
     async loadConfiguration() {
@@ -204,13 +207,18 @@ export function createAvailabilityRepository(
     },
     async saveOverride(input) {
       try {
-        const rows = await execute<{ id: string }>(saveOverrideQuery, [
-          input.id ?? null,
-          input.kind,
-          input.startsOn,
-          input.endsOn,
-          input.note,
-          JSON.stringify(input.windows),
+        if (!executeTransaction) throw new Error("Availability transactions are not configured");
+        const overrideId = input.id ?? randomUUID();
+        const [, rows] = await executeTransaction([
+          { query: removeOverrideWindowsQuery, params: [input.id ?? null] },
+          {
+            query: saveOverrideQuery,
+            params: [overrideId, input.kind, input.startsOn, input.endsOn, input.note],
+          },
+          {
+            query: saveOverrideWindowsQuery,
+            params: [overrideId, JSON.stringify(input.windows)],
+          },
         ]);
         return { success: true, id: rows[0].id };
       } catch (error) {
@@ -232,6 +240,16 @@ function createNeonExecutor(): AvailabilityQueryExecutor {
   return (query, params) => sql.query(query, params) as Promise<Record<string, unknown>[]>;
 }
 
+function createNeonTransactionExecutor(): AvailabilityTransactionExecutor {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) throw new Error("DATABASE_URL is not configured");
+  const sql = neon(databaseUrl);
+  return (queries) =>
+    sql.transaction(queries.map(({ query, params }) => sql.query(query, params))) as Promise<
+      Record<string, unknown>[][]
+    >;
+}
+
 export function getNeonAvailabilityRepository() {
-  return createAvailabilityRepository(createNeonExecutor());
+  return createAvailabilityRepository(createNeonExecutor(), createNeonTransactionExecutor());
 }
