@@ -136,6 +136,18 @@ export function parseAvailabilityOverride(input: unknown): ParseResult<Availabil
     : { success: true, data: parsed.data };
 }
 
+export function hasOverrideOverlap(
+  input: AvailabilityOverrideInput,
+  existing: AvailabilityOverride[],
+): boolean {
+  return existing.some(
+    (override) =>
+      override.id !== input.id &&
+      input.startsOn <= override.endsOn &&
+      input.endsOn >= override.startsOn,
+  );
+}
+
 export function getLocalDateInTimeZone(now = new Date(), timezone = ATELIER_TIMEZONE) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,

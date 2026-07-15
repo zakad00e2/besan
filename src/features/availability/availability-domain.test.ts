@@ -3,6 +3,7 @@ import {
   DEFAULT_WEEKLY_SCHEDULE,
   findScheduleConflicts,
   getLocalDateInTimeZone,
+  hasOverrideOverlap,
   parseAvailabilityOverride,
   parseWeeklySchedule,
   resolveAvailableSlots,
@@ -170,5 +171,40 @@ describe("availability domain", () => {
       }).success,
     ).toBe(false);
     expect(getLocalDateInTimeZone(new Date("2026-07-15T21:30:00Z"))).toBe("2026-07-16");
+  });
+
+  it("rejects inclusive override range intersections but permits replacing the same override", () => {
+    const existing = [
+      {
+        id: "leave",
+        kind: "closed" as const,
+        startsOn: "2026-08-10",
+        endsOn: "2026-08-12",
+        note: "Travel",
+        windows: [],
+      },
+    ];
+
+    expect(
+      hasOverrideOverlap(
+        {
+          kind: "closed",
+          startsOn: "2026-08-12",
+          endsOn: "2026-08-14",
+          note: "Personal leave",
+          windows: [],
+        },
+        existing,
+      ),
+    ).toBe(true);
+    expect(
+      hasOverrideOverlap(
+        {
+          ...existing[0],
+          note: "Updated travel note",
+        },
+        existing,
+      ),
+    ).toBe(false);
   });
 });
