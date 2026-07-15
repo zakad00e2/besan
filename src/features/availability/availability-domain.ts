@@ -148,6 +148,31 @@ export function hasOverrideOverlap(
   );
 }
 
+export function applyWeeklySchedule(
+  configuration: AvailabilityConfiguration,
+  weekly: WeeklyAvailabilityDay[],
+): AvailabilityConfiguration {
+  return { ...configuration, weekly: structuredClone(weekly) };
+}
+
+export function applyOverride(
+  configuration: AvailabilityConfiguration,
+  input: AvailabilityOverrideInput,
+): AvailabilityConfiguration {
+  const id = input.id ?? "draft-override";
+  const next: AvailabilityOverride = { ...input, id };
+  return {
+    ...configuration,
+    overrides: [...configuration.overrides.filter((item) => item.id !== id), next].sort((a, b) =>
+      a.startsOn.localeCompare(b.startsOn),
+    ),
+  };
+}
+
+export function removeOverride(configuration: AvailabilityConfiguration, id: string) {
+  return { ...configuration, overrides: configuration.overrides.filter((item) => item.id !== id) };
+}
+
 export function getLocalDateInTimeZone(now = new Date(), timezone = ATELIER_TIMEZONE) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,

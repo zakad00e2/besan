@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  applyOverride,
+  applyWeeklySchedule,
   DEFAULT_WEEKLY_SCHEDULE,
   findScheduleConflicts,
   getLocalDateInTimeZone,
   hasOverrideOverlap,
   parseAvailabilityOverride,
   parseWeeklySchedule,
+  removeOverride,
   resolveAvailableSlots,
   type AvailabilityConfiguration,
 } from "./availability-domain";
@@ -206,5 +209,49 @@ describe("availability domain", () => {
         existing,
       ),
     ).toBe(false);
+  });
+
+  it("applies weekly and override drafts without mutating loaded data", () => {
+    const weeklyDraft = configuration.weekly.map((day) =>
+      day.weekday === 0 ? { ...day, isEnabled: false } : day,
+    );
+    expect(applyWeeklySchedule(configuration, weeklyDraft).weekly[0].isEnabled).toBe(false);
+    expect(configuration.weekly[0].isEnabled).toBe(true);
+
+    const changed = applyOverride(configuration, {
+      kind: "closed",
+      startsOn: "2026-08-10",
+      endsOn: "2026-08-20",
+      note: "Travel",
+      windows: [],
+    });
+    expect(changed.overrides).toHaveLength(1);
+    expect(removeOverride(changed, "draft-override").overrides).toEqual([]);
+  });
+
+  it("detects overlapping overrides while allowing a row to replace itself", () => {
+    const existing = [
+      {
+        id: "11111111-1111-4111-8111-111111111111",
+        kind: "closed" as const,
+        startsOn: "2026-08-10",
+        endsOn: "2026-08-20",
+        note: "Travel",
+        windows: [],
+      },
+    ];
+    expect(
+      hasOverrideOverlap(
+        {
+          kind: "closed",
+          startsOn: "2026-08-15",
+          endsOn: "2026-08-22",
+          note: "",
+          windows: [],
+        },
+        existing,
+      ),
+    ).toBe(true);
+    expect(hasOverrideOverlap({ ...existing[0], endsOn: "2026-08-21" }, existing)).toBe(false);
   });
 });
