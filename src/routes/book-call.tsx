@@ -7,7 +7,6 @@ import { Calendar } from "@/components/ui/calendar";
 import {
   formatBookingDate,
   appointmentTypes,
-  timesByDay,
 } from "@/features/book-call/booking-domain";
 import { submitBooking } from "@/features/book-call/booking.functions";
 
@@ -28,6 +27,13 @@ export const Route = createFileRoute("/book-call")({
 const appointmentDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday"] as const;
 type AppointmentDay = (typeof appointmentDays)[number];
 
+const timesByDay: Record<AppointmentDay, readonly string[]> = {
+  Monday: ["10:00", "12:30", "16:00"],
+  Tuesday: ["11:00", "14:00", "17:30"],
+  Wednesday: ["10:30", "13:00", "16:30"],
+  Thursday: ["12:00", "15:00", "18:00"],
+  Saturday: ["10:00", "12:00", "14:30"],
+};
 const dayNameFormatter = new Intl.DateTimeFormat("en-US", { weekday: "long" });
 const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
   weekday: "long",
