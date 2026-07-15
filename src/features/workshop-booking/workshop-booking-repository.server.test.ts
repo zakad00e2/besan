@@ -46,6 +46,14 @@ const mappedWorkshopBooking = {
   updatedAt: "2026-07-02T10:00:00.000Z",
 };
 
+const updateInput = {
+  fullName: "Noor Khalil",
+  mobile: "+970591234567",
+  email: "noor@example.com",
+  date: "2026-07-13",
+  participants: 4,
+};
+
 describe("workshop booking repository", () => {
   it("stores a validated workshop booking in a parameterized query", async () => {
     const execute = vi.fn<QueryExecutor>().mockResolvedValue([{ id: "workshop-booking-1" }]);
@@ -99,5 +107,37 @@ describe("workshop booking repository", () => {
     await expect(
       createWorkshopBookingRepository(execute).updateStatus("workshop-booking-1", "confirmed"),
     ).resolves.toEqual({ success: false, reason: "not-found" });
+  });
+
+  it("updates the editable workshop booking fields and maps the returned row", async () => {
+    const execute = vi.fn<QueryExecutor>().mockResolvedValue([
+      { ...workshopBookingRow, full_name: "Noor Khalil", participants: 4 },
+    ]);
+
+    await expect(
+      createWorkshopBookingRepository(execute).update("workshop-booking-1", updateInput),
+    ).resolves.toEqual({
+      success: true,
+      booking: { ...mappedWorkshopBooking, fullName: "Noor Khalil", participants: 4 },
+    });
+    expect(execute).toHaveBeenCalledWith(expect.stringContaining("UPDATE public.workshop_bookings"), [
+      "workshop-booking-1",
+      "Noor Khalil",
+      "+970591234567",
+      "noor@example.com",
+      "2026-07-13",
+      4,
+    ]);
+  });
+
+  it("deletes an existing workshop booking", async () => {
+    const execute = vi.fn<QueryExecutor>().mockResolvedValue([{ id: "workshop-booking-1" }]);
+
+    await expect(
+      createWorkshopBookingRepository(execute).delete("workshop-booking-1"),
+    ).resolves.toEqual({ success: true });
+    expect(execute).toHaveBeenCalledWith(expect.stringContaining("DELETE FROM public.workshop_bookings"), [
+      "workshop-booking-1",
+    ]);
   });
 });

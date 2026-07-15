@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getTomorrowDateMinimum,
+  parseWorkshopBookingAdminUpdate,
   parseWorkshopBooking,
   parseWorkshopBookingInput,
   parseWorkshopBookingStatus,
@@ -65,6 +66,29 @@ describe("parseWorkshopBookingStatus", () => {
   it("accepts only supported statuses", () => {
     expect(parseWorkshopBookingStatus("confirmed")).toEqual({ success: true, data: "confirmed" });
     expect(parseWorkshopBookingStatus("refunded")).toEqual({ success: false });
+  });
+});
+
+describe("parseWorkshopBookingAdminUpdate", () => {
+  it("normalizes editable values while accepting an historic booking date", () => {
+    expect(
+      parseWorkshopBookingAdminUpdate({
+        fullName: "  Noor Khalil ",
+        mobile: " +970 59 123 4567 ",
+        email: " noor@example.com ",
+        date: "2026-07-01",
+        participants: 4,
+      }),
+    ).toEqual({
+      success: true,
+      data: {
+        fullName: "Noor Khalil",
+        mobile: "+970591234567",
+        email: "noor@example.com",
+        date: "2026-07-01",
+        participants: 4,
+      },
+    });
   });
 });
 

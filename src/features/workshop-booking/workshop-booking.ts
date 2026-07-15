@@ -35,6 +35,14 @@ export type WorkshopBookingInput = {
   notes?: string;
 };
 
+export type WorkshopBookingAdminUpdateInput = {
+  fullName: string;
+  mobile: string;
+  email: string;
+  date: string;
+  participants: number;
+};
+
 export type ValidatedWorkshopBooking = WorkshopBookingInput & { email: string; notes: string };
 
 export type WorkshopBookingListItem = ValidatedWorkshopBooking & {
@@ -71,6 +79,14 @@ const workshopBookingInputSchema = z.object({
 });
 
 const workshopBookingStatusSchema = z.enum(workshopBookingStatuses);
+
+const workshopBookingAdminUpdateSchema = z.object({
+  fullName: z.string(),
+  mobile: z.string(),
+  email: z.string(),
+  date: z.string(),
+  participants: z.number(),
+});
 
 function formatLocalDate(date: Date) {
   const year = date.getFullYear();
@@ -197,6 +213,59 @@ export function parseWorkshopBookingStatus(
 ): { success: true; data: WorkshopBookingStatus } | { success: false } {
   const parsed = workshopBookingStatusSchema.safeParse(input);
   return parsed.success ? { success: true, data: parsed.data } : { success: false };
+}
+
+export function parseWorkshopBookingAdminUpdate(
+  input: unknown,
+):
+  | { success: true; data: WorkshopBookingAdminUpdateInput }
+  | {
+      success: false;
+      errors: Pick<
+        WorkshopBookingErrors,
+        "fullName" | "mobile" | "email" | "date" | "participants"
+      >;
+    } {
+  const parsed = workshopBookingAdminUpdateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false, errors: inputTypeErrors(input) };
+  }
+
+  const fullName = parsed.data.fullName.trim();
+  const mobile = normalizeMobile(parsed.data.mobile.trim());
+  const email = parsed.data.email.trim();
+  const date = parsed.data.date.trim();
+  const { participants } = parsed.data;
+  const errors: Pick<
+    WorkshopBookingErrors,
+    "fullName" | "mobile" | "email" | "date" | "participants"
+  > = {};
+
+  if (fullName.length < 2) {
+    errors.fullName = "Enter your full name.";
+  } else if (fullName.length > 120) {
+    errors.fullName = "Enter a full name of 120 characters or fewer.";
+  }
+  if (!mobile) {
+    errors.mobile = "Enter your mobile number.";
+  } else if (mobile.length < 7) {
+    errors.mobile = "Enter a mobile number of at least 7 characters.";
+  } else if (mobile.length > 20) {
+    errors.mobile = "Enter a mobile number of 20 characters or fewer.";
+  }
+  if (email && (!emailPattern.test(email) || email.length > 254)) {
+    errors.email = "Enter a valid email address.";
+  }
+  if (!date || !isCalendarDate(date)) {
+    errors.date = "Choose a workshop date.";
+  }
+  if (!Number.isInteger(participants) || participants < 1) {
+    errors.participants = "Enter a whole number of at least 1.";
+  }
+
+  if (Object.keys(errors).length > 0) return { success: false, errors };
+
+  return { success: true, data: { fullName, mobile, email, date, participants } };
 }
 
 export function parseWorkshopBooking(

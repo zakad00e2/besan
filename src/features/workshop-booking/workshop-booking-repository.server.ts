@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import type {
   ValidatedWorkshopBooking,
+  WorkshopBookingAdminUpdateInput,
   WorkshopBookingListItem,
   WorkshopBookingStatus,
 } from "./workshop-booking";
@@ -19,6 +20,13 @@ export type WorkshopBookingRepository = {
   ): Promise<
     { success: true; booking: WorkshopBookingListItem } | { success: false; reason: "not-found" }
   >;
+  update(
+    id: string,
+    input: WorkshopBookingAdminUpdateInput,
+  ): Promise<
+    { success: true; booking: WorkshopBookingListItem } | { success: false; reason: "not-found" }
+  >;
+  delete(id: string): Promise<{ success: true } | { success: false; reason: "not-found" }>;
 };
 
 type WorkshopBookingRow = {
@@ -75,6 +83,17 @@ SET status = $2, updated_at = now()
 WHERE id = $1
 RETURNING ${workshopBookingColumns}`;
 
+const updateWorkshopBookingQuery = `
+UPDATE public.workshop_bookings
+SET full_name = $2, mobile = $3, email = $4, workshop_date = $5::date, participants = $6, updated_at = now()
+WHERE id = $1
+RETURNING ${workshopBookingColumns}`;
+
+const deleteWorkshopBookingQuery = `
+DELETE FROM public.workshop_bookings
+WHERE id = $1
+RETURNING id`;
+
 function mapWorkshopBookingRow(row: WorkshopBookingRow): WorkshopBookingListItem {
   return {
     id: row.id,
@@ -120,6 +139,24 @@ export function createWorkshopBookingRepository(execute: QueryExecutor): Worksho
       return row
         ? { success: true, booking: mapWorkshopBookingRow(row) }
         : { success: false, reason: "not-found" };
+    },
+    async update(id, input) {
+      const rows = await execute<WorkshopBookingRow>(updateWorkshopBookingQuery, [
+        id,
+        input.fullName,
+        input.mobile,
+        input.email,
+        input.date,
+        input.participants,
+      ]);
+      const row = rows[0];
+      return row
+        ? { success: true, booking: mapWorkshopBookingRow(row) }
+        : { success: false, reason: "not-found" };
+    },
+    async delete(id) {
+      const rows = await execute<{ id: string }>(deleteWorkshopBookingQuery, [id]);
+      return rows[0] ? { success: true } : { success: false, reason: "not-found" };
     },
   };
 }
