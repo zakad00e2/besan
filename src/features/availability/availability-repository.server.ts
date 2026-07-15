@@ -51,13 +51,13 @@ SELECT
         'windows', COALESCE((
           SELECT json_agg(
             json_build_object(
-              'id', window.id,
-              'startsAt', to_char(window.starts_at, 'HH24:MI'),
-              'endsAt', to_char(window.ends_at, 'HH24:MI')
-            ) ORDER BY window.sort_order, window.starts_at
+              'id', window_row.id,
+              'startsAt', to_char(window_row.starts_at, 'HH24:MI'),
+              'endsAt', to_char(window_row.ends_at, 'HH24:MI')
+            ) ORDER BY window_row.sort_order, window_row.starts_at
           )
-          FROM public.weekly_availability_windows window
-          WHERE window.weekday = day.weekday
+          FROM public.weekly_availability_windows window_row
+          WHERE window_row.weekday = day.weekday
         ), '[]'::json)
       ) ORDER BY day.weekday
     )
@@ -74,13 +74,13 @@ SELECT
         'windows', COALESCE((
           SELECT json_agg(
             json_build_object(
-              'id', window.id,
-              'startsAt', to_char(window.starts_at, 'HH24:MI'),
-              'endsAt', to_char(window.ends_at, 'HH24:MI')
-            ) ORDER BY window.sort_order, window.starts_at
+              'id', window_row.id,
+              'startsAt', to_char(window_row.starts_at, 'HH24:MI'),
+              'endsAt', to_char(window_row.ends_at, 'HH24:MI')
+            ) ORDER BY window_row.sort_order, window_row.starts_at
           )
-          FROM public.availability_date_windows window
-          WHERE window.override_id = override_row.id
+          FROM public.availability_date_windows window_row
+          WHERE window_row.override_id = override_row.id
         ), '[]'::json)
       ) ORDER BY override_row.starts_on, override_row.ends_on
     )
@@ -121,12 +121,12 @@ deleted_windows AS (
 INSERT INTO public.weekly_availability_windows (weekday, starts_at, ends_at, sort_order)
 SELECT
   (payload.day->>'weekday')::smallint,
-  (window.value->>'startsAt')::time,
-  (window.value->>'endsAt')::time,
-  (window.ordinality - 1)::smallint
+  (window_row.value->>'startsAt')::time,
+  (window_row.value->>'endsAt')::time,
+  (window_row.ordinality - 1)::smallint
 FROM payload
 CROSS JOIN LATERAL jsonb_array_elements(payload.day->'windows')
-  WITH ORDINALITY AS window(value, ordinality)
+  WITH ORDINALITY AS window_row(value, ordinality)
 WHERE (SELECT count(*) FROM deleted_windows) >= 0`;
 
 const removeOverrideWindowsQuery = `
@@ -149,11 +149,11 @@ const saveOverrideWindowsQuery = `
 INSERT INTO public.availability_date_windows (override_id, starts_at, ends_at, sort_order)
 SELECT
   $1::uuid,
-  (window.value->>'startsAt')::time,
-  (window.value->>'endsAt')::time,
-  (window.ordinality - 1)::smallint
+  (window_row.value->>'startsAt')::time,
+  (window_row.value->>'endsAt')::time,
+  (window_row.ordinality - 1)::smallint
 FROM jsonb_array_elements($2::jsonb)
-  WITH ORDINALITY AS window(value, ordinality)
+  WITH ORDINALITY AS window_row(value, ordinality)
 RETURNING id`;
 
 const deleteOverrideQuery = `

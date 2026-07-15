@@ -33,6 +33,31 @@ describe("availability repository", () => {
     expect(execute).toHaveBeenCalledWith(expect.stringContaining("weekly_availability_days"));
   });
 
+  it("does not use PostgreSQL reserved window aliases", async () => {
+    const execute = vi.fn<AvailabilityQueryExecutor>().mockResolvedValue([configurationRow]);
+    const transaction = vi
+      .fn()
+      .mockResolvedValue([[], [{ id: "11111111-1111-4111-8111-111111111111" }], []]);
+    execute.transaction = transaction;
+    const repository = createAvailabilityRepository(execute);
+
+    await repository.loadConfiguration();
+    await repository.replaceWeeklySchedule(DEFAULT_WEEKLY_SCHEDULE);
+    await repository.saveOverride({
+      kind: "custom-hours",
+      startsOn: "2026-07-16",
+      endsOn: "2026-07-16",
+      note: "Thursday opening",
+      windows: [{ startsAt: "11:30", endsAt: "13:30" }],
+    });
+
+    const directQueries = execute.mock.calls.map(([query]) => query);
+    const transactionQueries = transaction.mock.calls[0][0].map(
+      ({ query }: { query: string }) => query,
+    );
+    expect([...directQueries, ...transactionQueries].join("\n")).not.toMatch(/\bwindow\./);
+  });
+
   it("lists active occupied appointments in an inclusive range", async () => {
     const execute = vi.fn<AvailabilityQueryExecutor>().mockResolvedValue([
       {
