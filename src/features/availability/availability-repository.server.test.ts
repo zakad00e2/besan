@@ -79,6 +79,7 @@ describe("availability repository", () => {
     const transaction = vi
       .fn()
       .mockResolvedValue([[], [{ id: "11111111-1111-4111-8111-111111111111" }], []]);
+    execute.transaction = transaction;
     const input = {
       kind: "custom-hours" as const,
       startsOn: "2026-07-16",
@@ -86,13 +87,31 @@ describe("availability repository", () => {
       note: "Thursday opening",
       windows: [{ startsAt: "11:30", endsAt: "13:30" }],
     };
-    await expect(
-      createAvailabilityRepository(execute, transaction).saveOverride(input),
-    ).resolves.toEqual({
+    await expect(createAvailabilityRepository(execute).saveOverride(input)).resolves.toEqual({
       success: true,
       id: "11111111-1111-4111-8111-111111111111",
     });
     expect(transaction).toHaveBeenCalledOnce();
+  });
+
+  it("saves an override through the documented one-argument factory", async () => {
+    const overrideId = "11111111-1111-4111-8111-111111111111";
+    const execute = vi.fn<AvailabilityQueryExecutor>().mockImplementation(async (query) => {
+      if (query.includes("INSERT INTO public.availability_date_overrides")) {
+        return [{ id: overrideId }];
+      }
+      return [];
+    });
+
+    await expect(
+      createAvailabilityRepository(execute).saveOverride({
+        kind: "custom-hours",
+        startsOn: "2026-07-16",
+        endsOn: "2026-07-16",
+        note: "Thursday opening",
+        windows: [{ startsAt: "11:30", endsAt: "13:30" }],
+      }),
+    ).resolves.toEqual({ success: true, id: overrideId });
   });
 
   it("removes custom-hour windows before changing an override to closed", async () => {
@@ -104,8 +123,9 @@ describe("availability repository", () => {
         [{ id: "11111111-1111-4111-8111-111111111111" }],
         [],
       ]);
+    execute.transaction = transaction;
     await expect(
-      createAvailabilityRepository(execute, transaction).saveOverride({
+      createAvailabilityRepository(execute).saveOverride({
         id: "11111111-1111-4111-8111-111111111111",
         kind: "closed",
         startsOn: "2026-07-16",
@@ -143,8 +163,9 @@ describe("availability repository", () => {
       code: "23P01",
       constraint: "availability_date_overrides_no_overlap",
     });
+    execute.transaction = transaction;
     await expect(
-      createAvailabilityRepository(execute, transaction).saveOverride({
+      createAvailabilityRepository(execute).saveOverride({
         kind: "closed",
         startsOn: "2026-08-10",
         endsOn: "2026-08-20",

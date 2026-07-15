@@ -7,16 +7,12 @@ import type {
   WeeklyAvailabilityDay,
 } from "./availability-domain";
 
-export type AvailabilityQueryExecutor = <T extends Record<string, unknown>>(
-  query: string,
-  params?: unknown[],
-) => Promise<T[]>;
-
 type AvailabilityTransactionQuery = { query: string; params?: unknown[] };
 
-type AvailabilityTransactionExecutor = (
-  queries: AvailabilityTransactionQuery[],
-) => Promise<Record<string, unknown>[][]>;
+export type AvailabilityQueryExecutor = {
+  <T extends Record<string, unknown>>(query: string, params?: unknown[]): Promise<T[]>;
+  transaction?: (queries: AvailabilityTransactionQuery[]) => Promise<Record<string, unknown>[][]>;
+};
 
 export type SaveOverrideResult =
   { success: true; id: string } | { success: false; reason: "overlap" };
@@ -176,9 +172,21 @@ function isOverrideOverlap(error: unknown) {
   );
 }
 
+async function executeOverrideTransaction(
+  execute: AvailabilityQueryExecutor,
+  queries: AvailabilityTransactionQuery[],
+) {
+  if (execute.transaction) return execute.transaction(queries);
+
+  const results: Record<string, unknown>[][] = [];
+  for (const { query, params } of queries) {
+    results.push(await execute<Record<string, unknown>>(query, params));
+  }
+  return results;
+}
+
 export function createAvailabilityRepository(
   execute: AvailabilityQueryExecutor,
-  executeTransaction?: AvailabilityTransactionExecutor,
 ): AvailabilityRepository {
   return {
     async loadConfiguration() {
@@ -207,9 +215,8 @@ export function createAvailabilityRepository(
     },
     async saveOverride(input) {
       try {
-        if (!executeTransaction) throw new Error("Availability transactions are not configured");
         const overrideId = input.id ?? randomUUID();
-        const [, rows] = await executeTransaction([
+        const [, rows] = await executeOverrideTransaction(execute, [
           { query: removeOverrideWindowsQuery, params: [input.id ?? null] },
           {
             query: saveOverrideQuery,
@@ -237,19 +244,15 @@ function createNeonExecutor(): AvailabilityQueryExecutor {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error("DATABASE_URL is not configured");
   const sql = neon(databaseUrl);
-  return (query, params) => sql.query(query, params) as Promise<Record<string, unknown>[]>;
-}
-
-function createNeonTransactionExecutor(): AvailabilityTransactionExecutor {
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) throw new Error("DATABASE_URL is not configured");
-  const sql = neon(databaseUrl);
-  return (queries) =>
+  const execute = ((query, params) =>
+    sql.query(query, params) as Promise<Record<string, unknown>[]>) as AvailabilityQueryExecutor;
+  execute.transaction = (queries) =>
     sql.transaction(queries.map(({ query, params }) => sql.query(query, params))) as Promise<
       Record<string, unknown>[][]
     >;
+  return execute;
 }
 
 export function getNeonAvailabilityRepository() {
-  return createAvailabilityRepository(createNeonExecutor(), createNeonTransactionExecutor());
+  return createAvailabilityRepository(createNeonExecutor());
 }
