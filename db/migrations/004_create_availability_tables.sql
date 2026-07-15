@@ -105,6 +105,30 @@ CREATE TRIGGER availability_date_windows_custom_hours
 BEFORE INSERT OR UPDATE ON public.availability_date_windows
 FOR EACH ROW EXECUTE FUNCTION public.ensure_custom_hours_window();
 
+CREATE OR REPLACE FUNCTION public.ensure_custom_hours_override_kind()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  IF OLD.kind = 'custom-hours' AND NEW.kind <> 'custom-hours' THEN
+    IF EXISTS (
+      SELECT 1
+      FROM public.availability_date_windows window_row
+      WHERE window_row.override_id = OLD.id
+    ) THEN
+      RAISE EXCEPTION 'Date overrides with windows must remain custom-hours';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS availability_date_overrides_custom_hours
+  ON public.availability_date_overrides;
+CREATE TRIGGER availability_date_overrides_custom_hours
+BEFORE UPDATE OF kind ON public.availability_date_overrides
+FOR EACH ROW EXECUTE FUNCTION public.ensure_custom_hours_override_kind();
+
 DO $$
 BEGIN
   IF EXISTS (
@@ -132,7 +156,11 @@ $$;
 DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint WHERE conname = 'appointments_active_time_overlap'
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'appointments_active_time_overlap'
+      AND conrelid = 'public.appointments'::regclass
+      AND contype = 'x'
   ) THEN
     ALTER TABLE public.appointments
       ADD CONSTRAINT appointments_active_time_overlap
