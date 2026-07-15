@@ -31,17 +31,16 @@ describe("parseBookingInput", () => {
     });
   });
 
-  it("rejects dates that do not have bookable times", () => {
-    expect(parseBookingInput({ ...validBooking, appointmentDate: "2026-07-12" })).toMatchObject({
-      success: false,
-      fieldErrors: { appointmentDate: expect.any(String) },
-    });
-  });
-
-  it("rejects a time unavailable on the selected day", () => {
-    expect(parseBookingInput({ ...validBooking, appointmentTime: "11:15" })).toMatchObject({
-      success: false,
-      fieldErrors: { appointmentTime: expect.any(String) },
+  it("accepts a well-formed date and time for authoritative availability validation", () => {
+    expect(
+      parseBookingInput({
+        ...validBooking,
+        appointmentDate: "2026-07-16",
+        appointmentTime: "11:30",
+      }),
+    ).toMatchObject({
+      success: true,
+      data: { appointmentDate: "2026-07-16", appointmentTime: "11:30" },
     });
   });
 

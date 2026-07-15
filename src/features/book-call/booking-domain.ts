@@ -49,16 +49,6 @@ export const reminderStatuses = ["not-scheduled", "scheduled", "sent"] as const;
 
 export type BookingReminderStatus = (typeof reminderStatuses)[number];
 
-export const timesByDay = {
-  Monday: ["10:00", "12:30", "16:00"],
-  Tuesday: ["11:00", "14:00", "17:30"],
-  Wednesday: ["10:30", "13:00", "16:30"],
-  Thursday: ["12:00", "15:00", "18:00"],
-  Saturday: ["10:00", "12:00", "14:30"],
-} as const;
-
-type AppointmentDay = keyof typeof timesByDay;
-
 export type BookingInput = {
   appointmentType: string;
   appointmentDate: string;
@@ -140,13 +130,6 @@ export function parseScheduleNextAppointmentInput(
   return { success: true, data: { ...parsed.data, notes: parsed.data.notes.trim() } };
 }
 
-function getAppointmentDay(date: string): AppointmentDay | undefined {
-  const day = new Intl.DateTimeFormat("en-US", { weekday: "long", timeZone: "UTC" }).format(
-    new Date(`${date}T12:00:00Z`),
-  );
-  return day in timesByDay ? (day as AppointmentDay) : undefined;
-}
-
 function normalizeMobile(mobile: string) {
   const trimmed = mobile.trim();
   const digits = trimmed.replace(/\D/g, "");
@@ -187,13 +170,6 @@ export function parseBookingInput(input: BookingInput): BookingParseResult {
   }
   if (data.notes.length > 1000) {
     fieldErrors.notes = "Notes must be 1000 characters or fewer.";
-  }
-
-  const day = getAppointmentDay(data.appointmentDate);
-  if (!day) {
-    fieldErrors.appointmentDate = "Choose an available appointment day.";
-  } else if (!timesByDay[day].includes(data.appointmentTime as never)) {
-    fieldErrors.appointmentTime = "Choose an available appointment time.";
   }
 
   if (Object.keys(fieldErrors).length) return { success: false, fieldErrors };

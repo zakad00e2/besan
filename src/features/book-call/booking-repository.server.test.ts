@@ -166,4 +166,15 @@ describe("booking repository", () => {
       reason: "slot-unavailable",
     });
   });
+
+  it("maps the 60-minute overlap exclusion constraint", async () => {
+    const execute = vi.fn<QueryExecutor>().mockRejectedValue({
+      code: "23P01",
+      constraint: "appointments_active_time_overlap",
+    });
+    await expect(createBookingRepository(execute).create(booking)).resolves.toEqual({
+      success: false,
+      reason: "slot-unavailable",
+    });
+  });
 });

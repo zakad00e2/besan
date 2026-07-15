@@ -221,14 +221,14 @@ function mapScheduledRow(
 }
 
 function isActiveSlotConflict(error: unknown) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    "constraint" in error &&
-    error.code === "23505" &&
-    error.constraint === "appointments_active_slot_unique"
-  );
+  if (typeof error !== "object" || error === null || !("code" in error)) return false;
+  if (error.code === "23505" && "constraint" in error) {
+    return error.constraint === "appointments_active_slot_unique";
+  }
+  if (error.code === "23P01" && "constraint" in error) {
+    return error.constraint === "appointments_active_time_overlap";
+  }
+  return false;
 }
 
 export function createBookingRepository(execute: QueryExecutor): BookingRepository {
