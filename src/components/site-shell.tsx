@@ -98,14 +98,14 @@ export function SiteNav() {
 
   return (
     <header data-testid="site-nav" dir={direction} className="w-full border-b border-foreground/70">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto_1fr] items-center gap-5 px-6 py-3 md:px-10">
+      <div className="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto] items-center gap-5 px-6 py-3 md:px-10 lg:grid-cols-[1fr_auto_1fr]">
         <a
           href="/"
-          className={`whitespace-nowrap font-serif font-medium leading-tight tracking-normal ${locale === "ar" ? "text-xl md:text-2xl" : "text-lg md:text-xl"}`}
+          className={`whitespace-nowrap font-serif font-medium leading-tight tracking-normal lg:col-start-1 ${locale === "ar" ? "text-xl md:text-2xl" : "text-lg md:text-xl"}`}
         >
           {locale === "ar" ? "بيسان خلايلة" : "BESAN KHALAILY"}
         </a>
-        <nav className="hidden items-center justify-self-center gap-7 lg:flex">
+        <nav className="hidden items-center justify-self-center gap-7 lg:col-start-2 lg:flex">
           {nav.map((item) => {
             const active =
               item.href === "/workshops"
@@ -124,7 +124,7 @@ export function SiteNav() {
             );
           })}
         </nav>
-        <div className="flex shrink-0 items-center justify-self-end gap-2">
+        <div className="col-start-2 flex shrink-0 items-center justify-self-end gap-2 lg:col-start-3">
           <button type="button" aria-label="Switch language" onClick={() => setLocale(locale === "en" ? "ar" : "en")} className={`motion-press inline-flex size-[33px] items-center justify-center border border-foreground/50 leading-none transition-colors hover:bg-foreground hover:text-background ${locale === "en" ? "language-switch-arabic text-sm" : "text-xs"}`}>
             {messages.nav.language}
           </button>
