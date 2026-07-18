@@ -1,14 +1,10 @@
-import {
-  customerStages,
-  type CustomerStage,
-} from "@/features/book-call/booking-domain";
+import { customerStages, type CustomerStage } from "@/features/book-call/booking-domain";
 
 export { customerStages };
 export type { CustomerStage };
 export type BookingType = "workshop" | "design";
 export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled";
 export type ReminderStatus = "not-scheduled" | "scheduled" | "sent";
-export type WorkingDay = "sunday" | "monday" | "tuesday" | "wednesday" | "thursday";
 
 export type CustomerNote = { id: string; body: string; createdAt: string };
 export type CustomerActivity = { id: string; label: string; createdAt: string };
@@ -18,9 +14,10 @@ export type Customer = {
   name: string;
   phone: string;
   stage: CustomerStage;
+  createdAt: string;
   updatedAt: string;
-  notes: CustomerNote[];
-  activity: CustomerActivity[];
+  notes?: CustomerNote[];
+  activity?: CustomerActivity[];
 };
 
 export type Appointment = {
@@ -28,34 +25,15 @@ export type Appointment = {
   customerId: string;
   type: BookingType;
   purpose: string;
+  notes?: string;
   startsAt: string;
   endsAt: string;
+  createdAt: string;
   status: AppointmentStatus;
   reminderStatus: ReminderStatus;
 };
 
-export type AvailabilitySlot = {
-  id: string;
-  day: WorkingDay;
-  startsAt: string;
-  endsAt: string;
-  enabled: boolean;
-};
-
-export type ReminderSettings = {
-  customerWhatsapp: boolean;
-  supervisorDashboard: boolean;
-  hoursBefore: 24;
-};
-
 export type BookingStatusDistribution = Record<AppointmentStatus, number>;
-
-export type DashboardState = {
-  customers: Customer[];
-  appointments: Appointment[];
-  availability: AvailabilitySlot[];
-  reminderSettings: ReminderSettings;
-};
 
 export type DashboardMetrics = {
   today: number;
@@ -103,7 +81,7 @@ function isWithinRange(dateString: string, start: Date, end: Date) {
 }
 
 function getCustomerCreatedAt(customer: Customer) {
-  return customer.activity[0]?.createdAt ?? customer.updatedAt;
+  return customer.createdAt;
 }
 
 function countNeedsFollowUpAt(customers: Customer[], asOf: Date) {
@@ -142,31 +120,6 @@ export const reminderStatusLabels: Record<ReminderStatus, string> = {
   scheduled: "Scheduled",
   sent: "Sent",
 };
-
-export const workingDayLabels: Record<WorkingDay, string> = {
-  sunday: "Sunday",
-  monday: "Monday",
-  tuesday: "Tuesday",
-  wednesday: "Wednesday",
-  thursday: "Thursday",
-};
-
-export function createAvailabilitySlots(): AvailabilitySlot[] {
-  const days = Object.keys(workingDayLabels) as WorkingDay[];
-
-  return days.flatMap((day) =>
-    Array.from({ length: 8 }, (_, index) => {
-      const hour = index + 10;
-      return {
-        id: `${day}-${hour}`,
-        day,
-        startsAt: `${String(hour).padStart(2, "0")}:00`,
-        endsAt: `${String(hour + 1).padStart(2, "0")}:00`,
-        enabled: index < 6,
-      };
-    }),
-  );
-}
 
 export function appointmentsOverlap(
   appointment: Pick<Appointment, "startsAt" | "endsAt">,

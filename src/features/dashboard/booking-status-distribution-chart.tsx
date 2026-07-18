@@ -1,3 +1,4 @@
+import { ChartColumn } from "lucide-react";
 import { useId } from "react";
 import {
   Bar,
@@ -34,8 +35,12 @@ export function BookingStatusDistributionChart({
   const totalBookings = chartData.reduce((total, entry) => total + entry.value, 0);
 
   return (
-    <article className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-none">
-      <h2 className="text-xs font-normal text-[var(--muted-foreground)]">
+    <article className="min-h-[218px] rounded-[10px] border border-[#e6e6e8] bg-white p-4">
+      <h2 className="flex items-center gap-1.5 text-xs font-normal text-[#85868c]">
+        <ChartColumn
+          className="size-3.5 shrink-0 stroke-[1.75] text-[#a4a5aa]"
+          aria-hidden="true"
+        />
         Booking status distribution
       </h2>
       <p className="mt-1 text-3xl font-medium tabular-nums">{totalBookings}</p>
@@ -81,8 +86,13 @@ export function BookingStatusDistributionChart({
             <XAxis
               axisLine={false}
               dataKey="label"
+              height={34}
+              interval={0}
+              minTickGap={0}
+              padding={{ left: 8, right: 8 }}
+              tickMargin={8}
               tickLine={false}
-              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
             />
             <YAxis
               axisLine={false}

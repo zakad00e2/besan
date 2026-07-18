@@ -1,5 +1,4 @@
 import { neon } from "@neondatabase/serverless";
-import { randomUUID } from "node:crypto";
 import type {
   AvailabilityConfiguration,
   AvailabilityOverrideInput,
@@ -215,7 +214,7 @@ export function createAvailabilityRepository(
     },
     async saveOverride(input) {
       try {
-        const overrideId = input.id ?? randomUUID();
+        const overrideId = input.id ?? globalThis.crypto.randomUUID();
         const [, rows] = await executeOverrideTransaction(execute, [
           { query: removeOverrideWindowsQuery, params: [input.id ?? null] },
           {

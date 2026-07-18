@@ -2,12 +2,19 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { submitWorkshopBooking } from "./workshop-booking.functions";
 import { WorkshopBookingDialog } from "./workshop-booking-dialog";
+import {
+  SITE_LOCALE_STORAGE_KEY,
+  SiteLanguageProvider,
+} from "@/features/site-language/site-language";
 
 vi.mock("./workshop-booking.functions", () => ({
   submitWorkshopBooking: vi.fn(),
 }));
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  window.localStorage.clear();
+});
 
 const workshop = {
   id: "mini-course",
@@ -27,8 +34,8 @@ function fillValidForm() {
   fireEvent.change(screen.getByLabelText("Full name"), {
     target: { value: "Noor Al-Hashemi" },
   });
-  fireEvent.change(screen.getByLabelText("Mobile number"), {
-    target: { value: "0501234567" },
+  fireEvent.change(screen.getByLabelText("WhatsApp Number"), {
+    target: { value: "0502345678" },
   });
   fireEvent.change(screen.getByLabelText("Workshop date"), {
     target: { value: futureDate() },
@@ -49,13 +56,33 @@ function deferred<T>() {
 }
 
 describe("WorkshopBookingDialog", () => {
-  it("shows the selected workshop and all booking fields", () => {
+  it("uses the Arabic font and correct field directions", () => {
+    window.localStorage.setItem(SITE_LOCALE_STORAGE_KEY, "ar");
+    render(
+      <SiteLanguageProvider>
+        <WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />
+      </SiteLanguageProvider>,
+    );
+
+    const dialog = screen.getByRole("dialog");
+    expect(dialog.getAttribute("dir")).toBe("rtl");
+    expect(dialog.getAttribute("lang")).toBe("ar");
+    expect(dialog.className).toContain("public-site-arabic");
+    expect(screen.getByLabelText("الاسم الكامل").getAttribute("dir")).toBe("rtl");
+    expect(screen.getByLabelText("رقم واتساب").getAttribute("dir")).toBe("ltr");
+    expect(screen.getByLabelText("مقدمة رقم واتساب").getAttribute("dir")).toBe("ltr");
+    expect(screen.getByLabelText("تاريخ الورشة").getAttribute("dir")).toBe("ltr");
+    expect(screen.getByLabelText("عدد المشاركات").getAttribute("dir")).toBe("ltr");
+    expect(screen.getByLabelText("ملاحظات إضافية (اختياري)").getAttribute("dir")).toBe("rtl");
+  });
+
+  it("shows the selected workshop without asking the customer for an email", () => {
     render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
 
     expect(screen.getByRole("dialog").textContent).toContain("Private mini course");
     expect(screen.getByLabelText("Full name")).toBeTruthy();
-    expect(screen.getByLabelText("Mobile number")).toBeTruthy();
-    expect(screen.getByLabelText("Email (optional)")).toBeTruthy();
+    expect(screen.getByLabelText("WhatsApp Number")).toBeTruthy();
+    expect(screen.queryByLabelText("Email (optional)")).toBeNull();
     expect(screen.getByLabelText("Workshop date")).toBeTruthy();
     expect(screen.getByLabelText("Number of participants")).toBeTruthy();
     expect(screen.getByLabelText("Additional notes (optional)")).toBeTruthy();
@@ -65,27 +92,23 @@ describe("WorkshopBookingDialog", () => {
     render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
 
     const fieldsGrid = screen.getByLabelText("Full name").parentElement?.parentElement;
-    const emailFieldClasses =
-      screen.getByLabelText("Email (optional)").parentElement?.className.split(" ") ?? [];
     const notesFieldClasses =
       screen.getByLabelText("Additional notes (optional)").parentElement?.className.split(" ") ??
       [];
 
     expect(fieldsGrid?.className).toContain("grid-cols-1");
     expect(fieldsGrid?.className).toContain("sm:grid-cols-2");
-    expect(emailFieldClasses).not.toContain("col-span-2");
-    expect(notesFieldClasses).not.toContain("col-span-2");
     expect(notesFieldClasses).toContain("sm:col-span-2");
   });
 
   it("preserves entered values and shows field errors after invalid submission", () => {
     render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
 
-    const mobile = screen.getByLabelText("Mobile number") as HTMLInputElement;
-    fireEvent.change(mobile, { target: { value: "0501234567" } });
+    const mobile = screen.getByLabelText("WhatsApp Number") as HTMLInputElement;
+    fireEvent.change(mobile, { target: { value: "0502345678" } });
     fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
 
-    expect(mobile.value).toBe("0501234567");
+    expect(mobile.value).toBe("0502345678");
     expect(screen.getByText("Enter your full name.")).toBeTruthy();
     expect(screen.getByText("Choose a workshop date.")).toBeTruthy();
     expect(screen.getByLabelText("Full name")).toBeTruthy();
@@ -102,9 +125,11 @@ describe("WorkshopBookingDialog", () => {
     fillValidForm();
     fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
 
-    expect((await screen.findByRole("status")).textContent).toContain(
-      "Your workshop request was sent",
-    );
+    const status = await screen.findByRole("status");
+    expect(status.textContent).toContain("Your workshop request was sent");
+    const success = status.closest('[data-motion-state="workshop-success"]');
+    expect(success).toBeTruthy();
+    expect(success?.className).toContain("motion-state-enter");
     expect(submitWorkshopBooking).toHaveBeenCalledWith({
       data: expect.objectContaining({
         workshopId: "mini-course",
@@ -187,7 +212,7 @@ describe("WorkshopBookingDialog", () => {
     fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
 
     expect(await screen.findByText("Use a valid mobile number.")).toBeTruthy();
-    expect(screen.getByLabelText("Mobile number").getAttribute("aria-invalid")).toBe("true");
+    expect(screen.getByLabelText("WhatsApp Number").getAttribute("aria-invalid")).toBe("true");
   });
 
   it("preserves values and allows retry after storage failure", async () => {

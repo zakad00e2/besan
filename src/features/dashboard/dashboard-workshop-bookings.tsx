@@ -1,4 +1,4 @@
-import { Bell, MessageCircle, Pencil, Search, Trash2 } from "lucide-react";
+import { Bell, Eye, MessageCircle, Pencil, Search, Trash2 } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 import {
   AlertDialog,
@@ -129,6 +129,7 @@ export function DashboardWorkshopBookings({
   });
   const [editingBooking, setEditingBooking] = useState<WorkshopBookingListItem | null>(null);
   const [deletingBooking, setDeletingBooking] = useState<WorkshopBookingListItem | null>(null);
+  const [notePreview, setNotePreview] = useState<WorkshopBookingListItem | null>(null);
   const [editFormError, setEditFormError] = useState("");
   const [editForm, setEditForm] = useState<WorkshopBookingAdminUpdateInput>({
     fullName: "",
@@ -277,7 +278,6 @@ export function DashboardWorkshopBookings({
                   <tr>
                     <th className="px-4 py-3">Customer</th>
                     <th>Mobile</th>
-                    <th>Email</th>
                     <th>Workshop</th>
                     <th>Date</th>
                     <th>Participants</th>
@@ -293,14 +293,33 @@ export function DashboardWorkshopBookings({
                       <td className="text-slate-500" dir="ltr">
                         {booking.mobile}
                       </td>
-                      <td className="text-slate-500">{booking.email || "—"}</td>
                       <td className="text-slate-500">{booking.workshopName}</td>
                       <td className="text-slate-500" dir="ltr">
                         {booking.date}
                       </td>
                       <td className="text-slate-500">{booking.participants}</td>
-                      <td className="max-w-48 truncate text-slate-500" title={booking.notes}>
-                        {booking.notes || "—"}
+                      <td className="max-w-48 text-slate-500">
+                        {booking.notes && booking.notes.length > 44 && (
+                          <div className="flex items-center gap-1">
+                            <span className="truncate" title={booking.notes}>
+                              {`${booking.notes.slice(0, 44)}…`}
+                            </span>
+                            <button
+                              type="button"
+                              aria-label={`View full notes for ${booking.fullName}`}
+                              title="View full notes"
+                              onClick={() => setNotePreview(booking)}
+                              className="inline-flex size-6 shrink-0 items-center justify-center rounded text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                            >
+                              <Eye className="size-3.5" aria-hidden="true" />
+                            </button>
+                          </div>
+                        )}
+                        <span
+                          className={booking.notes && booking.notes.length > 44 ? "hidden" : ""}
+                        >
+                          {booking.notes || "—"}
+                        </span>
                       </td>
                       <td className="px-4 py-3">
                         <StatusSelect
@@ -375,7 +394,6 @@ export function DashboardWorkshopBookings({
                   <div className="grid grid-cols-2 gap-2 text-xs text-slate-500">
                     <span dir="ltr">{booking.mobile}</span>
                     <span dir="ltr">{booking.date}</span>
-                    <span>{booking.email || "No email"}</span>
                     <span>{booking.participants} participants</span>
                   </div>
                   <p className="text-xs text-slate-500">{booking.notes || "No notes"}</p>
@@ -385,15 +403,6 @@ export function DashboardWorkshopBookings({
                     onStatusChange={onStatusChange}
                   />
                   <div className="flex flex-wrap gap-2">
-                    <a
-                      href={getWorkshopActionLinks(booking).reminderHref}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`Send reminder to ${booking.fullName}`}
-                      className="text-xs text-amber-700 hover:underline"
-                    >
-                      Send reminder
-                    </a>
                     <a
                       href={getWorkshopActionLinks(booking).messageHref}
                       target="_blank"
@@ -428,6 +437,21 @@ export function DashboardWorkshopBookings({
           </>
         )}
       </div>
+
+      <Dialog
+        open={Boolean(notePreview)}
+        onOpenChange={(isOpen) => !isOpen && setNotePreview(null)}
+      >
+        <DialogContent dir="ltr" className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-medium leading-none tracking-tight">Workshop notes</DialogTitle>
+            <DialogDescription>{notePreview?.fullName}</DialogDescription>
+          </DialogHeader>
+          <p className="whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">
+            {notePreview?.notes}
+          </p>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={Boolean(editingBooking)}

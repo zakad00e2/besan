@@ -75,6 +75,20 @@ describe("DashboardWorkshopBookings", () => {
     expect(screen.getAllByText("Vegetarian lunch").length).toBe(2);
   });
 
+  it("opens a popup for a long workshop note", () => {
+    const longNote =
+      "Please prepare the full corset fitting kit and bring all reference materials.";
+    render(
+      <DashboardWorkshopBookings
+        bookings={[{ ...bookings[0], notes: longNote }]}
+        onStatusChange={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText("View full notes for Noor Al-Hashemi"));
+    expect(screen.getByRole("dialog").textContent).toContain(longNote);
+  });
+
   it("filters by both selects and calls for a validated status change", () => {
     const onStatusChange = vi.fn();
     render(<DashboardWorkshopBookings bookings={bookings} onStatusChange={onStatusChange} />);

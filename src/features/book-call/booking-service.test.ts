@@ -8,7 +8,7 @@ import type { AvailabilityRepository } from "@/features/availability/availabilit
 import { submitBookingRequest } from "./booking-service";
 
 const validInput = {
-  appointmentType: "First Fitting",
+  appointmentType: "Custom Design",
   appointmentDate: "2026-07-13",
   appointmentTime: "10:00",
   fullName: "Noor Al-Hashemi",

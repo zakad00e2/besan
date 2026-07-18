@@ -3,15 +3,23 @@ import type { WorkshopBookingListItem } from "@/features/workshop-booking/worksh
 import type { BookingListItem } from "@/features/book-call/booking-domain";
 import {
   changeBookingStatusForAdmin,
+  createBookingForAdmin,
   changeWorkshopBookingStatusForAdmin,
   deleteWorkshopBookingForAdmin,
   deleteBookingForAdmin,
   listBookingsForAdmin,
+  loadBookingsPageForAdmin,
   listWorkshopBookingsForAdmin,
+  markBookingsPageSeenForAdmin,
   markBookingReminderSentForAdmin,
   scheduleNextAppointmentForAdmin,
   updateWorkshopBookingForAdmin,
+  updateBookingForAdmin,
 } from "./admin.functions";
+import {
+  DEFAULT_WEEKLY_SCHEDULE,
+  type AvailabilityConfiguration,
+} from "@/features/availability/availability-domain";
 
 const appointment: BookingListItem = {
   id: "appointment-1",
@@ -23,11 +31,26 @@ const appointment: BookingListItem = {
   notes: "Bring reference photos",
   customerId: "22222222-2222-4222-8222-222222222222",
   customerStage: "fitting",
+  customerCreatedAt: "2026-06-20T08:00:00.000Z",
   customerUpdatedAt: "2026-07-01T10:00:00.000Z",
   status: "pending",
   reminderStatus: "not-scheduled",
   createdAt: "2026-07-01T10:00:00.000Z",
 };
+
+function bookingPageDependencies(lastSeenAt: string | null = null) {
+  const pageViewRepository = {
+    getLastSeen: vi.fn().mockResolvedValue(lastSeenAt),
+    getSnapshotAt: vi.fn().mockResolvedValue("2026-07-17T09:00:00.000Z"),
+    saveLastSeen: vi.fn().mockResolvedValue(undefined),
+  };
+  return {
+    verifyAdminToken: vi.fn().mockResolvedValue({ allowed: true, supervisorId: "supervisor-1" }),
+    getBookingRepository: vi.fn(() => ({ list: vi.fn().mockResolvedValue([appointment]) })),
+    getBookingPageViewRepository: vi.fn(() => pageViewRepository),
+    pageViewRepository,
+  };
+}
 
 function bookingDependencies(allowed = true) {
   return {
@@ -43,10 +66,10 @@ function bookingDependencies(allowed = true) {
         nextBooking: {
           ...appointment,
           id: "33333333-3333-4333-8333-333333333333",
-          appointmentType: "Measurements",
+          appointmentType: "First Fitting",
           appointmentDate: "2026-07-20",
           appointmentTime: "13:30",
-          customerStage: "measurements-appointment",
+          customerStage: "fitting",
           status: "confirmed",
           reminderStatus: "scheduled",
         },
@@ -57,14 +80,143 @@ function bookingDependencies(allowed = true) {
 
 const scheduleInput = {
   currentAppointmentId: "11111111-1111-4111-8111-111111111111",
-  appointmentType: "Measurements",
+  appointmentType: "First Fitting",
   appointmentDate: "2026-07-20",
   appointmentTime: "13:30",
   notes: "Bring shoes",
   reminderStatus: "scheduled",
 };
 
+const adminBookingInput = {
+  customerId: appointment.customerId,
+  appointmentType: "First Fitting",
+  appointmentDate: "2026-07-19",
+  appointmentTime: "11:00",
+  notes: "Bring shoes",
+  status: "confirmed",
+  reminderStatus: "scheduled",
+};
+
+const adminBookingCreateInput = {
+  fullName: appointment.fullName,
+  mobile: appointment.mobile,
+  appointmentType: "First Fitting",
+  appointmentDate: "2026-07-19",
+  appointmentTime: "11:00",
+  notes: "Bring shoes",
+  status: "confirmed",
+  reminderStatus: "scheduled",
+};
+
+const availabilityConfiguration: AvailabilityConfiguration = {
+  timezone: "Asia/Jerusalem",
+  slotDurationMinutes: 60,
+  weekly: DEFAULT_WEEKLY_SCHEDULE,
+  overrides: [],
+};
+
+function bookingMutationDependencies(allowed = true) {
+  const bookingRepository = {
+    createForAdmin: vi.fn().mockResolvedValue({ success: true, booking: appointment }),
+    updateForAdmin: vi.fn().mockResolvedValue({ success: true, booking: appointment }),
+  };
+  const availabilityRepository = {
+    loadConfiguration: vi.fn().mockResolvedValue(availabilityConfiguration),
+    listOccupiedAppointments: vi.fn().mockResolvedValue([]),
+    replaceWeeklySchedule: vi.fn().mockResolvedValue(undefined),
+    saveOverride: vi.fn().mockResolvedValue({ success: true, id: "override-1" }),
+    deleteOverride: vi.fn().mockResolvedValue(true),
+  };
+  return {
+    verifyAdminToken: vi.fn().mockResolvedValue({ allowed }),
+    now: () => new Date("2026-07-15T09:00:00Z"),
+    getBookingRepository: vi.fn(() => bookingRepository),
+    getAvailabilityRepository: vi.fn(() => availabilityRepository),
+    bookingRepository,
+    availabilityRepository,
+  };
+}
+
 describe("booking admin functions", () => {
+  it("returns the old checkpoint and a snapshot for an allowed supervisor", async () => {
+    const deps = bookingPageDependencies("2026-07-17T08:00:00.000Z");
+
+    await expect(loadBookingsPageForAdmin("admin-token", deps)).resolves.toEqual({
+      success: true,
+      bookings: [appointment],
+      lastSeenAt: "2026-07-17T08:00:00.000Z",
+      snapshotAt: "2026-07-17T09:00:00.000Z",
+    });
+  });
+
+  it("saves a verified supervisor checkpoint", async () => {
+    const deps = bookingPageDependencies();
+
+    await expect(
+      markBookingsPageSeenForAdmin(
+        { token: "admin-token", seenAt: "2026-07-17T09:00:00.000Z" },
+        deps,
+      ),
+    ).resolves.toEqual({ success: true });
+    expect(deps.pageViewRepository.saveLastSeen).toHaveBeenCalledWith(
+      "supervisor-1",
+      "2026-07-17T09:00:00.000Z",
+    );
+  });
+
+  it("authorizes and revalidates an administrator create", async () => {
+    const deps = bookingMutationDependencies();
+
+    await expect(
+      createBookingForAdmin({ token: "admin-token", input: adminBookingCreateInput }, deps),
+    ).resolves.toMatchObject({ success: true, booking: { id: appointment.id } });
+    expect(deps.bookingRepository.createForAdmin).toHaveBeenCalledWith(adminBookingCreateInput);
+  });
+
+  it("rejects forbidden and stale administrator writes", async () => {
+    const forbidden = bookingMutationDependencies(false);
+    await expect(
+      createBookingForAdmin({ token: "bad-token", input: adminBookingCreateInput }, forbidden),
+    ).resolves.toEqual({ success: false, reason: "forbidden" });
+    expect(forbidden.getBookingRepository).not.toHaveBeenCalled();
+
+    const stale = bookingMutationDependencies();
+    stale.availabilityRepository.listOccupiedAppointments.mockResolvedValue([
+      {
+        id: "occupied",
+        date: adminBookingCreateInput.appointmentDate,
+        startsAt: adminBookingCreateInput.appointmentTime,
+        status: "confirmed",
+      },
+    ]);
+    await expect(
+      createBookingForAdmin({ token: "admin-token", input: adminBookingCreateInput }, stale),
+    ).resolves.toEqual({ success: false, reason: "slot-unavailable" });
+  });
+
+  it("excludes the current appointment while revalidating an update", async () => {
+    const deps = bookingMutationDependencies();
+    deps.availabilityRepository.listOccupiedAppointments.mockResolvedValue([
+      {
+        id: appointment.id,
+        date: adminBookingInput.appointmentDate,
+        startsAt: adminBookingInput.appointmentTime,
+        status: "confirmed",
+      },
+    ]);
+
+    await expect(
+      updateBookingForAdmin(
+        { token: "admin-token", id: appointment.id, input: adminBookingInput },
+        deps,
+      ),
+    ).resolves.toMatchObject({ success: true });
+    expect(deps.bookingRepository.updateForAdmin).toHaveBeenCalledWith(
+      appointment.id,
+      adminBookingInput,
+    );
+  });
+
   it("lists bookings and only updates a valid status for an admin", async () => {
     const testDependencies = bookingDependencies();
 
@@ -157,7 +309,7 @@ describe("booking admin functions", () => {
     );
     expect(result).toMatchObject({
       success: true,
-      nextBooking: { appointmentType: "Measurements" },
+      nextBooking: { appointmentType: "First Fitting" },
     });
     expect(testDependencies.repository.scheduleNextAppointment).toHaveBeenCalledWith(scheduleInput);
   });
@@ -218,7 +370,9 @@ function dependencies(allowed = true) {
     repository: {
       list: vi.fn().mockResolvedValue([booking]),
       updateStatus: vi.fn().mockResolvedValue({ success: true, booking }),
-      update: vi.fn().mockResolvedValue({ success: true, booking: { ...booking, fullName: "Noor Khalil" } }),
+      update: vi
+        .fn()
+        .mockResolvedValue({ success: true, booking: { ...booking, fullName: "Noor Khalil" } }),
       delete: vi.fn().mockResolvedValue({ success: true }),
     },
   };
@@ -352,14 +506,21 @@ describe("workshop booking admin functions", () => {
         testDependencies,
       ),
     ).resolves.toEqual({ success: true, booking: { ...booking, fullName: "Noor Khalil" } });
-    expect(testDependencies.repository.update).toHaveBeenCalledWith(booking.id, workshopUpdateInput);
+    expect(testDependencies.repository.update).toHaveBeenCalledWith(
+      booking.id,
+      workshopUpdateInput,
+    );
   });
 
   it("rejects invalid workshop edits and forbidden workshop deletion", async () => {
     const invalidDependencies = dependencies();
     await expect(
       updateWorkshopBookingForAdmin(
-        { token: "admin-token", id: booking.id, input: { ...workshopUpdateInput, participants: 0 } },
+        {
+          token: "admin-token",
+          id: booking.id,
+          input: { ...workshopUpdateInput, participants: 0 },
+        },
         invalidDependencies,
       ),
     ).resolves.toMatchObject({ success: false, reason: "validation" });
@@ -367,7 +528,10 @@ describe("workshop booking admin functions", () => {
 
     const forbiddenDependencies = dependencies(false);
     await expect(
-      deleteWorkshopBookingForAdmin({ token: "invalid-token", id: booking.id }, forbiddenDependencies),
+      deleteWorkshopBookingForAdmin(
+        { token: "invalid-token", id: booking.id },
+        forbiddenDependencies,
+      ),
     ).resolves.toEqual({ success: false, reason: "forbidden" });
     expect(forbiddenDependencies.repository.delete).not.toHaveBeenCalled();
   });

@@ -15,6 +15,12 @@ import {
   type WorkshopOption,
 } from "./workshop-booking";
 import { submitWorkshopBooking } from "./workshop-booking.functions";
+import { useSiteLanguage } from "@/features/site-language/site-language";
+import { WhatsAppNumberField } from "@/features/whatsapp/whatsapp-number-field";
+import {
+  DEFAULT_WHATSAPP_COUNTRY,
+  normalizeWhatsAppNumber,
+} from "@/features/whatsapp/whatsapp-number";
 
 type WorkshopBookingDialogProps = {
   workshop: WorkshopOption | null;
@@ -31,11 +37,21 @@ const initialValues: WorkshopBookingFormValues = {
 };
 
 export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookingDialogProps) {
+  const { direction, locale } = useSiteLanguage();
+  const ar = locale === "ar";
+  const workshopName = ar
+    ? ({
+        "pattern-foundation": "أساسيات الباترون",
+        "mini-course": "الدورة المصغرة الخاصة",
+        "corset-workshop": "ورشة الكورسيه ليوم واحد",
+      }[workshop?.id ?? ""] ?? workshop?.name)
+    : workshop?.name;
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<WorkshopBookingErrors>({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [mobileCountry, setMobileCountry] = useState(DEFAULT_WHATSAPP_COUNTRY);
   const submissionSessionRef = useRef(0);
 
   function updateValue(field: keyof WorkshopBookingFormValues, value: string) {
@@ -45,7 +61,15 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const parsed = parseWorkshopBooking(workshop, values);
+    const normalizedMobile = normalizeWhatsAppNumber(mobileCountry, values.mobile);
+    if (!normalizedMobile.success) {
+      setErrors((current) => ({
+        ...current,
+        mobile: ar ? "أدخلي رقم واتساب صحيحًا." : "Enter a valid WhatsApp number.",
+      }));
+      return;
+    }
+    const parsed = parseWorkshopBooking(workshop, { ...values, mobile: normalizedMobile.number });
 
     if (!parsed.success) {
       setErrors(parsed.errors);
@@ -65,11 +89,11 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
       } else if (result.reason === "validation") {
         setErrors(result.fieldErrors);
       } else {
-        setSubmissionError("We could not send your request. Please try again.");
+        setSubmissionError(ar ? "تعذر إرسال طلبك. يرجى المحاولة مرة أخرى." : "We could not send your request. Please try again.");
       }
     } catch {
       if (submissionSession === submissionSessionRef.current) {
-        setSubmissionError("We could not send your request. Please try again.");
+        setSubmissionError(ar ? "تعذر إرسال طلبك. يرجى المحاولة مرة أخرى." : "We could not send your request. Please try again.");
       }
     } finally {
       if (submissionSession === submissionSessionRef.current) {
@@ -92,66 +116,85 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
 
   return (
     <Dialog open={workshop !== null} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[calc(100vh-0.5rem)] max-w-2xl overflow-hidden rounded-none border-foreground/70 p-0">
+      <DialogContent
+        dir={direction}
+        lang={locale}
+        className={`max-h-[calc(100vh-0.5rem)] max-w-2xl overflow-hidden rounded-none border-foreground/70 p-0 ${
+          ar ? "public-site-arabic [&_label]:tracking-normal" : ""
+        }`}
+      >
         {submitted ? (
-          <div className="flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center sm:px-10">
+          <div
+            data-motion-state="workshop-success"
+            className="motion-state-enter flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center sm:px-10"
+          >
             <Check className="h-8 w-8" aria-hidden="true" />
-            <p className="mt-5 text-xs tracking-[0.2em] text-muted-foreground">REQUEST SENT</p>
-            <DialogTitle className="mt-3 font-serif text-4xl font-normal tracking-tighter">
-              Thank you
+            <p className={`mt-5 text-xs text-muted-foreground ${ar ? "tracking-normal" : "tracking-[0.2em]"}`}>{ar ? "تم إرسال الطلب" : "REQUEST SENT"}</p>
+            <DialogTitle className={`mt-3 text-4xl font-normal ${ar ? "arabic-ui-heading tracking-normal" : "font-serif tracking-tighter"}`}>
+              {ar ? "شكرًا لك" : "Thank you"}
             </DialogTitle>
             <p role="status" className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
-              Your workshop request was sent to the atelier. We will be in touch soon to confirm the
-              details.
+              {ar ? "تم إرسال طلب الورشة إلى الأتيليه. سنتواصل معك قريبًا لتأكيد التفاصيل." : "Your workshop request was sent to the atelier. We will be in touch soon to confirm the details."}
             </p>
             <DialogClose asChild>
               <button
                 type="button"
-                className="mt-8 border border-foreground bg-foreground px-10 py-4 text-xs tracking-[0.12em] text-background transition-opacity hover:opacity-85"
+                className={`motion-press mt-8 border border-foreground bg-foreground px-10 py-4 text-xs text-background transition-opacity hover:opacity-85 ${ar ? "tracking-normal" : "tracking-[0.12em]"}`}
               >
-                CLOSE
+                {ar ? "إغلاق" : "CLOSE"}
               </button>
             </DialogClose>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} noValidate>
-            <DialogHeader className="gap-0 px-6 pb-1 pt-4 text-left sm:px-8">
-              <p className="text-xs leading-none tracking-[0.2em] text-muted-foreground">
-                WORKSHOP BOOKING
+          <form onSubmit={handleSubmit} noValidate dir={direction}>
+            <DialogHeader
+              className={`gap-0 border-b border-foreground/30 px-6 pb-3 pt-4 sm:px-8 ${
+                ar ? "items-start text-right" : "items-start text-left"
+              }`}
+            >
+              <p className={`text-xs leading-none text-muted-foreground ${ar ? "tracking-normal" : "tracking-[0.2em]"}`}>
+                {ar ? "حجز ورشة" : "WORKSHOP BOOKING"}
               </p>
-              <DialogTitle className="-mt-0.5 font-serif text-3xl font-normal leading-none tracking-tighter">
-                {workshop?.name}
+              <DialogTitle className={`-mt-0.5 text-3xl font-normal leading-none ${ar ? "arabic-ui-heading tracking-normal" : "font-serif tracking-tighter"}`}>
+                {workshopName}
               </DialogTitle>
             </DialogHeader>
 
-            <div className="grid grid-cols-1 gap-2 px-4 pb-3 pt-1 sm:grid-cols-2 sm:px-8 sm:pb-4 sm:pt-1">
-              <Field label="Full name" error={errors.fullName}>
+            <div className="grid grid-cols-1 gap-2 px-4 pb-3 pt-3 sm:grid-cols-2 sm:px-8 sm:pb-4 sm:pt-4">
+              <Field id="workshop-full-name" label={ar ? "الاسم الكامل" : "Full name"} error={errors.fullName}>
                 <input
                   value={values.fullName}
                   onChange={(event) => updateValue("fullName", event.target.value)}
                   autoComplete="name"
+                  dir={direction}
                   className={inputClass}
                 />
               </Field>
-              <Field label="Mobile number" error={errors.mobile}>
-                <input
-                  value={values.mobile}
-                  onChange={(event) => updateValue("mobile", event.target.value)}
-                  type="tel"
-                  autoComplete="tel"
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Workshop date" error={errors.date}>
+              <WhatsAppNumberField
+                id="workshop-whatsapp"
+                locale={locale}
+                country={mobileCountry}
+                value={values.mobile}
+                disabled={submitting}
+                compact
+                error={errors.mobile}
+                onCountryChange={(country) => {
+                  setMobileCountry(country);
+                  setErrors((current) => ({ ...current, mobile: undefined }));
+                }}
+                onValueChange={(value) => updateValue("mobile", value)}
+              />
+              <Field id="workshop-date" label={ar ? "تاريخ الورشة" : "Workshop date"} error={errors.date}>
                 <input
                   value={values.date}
                   onChange={(event) => updateValue("date", event.target.value)}
                   type="date"
                   min={getTomorrowDateMinimum()}
+                  dir="ltr"
                   className={inputClass}
                 />
               </Field>
-              <Field label="Number of participants" error={errors.participants}>
+              <Field id="workshop-participants" label={ar ? "عدد المشاركات" : "Number of participants"} error={errors.participants}>
                 <input
                   value={values.participants}
                   onChange={(event) => updateValue("participants", event.target.value)}
@@ -159,20 +202,13 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
                   min={1}
                   step={1}
                   inputMode="numeric"
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Email (optional)" error={errors.email} className="sm:col-span-1">
-                <input
-                  value={values.email}
-                  onChange={(event) => updateValue("email", event.target.value)}
-                  type="email"
-                  autoComplete="email"
+                  dir="ltr"
                   className={inputClass}
                 />
               </Field>
               <Field
-                label="Additional notes (optional)"
+                id="workshop-notes"
+                label={ar ? "ملاحظات إضافية (اختياري)" : "Additional notes (optional)"}
                 error={errors.notes}
                 className="sm:col-span-2"
               >
@@ -180,6 +216,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
                   value={values.notes}
                   onChange={(event) => updateValue("notes", event.target.value)}
                   rows={2}
+                  dir={direction}
                   className={`${inputClass} resize-none`}
                 />
               </Field>
@@ -195,9 +232,9 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.12em] text-background transition-opacity hover:opacity-85 sm:w-auto"
+                className={`motion-press w-full border border-foreground bg-foreground px-8 py-4 text-xs text-background transition-opacity hover:opacity-85 sm:w-auto ${ar ? "tracking-normal" : "tracking-[0.12em]"}`}
               >
-                {submitting ? "Sending…" : "Send booking request"}
+                {submitting ? (ar ? "جارٍ الإرسال…" : "Sending…") : (ar ? "إرسال طلب الحجز" : "Send booking request")}
               </button>
             </div>
           </form>
@@ -208,7 +245,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
 }
 
 const inputClass =
-  "mt-1 w-full border border-foreground/40 bg-transparent px-4 py-2 text-sm outline-none transition-colors focus:border-foreground";
+  "mt-1 w-full border border-foreground/40 bg-transparent px-4 py-2 text-start text-sm outline-none transition-colors focus:border-foreground";
 
 type AccessibleFieldProps = {
   id?: string;
@@ -217,17 +254,18 @@ type AccessibleFieldProps = {
 };
 
 function Field({
+  id,
   label,
   error,
   className = "",
   children,
 }: {
+  id: string;
   label: string;
   error?: string;
   className?: string;
   children: ReactElement<AccessibleFieldProps>;
 }) {
-  const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const errorId = `${id}-error`;
 
   return (

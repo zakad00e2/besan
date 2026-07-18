@@ -4,7 +4,6 @@ import {
   appointmentStatusLabels,
   bookingTypeLabels,
   calculateChangePercent,
-  createAvailabilitySlots,
   getDashboardMetricComparisons,
   getDashboardMetrics,
   getBookingStatusDistribution,
@@ -12,9 +11,12 @@ import {
   stageLabels,
   type Appointment,
   type Customer,
-  workingDayLabels,
 } from "./dashboard-model";
-import { demoDashboardState } from "./dashboard-data";
+import { dashboardFixture } from "@/test/fixtures/dashboard";
+
+it("does not expose demo availability as dashboard state", () => {
+  expect("availability" in dashboardFixture).toBe(false);
+});
 
 const customers: Customer[] = [
   {
@@ -22,6 +24,7 @@ const customers: Customer[] = [
     name: "Layan Mansour",
     phone: "+970 59 123 4567",
     stage: "new-inquiry",
+    createdAt: "2026-07-01T08:00:00.000Z",
     updatedAt: "2026-07-05T08:00:00.000Z",
     notes: [],
     activity: [],
@@ -41,20 +44,6 @@ const appointments: Appointment[] = [
   },
 ];
 
-describe("createAvailabilitySlots", () => {
-  it("creates eight hourly slots for each of five working days", () => {
-    const slots = createAvailabilitySlots();
-
-    expect(slots).toHaveLength(40);
-    expect(slots[0]).toMatchObject({ day: "sunday", startsAt: "10:00", endsAt: "11:00" });
-    expect(slots.at(-1)).toMatchObject({
-      day: "thursday",
-      startsAt: "17:00",
-      endsAt: "18:00",
-    });
-  });
-});
-
 describe("dashboard display content", () => {
   it("provides English labels and demo data", () => {
     expect(stageLabels["new-inquiry"]).toBe("New inquiry");
@@ -62,10 +51,9 @@ describe("dashboard display content", () => {
     expect(bookingTypeLabels.workshop).toBe("Workshop");
     expect(appointmentStatusLabels.confirmed).toBe("Confirmed");
     expect(reminderStatusLabels.scheduled).toBe("Scheduled");
-    expect(workingDayLabels.sunday).toBe("Sunday");
-    expect(demoDashboardState.customers[0].name).toBe("Layan Mansour");
-    expect(demoDashboardState.appointments[0].purpose).toBe("Initial consultation");
-    expect(JSON.stringify(demoDashboardState)).not.toMatch(/[\u0600-\u06ff]/);
+    expect(dashboardFixture.customers[0].name).toBe("Layan Mansour");
+    expect(dashboardFixture.appointments[0].purpose).toBe("Initial consultation");
+    expect(JSON.stringify(dashboardFixture)).not.toMatch(/[\u0600-\u06ff]/);
   });
 });
 
@@ -142,6 +130,24 @@ describe("getDashboardMetricComparisons", () => {
       todayAppointments: { current: 1, previous: 0, changePercent: null },
       newCustomers: { current: 1, previous: 0, changePercent: null },
       needsFollowUp: { current: 1, previous: 0, changePercent: null },
+    });
+  });
+
+  it("uses the persisted customer creation timestamp for new-customer comparisons", () => {
+    const staleCustomer = {
+      ...customers[0],
+      createdAt: "2026-06-01T08:00:00.000Z",
+      updatedAt: "2026-07-05T08:00:00.000Z",
+    };
+
+    expect(
+      getDashboardMetricComparisons(
+        [staleCustomer],
+        appointments,
+        new Date("2026-07-10T08:00:00.000Z"),
+      ),
+    ).toMatchObject({
+      newCustomers: { current: 0, previous: 1, changePercent: -100 },
     });
   });
 });

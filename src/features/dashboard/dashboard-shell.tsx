@@ -1,15 +1,18 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   CalendarDays,
   Clock3,
+  Scissors,
   LayoutDashboard,
+  LogOut,
   Menu,
-  Plus,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import besanLogo from "@/assets/besan-logo.png";
 import { Toaster } from "@/components/ui/sonner";
+import { authClient } from "@/features/auth/neon-auth-client";
 import {
   Sheet,
   SheetContent,
@@ -18,33 +21,28 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import {
-  dashboardIconButtonClassName,
-  dashboardPrimaryButtonClassName,
-  dashboardSecondaryButtonClassName,
-} from "./dashboard-ui";
 
 const dashboardNavigation = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Bookings", to: "/dashboard/bookings", icon: CalendarDays },
+  { label: "Workshop", to: "/dashboard/workshop-bookings", icon: Scissors },
   { label: "Customers", to: "/dashboard/customers", icon: Users },
-  { label: "Workshop bookings", to: "/dashboard/workshop-bookings", icon: CalendarDays },
   { label: "Availability", to: "/dashboard/availability", icon: Clock3 },
 ] as const;
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/dashboard/bookings": "Bookings",
+  "/dashboard/workshop-bookings": "Workshop",
   "/dashboard/customers": "Customers",
-  "/dashboard/workshop-bookings": "Workshop bookings",
   "/dashboard/availability": "Availability",
 };
 
 const pageDescriptions: Record<string, string> = {
   "/dashboard": "A quick view of your appointments and atelier bookings",
   "/dashboard/bookings": "Manage design appointments in one place",
-  "/dashboard/customers": "Customer profiles, production stages, and upcoming appointments",
   "/dashboard/workshop-bookings": "Workshop requests and participant details",
+  "/dashboard/customers": "Customer profiles, production stages, and upcoming appointments",
   "/dashboard/availability": "Set available time slots and reminder preferences",
 };
 
@@ -74,16 +72,16 @@ function DashboardNav({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "group flex min-h-9 items-center gap-2 rounded-md px-2.5 text-[12px] font-medium outline-none transition-all duration-200 active:translate-y-px focus-visible:ring-2 focus-visible:ring-violet-500",
+              "group flex min-h-9 items-center gap-2.5 px-2.5 text-[12px] outline-none transition-[color,background-color,border-color,box-shadow] duration-[var(--motion-duration-color)] ease-[var(--motion-ease-out)] focus-visible:ring-2 focus-visible:ring-violet-500",
               active
-                ? "bg-[#f7f7f8] text-[#171719]"
-                : "text-[#5f6066] hover:bg-[#fafafa] hover:text-[#171719]",
+                ? "rounded-xl border border-[#e8e8ec] bg-white font-medium text-[#141417] shadow-[0_1px_2px_rgba(24,24,27,0.04)]"
+                : "font-normal text-[#6e6f74] hover:text-[#141417]",
             )}
           >
             <Icon
               className={cn(
-                "size-3.5 stroke-[1.8]",
-                active ? "text-[#1d1d20]" : "text-[#777980] group-hover:text-[#1d1d20]",
+                "size-3.5 shrink-0 stroke-[1.75]",
+                active ? "text-[#141417]" : "text-[#93949a] group-hover:text-[#6e6f74]",
               )}
               aria-hidden="true"
             />
@@ -98,16 +96,47 @@ function DashboardNav({ onNavigate }: { onNavigate?: () => void }) {
 function Brand() {
   return (
     <div className="px-3.5 pb-3 pt-4">
-      <div className="flex items-center gap-2">
-        <span className="flex size-6 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
-          B
-        </span>
-        <div>
-          <p className="text-[11px] font-semibold leading-none text-[#19191c]">Besan-Ops</p>
-          <p className="mt-1 text-[9px] text-[#8a8b91]">Atelier management</p>
+      <div className="flex items-center gap-2.5">
+        <img src={besanLogo} alt="besan khalaily" className="size-12 shrink-0 object-contain" />
+        <div className="flex flex-col justify-center">
+          <p className="text-sm font-semibold leading-none text-[#19191c]">Besan Khalaily</p>
+          <p className="mt-0.5 text-[10px] leading-tight text-[#8a8b91]">Atelier management</p>
         </div>
       </div>
     </div>
+  );
+}
+
+function SignOutButton({ onNavigate }: { onNavigate?: () => void }) {
+  const navigate = useNavigate();
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function signOut() {
+    setSigningOut(true);
+    try {
+      await authClient.signOut();
+      onNavigate?.();
+      await navigate({ to: "/auth" });
+    } finally {
+      setSigningOut(false);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => void signOut()}
+      disabled={signingOut}
+      className={cn(
+        "group flex min-h-9 w-full items-center gap-2.5 rounded-lg px-2.5 text-[11px] font-normal text-[#85868c] transition-[color,background-color] duration-[var(--motion-duration-color)] ease-[var(--motion-ease-out)] hover:bg-[#f0f0f1] hover:text-[#c24141] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 disabled:cursor-wait disabled:opacity-60",
+      )}
+    >
+      <LogOut
+        className="size-3.5 stroke-[1.75] text-[#a5a6ab] transition-colors duration-[var(--motion-duration-color)] ease-[var(--motion-ease-out)] group-hover:text-[#c24141]"
+        aria-hidden="true"
+      />
+      {signingOut ? "Logging out…" : "Log out"}
+    </button>
   );
 }
 
@@ -115,30 +144,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col">
       <Brand />
-      <div className="px-2.5">
-        <Link
-          to="/dashboard/bookings"
-          search={{ new: 1 }}
-          onClick={onNavigate}
-          className={cn(
-            dashboardPrimaryButtonClassName,
-            "flex min-h-9 w-full gap-2 px-3 text-[11px]",
-          )}
-        >
-          <Plus className="size-3.5" aria-hidden="true" />
-          New appointment
-        </Link>
-      </div>
-      <div className="mt-4 px-2.5">
-        <p className="mb-1.5 px-2.5 text-[9px] font-medium text-[#999aa0]">Workspace</p>
+      <div className="mt-5 px-2">
+        <p className="mb-3 px-3 text-[11px] font-normal text-[#94959b]">Workspace</p>
         <DashboardNav onNavigate={onNavigate} />
       </div>
       <div className="mt-auto border-t border-[#eeeeef] px-3 py-3">
-        <div className="rounded-md bg-[#fafafa] px-2.5 py-2 text-[9px] leading-4 text-[#85868c]">
-          Demo version
-          <br />
-          Reminders are not actually sent
-        </div>
+        <SignOutButton onNavigate={onNavigate} />
       </div>
     </div>
   );
@@ -152,12 +163,12 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="dashboard-app min-h-screen bg-white text-[#161619]" dir="ltr" lang="en">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 border-r border-[#e9e9eb] bg-white lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 border-r border-[#e9e9eb] bg-[#f8f8f9] lg:block">
         <SidebarContent />
       </aside>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-64 border-[#e9e9eb] bg-white p-0" dir="ltr">
+        <SheetContent side="left" className="w-64 border-[#e9e9eb] bg-[#f8f8f9] p-0" dir="ltr">
           <SheetHeader className="sr-only">
             <SheetTitle>Dashboard menu</SheetTitle>
             <SheetDescription>Dashboard navigation links</SheetDescription>
@@ -173,12 +184,14 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
-              className={cn(dashboardIconButtonClassName, "size-7 lg:hidden")}
+              className="inline-flex size-7 items-center justify-center rounded-md border border-[#e5e5e7] text-[#5f6066] transition-colors hover:bg-[#f6f6f7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 lg:hidden"
             >
               <Menu className="size-4" aria-hidden="true" />
             </button>
-            <span className="hidden text-[10px] font-semibold text-[#44454a] lg:block">Besan-Ops</span>
-            <span className="text-[9px] text-[#a0a1a6]">Atelier admin dashboard</span>
+            <span className="hidden text-sm font-normal uppercase tracking-[0.08em] text-[#44454a] lg:block">
+              besan khalaily
+            </span>
+            <span className="text-[11px] text-[#a0a1a6]">Atelier admin dashboard</span>
           </div>
         </header>
 
@@ -190,17 +203,6 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               </h1>
               <p className="mt-1 text-[11px] text-[#8b8c92]">{description}</p>
             </div>
-            <Link
-              to="/dashboard/bookings"
-              search={{ new: 1 }}
-              className={cn(
-                dashboardSecondaryButtonClassName,
-                "min-h-9 gap-1.5 px-3 text-[11px] lg:hidden",
-              )}
-            >
-              <Plus className="size-3.5" aria-hidden="true" />
-              New appointment
-            </Link>
           </div>
           <main>{children}</main>
         </div>

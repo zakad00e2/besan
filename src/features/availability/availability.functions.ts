@@ -8,6 +8,8 @@ import {
   getOpenDatesForMonth,
   getSlotsForDate,
   loadAvailabilityForAdmin,
+  loadOpenDatesForAdmin,
+  loadSlotsForAdmin,
   saveOverrideForAdmin,
   saveWeeklyScheduleForAdmin,
 } from "./availability-service";
@@ -40,6 +42,19 @@ export const getPublicAvailabilityDay = createServerFn({ method: "GET" })
 export const getAdminAvailability = createServerFn({ method: "POST" })
   .validator(z.object({ token: z.string().min(1) }))
   .handler(({ data }) => loadAvailabilityForAdmin(data.token, adminDependencies()));
+
+const adminProjectionBase = {
+  token: z.string().min(1),
+  excludeAppointmentId: z.string().uuid().optional(),
+};
+
+export const getAdminBookingAvailabilityMonth = createServerFn({ method: "POST" })
+  .validator(z.object({ ...adminProjectionBase, month: z.string().regex(/^\d{4}-\d{2}$/) }))
+  .handler(({ data }) => loadOpenDatesForAdmin(data, adminDependencies()));
+
+export const getAdminBookingAvailabilityDay = createServerFn({ method: "POST" })
+  .validator(z.object({ ...adminProjectionBase, date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }))
+  .handler(({ data }) => loadSlotsForAdmin(data, adminDependencies()));
 
 export const saveAdminWeeklySchedule = createServerFn({ method: "POST" })
   .validator(

@@ -34,10 +34,12 @@
 ### Task 1: Create the reusable score chart with test-first coverage
 
 **Files:**
+
 - Create: `src/features/dashboard/score-distribution-chart.test.tsx`
 - Create: `src/features/dashboard/score-distribution-chart.tsx`
 
 **Interfaces:**
+
 - Consumes: `ScoreDistribution` from `./dashboard-model`.
 - Produces: `calculateScoreAverage(scoreDist: ScoreDistribution): number` and `ScoreDistributionChart({ scoreDist, avgScore }: ScoreDistributionChartProps): JSX.Element`.
 
@@ -92,7 +94,16 @@ Expected: FAIL because `./score-distribution-chart` does not exist.
 - [ ] **Step 3: Write the minimal implementation**
 
 ```tsx
-import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import type { ScoreDistribution } from "./dashboard-model";
 
 export type ScoreDistributionChartProps = {
@@ -149,22 +160,66 @@ export function ScoreDistributionChart({ scoreDist, avgScore }: ScoreDistributio
           ))}
         </dl>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} barCategoryGap="28%" margin={{ top: 8, right: 8, left: -12, bottom: 4 }}>
+          <BarChart
+            data={chartData}
+            barCategoryGap="28%"
+            margin={{ top: 8, right: 8, left: -12, bottom: 4 }}
+          >
             <defs>
               {scoreBuckets.map((bucket) => (
-                <linearGradient id={`score-distribution-${bucket.key}`} key={bucket.key} x1="0" x2="0" y1="0" y2="1">
+                <linearGradient
+                  id={`score-distribution-${bucket.key}`}
+                  key={bucket.key}
+                  x1="0"
+                  x2="0"
+                  y1="0"
+                  y2="1"
+                >
                   <stop offset="0%" stopColor={bucket.top} stopOpacity={0.95} />
                   <stop offset="100%" stopColor={bucket.bottom} stopOpacity={0.85} />
                 </linearGradient>
               ))}
             </defs>
-            <CartesianGrid horizontal vertical={false} stroke="var(--border)" strokeOpacity={0.45} />
-            <CartesianGrid horizontal={false} vertical stroke="var(--border)" strokeDasharray="4 4" strokeOpacity={0.35} />
-            <XAxis axisLine={false} dataKey="label" tickLine={false} tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} width={28} />
-            <Tooltip cursor={{ fill: "var(--muted)", fillOpacity: 0.35 }} contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12, padding: "8px 12px", fontSize: 12, boxShadow: "0 4px 12px rgb(0 0 0 / 0.08)" }} />
+            <CartesianGrid
+              horizontal
+              vertical={false}
+              stroke="var(--border)"
+              strokeOpacity={0.45}
+            />
+            <CartesianGrid
+              horizontal={false}
+              vertical
+              stroke="var(--border)"
+              strokeDasharray="4 4"
+              strokeOpacity={0.35}
+            />
+            <XAxis
+              axisLine={false}
+              dataKey="label"
+              tickLine={false}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              width={28}
+            />
+            <Tooltip
+              cursor={{ fill: "var(--muted)", fillOpacity: 0.35 }}
+              contentStyle={{
+                background: "var(--card)",
+                border: "1px solid var(--border)",
+                borderRadius: 12,
+                padding: "8px 12px",
+                fontSize: 12,
+                boxShadow: "0 4px 12px rgb(0 0 0 / 0.08)",
+              }}
+            />
             <Bar dataKey="value" isAnimationActive={false} maxBarSize={44} radius={[10, 10, 4, 4]}>
-              {chartData.map((entry) => <Cell key={entry.gradientId} fill={`url(#${entry.gradientId})`} />)}
+              {chartData.map((entry) => (
+                <Cell key={entry.gradientId} fill={`url(#${entry.gradientId})`} />
+              ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -190,6 +245,7 @@ git commit -m "feat: add score distribution chart"
 ### Task 2: Supply score data through dashboard state and replace the old chart
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-model.ts:45-58`
 - Modify: `src/features/dashboard/dashboard-data.ts:129-134`
 - Modify: `src/routes/dashboard/index.tsx:7-10`
@@ -197,6 +253,7 @@ git commit -m "feat: add score distribution chart"
 - Modify: `src/features/dashboard/dashboard-overview.test.tsx:8-31`
 
 **Interfaces:**
+
 - Consumes: `ScoreDistribution` and `ScoreDistributionChart` from Task 1.
 - Produces: a dashboard overview that renders the chart from `DashboardState.scoreDist` and optional `DashboardState.avgScore`.
 

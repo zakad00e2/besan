@@ -1,7 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;600;700&display=swap");
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+
+@font-face { font-family: "Thmanyah Sans"; src: url("./assets/thmanyahsans-Light.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Sans"; src: url("./assets/thmanyahsans-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Sans"; src: url("./assets/thmanyahsans-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Thmanyah Serif Display"; src: url("./assets/thmanyahserifdisplay-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
 
 @custom-variant dark (&:is(.dark *));
 
@@ -65,6 +70,31 @@
   --border: oklch(0.16 0.01 60 / 0.18);
   --input: oklch(0.16 0.01 60 / 0.18);
   --ring: oklch(0.16 0.01 60 / 0.4);
+
+  --motion-duration-press: 120ms;
+  --motion-duration-color: 160ms;
+  --motion-duration-state: 180ms;
+  --motion-duration-reveal: 220ms;
+  --motion-duration-surface: 240ms;
+  --motion-duration-editorial: 700ms;
+  --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-ease-move: cubic-bezier(0.77, 0, 0.175, 1);
+  --motion-ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --check-opacity-dur: 500ms;
+  --check-rotate-dur: 500ms;
+  --check-rotate-from: 80deg;
+  --check-bob-dur: 500ms;
+  --check-y-amount: 40px;
+  --check-blur-dur: 500ms;
+  --check-blur-from: 10px;
+  --check-path-dur: 500ms;
+  --check-path-delay: 80ms;
+  --check-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-opacity: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-rotate: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-bob: cubic-bezier(0.34, 1.35, 0.64, 1);
+  --check-ease-path: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
@@ -112,16 +142,181 @@
   letter-spacing: 0;
 }
 
+.public-site-arabic { font-family: "Thmanyah Sans", ui-sans-serif, system-ui, sans-serif; font-weight: 400; }
+.public-site-arabic .font-serif { font-family: "Thmanyah Serif Display", "Thmanyah Sans", ui-serif, serif; font-weight: 500; letter-spacing: 0; }
+.arabic-name-title { font-feature-settings: "ss01", "cv11"; }
+.arabic-ui-heading { font-family: "Thmanyah Sans", ui-sans-serif, system-ui, sans-serif; font-weight: 500; letter-spacing: 0; }
+.language-switch-arabic { font-family: "Thmanyah Serif Display", "Thmanyah Sans", ui-serif, serif; font-weight: 500; }
+
 .dashboard-app ::selection {
   background: rgb(124 58 237 / 0.16);
 }
 
+.motion-press {
+  transition-property: transform;
+  transition-duration: var(--motion-duration-press);
+  transition-timing-function: var(--motion-ease-out);
+}
+
+.motion-press:active {
+  transform: scale(0.97);
+}
+
+/* Wrapper drives the appear animation; it doesn't own any
+   sizing or color so you can drop in any icon. */
+.t-success-check {
+  display: inline-block;
+  transform-origin: center;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+}
+/* overflow: visible keeps the stroke from clipping while it
+   draws; display: block kills the inline whitespace under SVGs. */
+.t-success-check svg { display: block; overflow: visible; }
+/* Stroke-draw setup for the Lucide Check path (rounded up from 22.63). */
+.t-success-check svg path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+}
+
+.t-success-check[data-state="in"] {
+  animation:
+    t-check-fade   var(--check-opacity-dur) var(--check-ease-opacity) forwards,
+    t-check-rotate var(--check-rotate-dur)  var(--check-ease-rotate)  forwards,
+    t-check-blur   var(--check-blur-dur)    var(--check-ease-out)     forwards,
+    t-check-bob    var(--check-bob-dur)     var(--check-ease-bob)     forwards;
+}
+.t-success-check[data-state="in"] svg path {
+  animation: t-check-draw var(--check-path-dur) var(--check-ease-path) var(--check-path-delay, 0ms) forwards;
+}
+
+@keyframes t-check-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes t-check-rotate {
+  from { transform: rotate(var(--check-rotate-from)); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes t-check-blur {
+  from { filter: blur(var(--check-blur-from)); }
+  to   { filter: blur(0); }
+}
+@keyframes t-check-bob {
+  from { translate: 0 var(--check-y-amount); }
+  to   { translate: 0 0; }
+}
+@keyframes t-check-draw { to { stroke-dashoffset: 0; } }
+
+.motion-state-enter {
+  animation: motion-state-enter var(--motion-duration-reveal) var(--motion-ease-out) both;
+}
+
+.editorial-image,
+.editorial-overlay {
+  transition-duration: var(--motion-duration-surface);
+  transition-timing-function: var(--motion-ease-out);
+}
+
+.editorial-image {
+  transition-property: transform;
+}
+
+.workshop-image {
+  filter: grayscale(1);
+  transition-property: transform, filter;
+  transition-duration: 650ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.main-portrait-image {
+  filter: grayscale(1);
+  transition-property: transform, filter;
+  transition-duration: 750ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.editorial-overlay {
+  transition-property: opacity;
+}
+
+@keyframes motion-state-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes motion-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes motion-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .editorial-image,
+  .editorial-image:hover {
+    transform: scale(1.015);
+  }
+
+  .group:hover .workshop-image,
+  .workshop-image:hover {
+    filter: grayscale(0);
+  }
+
+  .group:hover .main-portrait-image,
+  .main-portrait-image:hover {
+    filter: grayscale(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .dashboard-app *,
-  .dashboard-app *::before,
-  .dashboard-app *::after {
+  .t-success-check { animation: none !important; opacity: 1; }
+  .t-success-check svg path { animation: none !important; stroke-dashoffset: 0 !important; }
+
+  html {
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+  }
+
+  .motion-press:active {
+    transform: none;
+  }
+
+  .motion-state-enter {
+    animation-name: motion-fade-in;
+    animation-duration: 180ms;
+  }
+
+  .editorial-image {
+    transform: none !important;
+  }
+
+  [data-motion-surface="dialog"],
+  [data-motion-surface="sheet"] {
+    animation-duration: 180ms !important;
+  }
+
+  [data-motion-surface][data-state="open"] {
+    animation-name: motion-fade-in !important;
+  }
+
+  [data-motion-surface][data-state="closed"] {
+    animation-name: motion-fade-out !important;
   }
 }

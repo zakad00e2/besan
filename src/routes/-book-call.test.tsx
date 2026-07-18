@@ -86,7 +86,7 @@ describe("book-call route", () => {
     selectJulyNineteenth();
     fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
     fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Noor Al-Hashemi" } });
-    fireEvent.change(screen.getByLabelText("Mobile Number"), {
+    fireEvent.change(screen.getByLabelText("WhatsApp Number"), {
       target: { value: "+970591234567" },
     });
     await act(async () => {
@@ -99,7 +99,7 @@ describe("book-call route", () => {
     );
     expect(availability.loadDate).toHaveBeenCalledTimes(2);
     expect((screen.getByLabelText("Full Name") as HTMLInputElement).value).toBe("Noor Al-Hashemi");
-    expect((screen.getByLabelText("Mobile Number") as HTMLInputElement).value).toBe(
+    expect((screen.getByLabelText("WhatsApp Number") as HTMLInputElement).value).toBe(
       "+970591234567",
     );
     expect(screen.getAllByRole("button", { name: "11:00" })[0].className).not.toContain(
@@ -116,7 +116,7 @@ describe("book-call route", () => {
     selectJulyNineteenth();
     fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
     fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Noor Al-Hashemi" } });
-    fireEvent.change(screen.getByLabelText("Mobile Number"), {
+    fireEvent.change(screen.getByLabelText("WhatsApp Number"), {
       target: { value: "+970591234567" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Confirm Booking" }));
@@ -140,7 +140,7 @@ describe("book-call route", () => {
     selectJulyNineteenth();
     fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
     fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Noor Al-Hashemi" } });
-    fireEvent.change(screen.getByLabelText("Mobile Number"), {
+    fireEvent.change(screen.getByLabelText("WhatsApp Number"), {
       target: { value: "+970591234567" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Confirm Booking" }));

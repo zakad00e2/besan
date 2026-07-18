@@ -2,13 +2,26 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import {
   parseBookingStatus,
+  parseAdminBookingCreateInput,
+  parseAdminBookingInput,
   parseScheduleNextAppointmentInput,
   type BookingListItem,
+  type ValidatedAdminBooking,
+  type ValidatedAdminBookingCreate,
 } from "@/features/book-call/booking-domain";
 import {
   getNeonBookingRepository,
   type BookingRepository,
 } from "@/features/book-call/booking-repository.server";
+import {
+  getNeonBookingPageViewRepository,
+  type BookingPageViewRepository,
+} from "@/features/book-call/booking-page-view-repository.server";
+import { getSlotsForDate } from "@/features/availability/availability-service";
+import {
+  getNeonAvailabilityRepository,
+  type AvailabilityRepository,
+} from "@/features/availability/availability-repository.server";
 import {
   parseWorkshopBookingAdminUpdate,
   parseWorkshopBookingStatus,
@@ -30,6 +43,72 @@ export const checkAdminAccess = createServerFn({ method: "POST" })
 export const getBookings = createServerFn({ method: "POST" })
   .validator(tokenSchema)
   .handler(async ({ data }) => await listBookingsForAdmin(data.token));
+
+export const getBookingsPage = createServerFn({ method: "POST" })
+  .validator(tokenSchema)
+  .handler(async ({ data }) => await loadBookingsPageForAdmin(data.token));
+
+type BookingPageReadDependencies = {
+  verifyAdminToken: typeof verifyAdminToken;
+  getBookingRepository: () => Pick<BookingRepository, "list">;
+  getBookingPageViewRepository: () => BookingPageViewRepository;
+};
+
+const defaultBookingPageReadDependencies: BookingPageReadDependencies = {
+  verifyAdminToken,
+  getBookingRepository: getNeonBookingRepository,
+  getBookingPageViewRepository: getNeonBookingPageViewRepository,
+};
+
+export async function loadBookingsPageForAdmin(
+  token: string,
+  dependencies: BookingPageReadDependencies = defaultBookingPageReadDependencies,
+): Promise<
+  | { success: true; bookings: BookingListItem[]; lastSeenAt: string | null; snapshotAt: string }
+  | { success: false; reason: "forbidden" | "load-error" }
+> {
+  let access: Awaited<ReturnType<typeof verifyAdminToken>>;
+  try {
+    access = await dependencies.verifyAdminToken(token);
+  } catch {
+    return { success: false, reason: "forbidden" };
+  }
+  if (!access.allowed || !access.supervisorId) return { success: false, reason: "forbidden" };
+
+  try {
+    const repository = dependencies.getBookingPageViewRepository();
+    const lastSeenAt = await repository.getLastSeen(access.supervisorId);
+    const snapshotAt = await repository.getSnapshotAt();
+    const bookings = await dependencies.getBookingRepository().list();
+    return { success: true, bookings, lastSeenAt, snapshotAt };
+  } catch {
+    return { success: false, reason: "load-error" };
+  }
+}
+
+export async function markBookingsPageSeenForAdmin(
+  input: { token: string; seenAt: string },
+  dependencies: BookingPageReadDependencies = defaultBookingPageReadDependencies,
+): Promise<{ success: true } | { success: false; reason: "forbidden" | "save-error" }> {
+  let access: Awaited<ReturnType<typeof verifyAdminToken>>;
+  try {
+    access = await dependencies.verifyAdminToken(input.token);
+  } catch {
+    return { success: false, reason: "forbidden" };
+  }
+  if (!access.allowed || !access.supervisorId) return { success: false, reason: "forbidden" };
+
+  try {
+    await dependencies.getBookingPageViewRepository().saveLastSeen(access.supervisorId, input.seenAt);
+    return { success: true };
+  } catch {
+    return { success: false, reason: "save-error" };
+  }
+}
+
+export const markBookingsPageSeen = createServerFn({ method: "POST" })
+  .validator(z.object({ token: z.string().min(1), seenAt: z.string().datetime() }))
+  .handler(({ data }) => markBookingsPageSeenForAdmin(data));
 
 type BookingAdminDependencies = {
   verifyAdminToken: typeof verifyAdminToken;
@@ -53,6 +132,101 @@ const defaultBookingAdminDependencies: BookingAdminDependencies = {
   verifyAdminToken,
   getRepository: getNeonBookingRepository,
 };
+
+type AdminBookingMutationDependencies = {
+  verifyAdminToken: typeof verifyAdminToken;
+  now: () => Date;
+  getBookingRepository: () => Pick<BookingRepository, "createForAdmin" | "updateForAdmin">;
+  getAvailabilityRepository: () => AvailabilityRepository;
+};
+
+const defaultAdminBookingMutationDependencies: AdminBookingMutationDependencies = {
+  verifyAdminToken,
+  now: () => new Date(),
+  getBookingRepository: getNeonBookingRepository,
+  getAvailabilityRepository: getNeonAvailabilityRepository,
+};
+
+type AdminBookingMutationResult =
+  | { success: true; booking: BookingListItem }
+  | {
+      success: false;
+      reason: "forbidden" | "validation" | "not-found" | "slot-unavailable" | "storage-error";
+      fieldErrors?: Record<string, string | undefined>;
+    };
+
+async function isAdminAllowed(
+  token: string,
+  dependencies: Pick<AdminBookingMutationDependencies, "verifyAdminToken">,
+) {
+  try {
+    return (await dependencies.verifyAdminToken(token)).allowed;
+  } catch {
+    return false;
+  }
+}
+
+async function saveAdminBooking(
+  request: { token: string; input: unknown; id?: string },
+  dependencies: AdminBookingMutationDependencies,
+): Promise<AdminBookingMutationResult> {
+  if (!(await isAdminAllowed(request.token, dependencies))) {
+    return { success: false, reason: "forbidden" };
+  }
+
+  const parsed = request.id
+    ? parseAdminBookingInput(request.input)
+    : parseAdminBookingCreateInput(request.input);
+  if (!parsed.success) {
+    return { success: false, reason: "validation", fieldErrors: parsed.fieldErrors };
+  }
+
+  try {
+    const availability = await getSlotsForDate(
+      parsed.data.appointmentDate,
+      dependencies.getAvailabilityRepository(),
+      dependencies.now(),
+      request.id,
+    );
+    if (!availability.success) return { success: false, reason: "storage-error" };
+    if (!availability.slots.some((slot) => slot.startsAt === parsed.data.appointmentTime)) {
+      return { success: false, reason: "slot-unavailable" };
+    }
+
+    return request.id
+      ? await dependencies.getBookingRepository().updateForAdmin(
+          request.id,
+          parsed.data as ValidatedAdminBooking,
+        )
+      : await dependencies.getBookingRepository().createForAdmin(
+          parsed.data as ValidatedAdminBookingCreate,
+        );
+  } catch {
+    return { success: false, reason: "storage-error" };
+  }
+}
+
+export function createBookingForAdmin(
+  request: { token: string; input: unknown },
+  dependencies: AdminBookingMutationDependencies = defaultAdminBookingMutationDependencies,
+) {
+  return saveAdminBooking(request, dependencies);
+}
+
+export function updateBookingForAdmin(
+  request: { token: string; id: string; input: unknown },
+  dependencies: AdminBookingMutationDependencies = defaultAdminBookingMutationDependencies,
+) {
+  return saveAdminBooking(request, dependencies);
+}
+
+export const createAdminBooking = createServerFn({ method: "POST" })
+  .validator(z.object({ token: z.string().min(1), input: z.unknown() }))
+  .handler(({ data }) => createBookingForAdmin(data));
+
+export const updateAdminBooking = createServerFn({ method: "POST" })
+  .validator(z.object({ token: z.string().min(1), id: z.string().uuid(), input: z.unknown() }))
+  .handler(({ data }) => updateBookingForAdmin(data));
 
 function resolveBookingRepository(dependencies: BookingAdminDependencies) {
   if (dependencies.repository) return dependencies.repository;
@@ -208,7 +382,10 @@ type WorkshopBookingAdminDependencies = {
   | { repository: Pick<WorkshopBookingRepository, "list" | "updateStatus" | "update" | "delete"> }
   | {
       repository?: never;
-      getRepository: () => Pick<WorkshopBookingRepository, "list" | "updateStatus" | "update" | "delete">;
+      getRepository: () => Pick<
+        WorkshopBookingRepository,
+        "list" | "updateStatus" | "update" | "delete"
+      >;
     }
 );
 
@@ -315,7 +492,9 @@ export const updateWorkshopBooking = createServerFn({ method: "POST" })
 export async function deleteWorkshopBookingForAdmin(
   input: { token: string; id: string },
   dependencies: WorkshopBookingAdminDependencies = defaultWorkshopBookingAdminDependencies,
-): Promise<{ success: true } | { success: false; reason: "forbidden" | "not-found" | "delete-error" }> {
+): Promise<
+  { success: true } | { success: false; reason: "forbidden" | "not-found" | "delete-error" }
+> {
   let access: Awaited<ReturnType<typeof verifyAdminToken>>;
   try {
     access = await dependencies.verifyAdminToken(input.token);

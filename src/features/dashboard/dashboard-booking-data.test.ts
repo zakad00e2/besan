@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { BookingListItem } from "@/features/book-call/booking-domain";
-import { mergeScheduledNext, normalizeBookingList } from "./dashboard-booking-data";
+import {
+  mergePersistedBooking,
+  mergeScheduledNext,
+  normalizeBookingList,
+} from "./dashboard-booking-data";
 
 const first: BookingListItem = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -8,6 +12,7 @@ const first: BookingListItem = {
   fullName: "Noor Al-Hashemi",
   mobile: "+970591234567",
   customerStage: "new-inquiry",
+  customerCreatedAt: "2026-06-20T08:00:00.000Z",
   customerUpdatedAt: "2026-07-01T09:00:00.000Z",
   appointmentType: "New Design",
   appointmentDate: "2026-07-14",
@@ -25,12 +30,32 @@ describe("dashboard booking data", () => {
       { ...first, id: "33333333-3333-4333-8333-333333333333", appointmentTime: "12:00" },
     ]);
     expect(data.customers).toHaveLength(1);
-    expect(data.customers[0].id).toBe(first.customerId);
+    expect(data.customers[0]).toMatchObject({
+      id: first.customerId,
+      createdAt: "2026-06-20T08:00:00.000Z",
+      updatedAt: "2026-07-01T09:00:00.000Z",
+    });
+    expect("notes" in data.customers[0]).toBe(false);
+    expect("activity" in data.customers[0]).toBe(false);
     expect(data.appointments.map((item) => item.customerId)).toEqual([
       first.customerId,
       first.customerId,
     ]);
     expect(data.appointments[0].endsAt).toBe("2026-07-14T11:00:00.000Z");
+    expect(data.appointments[0].createdAt).toBe("2026-07-01T10:00:00.000Z");
+  });
+
+  it("merges a persisted create or update without inventing a local row", () => {
+    const data = normalizeBookingList([first]);
+    const updated = { ...first, notes: "Persisted update", status: "confirmed" as const };
+    const merged = mergePersistedBooking(data, updated);
+
+    expect(merged.appointments).toHaveLength(1);
+    expect(merged.appointments[0]).toMatchObject({
+      id: first.id,
+      notes: "Persisted update",
+      status: "confirmed",
+    });
   });
 
   it("merges the completed current appointment, next appointment, and customer stage", () => {

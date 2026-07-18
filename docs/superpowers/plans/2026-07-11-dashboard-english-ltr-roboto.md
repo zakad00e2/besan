@@ -47,12 +47,14 @@
 ### Task 1: Dashboard shell semantics, direction, and typography
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-shell.test.tsx`
 - Modify: `src/features/dashboard/dashboard-shell.tsx`
 - Modify: `src/styles.css`
 - Modify: `src/routes/dashboard.tsx`
 
 **Interfaces:**
+
 - Consumes: existing `DashboardShell({ children }: { children: ReactNode })` and `.dashboard-app` scope.
 - Produces: an English LTR shell with a left sidebar/drawer and dashboard-scoped Roboto styling used by every later task.
 
@@ -71,9 +73,7 @@ it("renders English LTR navigation and marks the current section", () => {
   const root = container.firstElementChild;
   expect(root?.getAttribute("lang")).toBe("en");
   expect(root?.getAttribute("dir")).toBe("ltr");
-  expect(screen.getByRole("link", { name: "Customers" }).getAttribute("aria-current")).toBe(
-    "page",
-  );
+  expect(screen.getByRole("link", { name: "Customers" }).getAttribute("aria-current")).toBe("page");
   expect(screen.getByRole("button", { name: "Open menu" })).toBeTruthy();
   expect(document.body.textContent).toContain("Demo version");
   expect(document.body.textContent).toContain("Reminders are not actually sent");
@@ -167,11 +167,13 @@ git commit -m "feat: convert dashboard shell to English LTR"
 ### Task 2: English label maps and demo data
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-model.test.ts`
 - Modify: `src/features/dashboard/dashboard-model.ts`
 - Modify: `src/features/dashboard/dashboard-data.ts`
 
 **Interfaces:**
+
 - Consumes: existing `CustomerStage`, `BookingType`, `AppointmentStatus`, `ReminderStatus`, `WorkingDay`, and `demoDashboardState` shapes.
 - Produces: English label records and English demo records consumed unchanged by all feature views.
 
@@ -250,7 +252,7 @@ Use the customer names `Layan Mansour`, `Sarah Khalil`, `Noor Hamdan`, `Mariam O
   "Private mini course",
   "Measurement appointment",
   "One-day workshop",
-]
+];
 ```
 
 Do not change IDs, phone numbers, timestamps, enum keys, or reminder settings.
@@ -277,11 +279,13 @@ git commit -m "feat: translate dashboard demo data"
 ### Task 3: English overview and shared dashboard UI
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-overview.test.tsx`
 - Modify: `src/features/dashboard/dashboard-overview.tsx`
 - Modify: `src/features/dashboard/dashboard-ui.tsx`
 
 **Interfaces:**
+
 - Consumes: English label maps and `demoDashboardState` from Task 2, plus the existing `MetricCard`, `StatusBadge`, and `DashboardEmptyState` APIs.
 - Produces: a fully English overview with LTR table alignment; component props remain unchanged.
 
@@ -333,10 +337,12 @@ git commit -m "feat: translate dashboard overview"
 ### Task 4: English bookings workflow and LTR controls
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-bookings.test.tsx`
 - Modify: `src/features/dashboard/dashboard-bookings.tsx`
 
 **Interfaces:**
+
 - Consumes: existing `filterAppointments`, `validateAppointment`, `DashboardBookings`, English label maps, and English demo state.
 - Produces: the same booking filtering, validation, create/edit, and dispatch behavior with English copy and LTR controls.
 
@@ -380,6 +386,7 @@ git commit -m "feat: translate dashboard bookings"
 ### Task 5: English customer directory and profile
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-customers.test.tsx`
 - Modify: `src/features/dashboard/dashboard-customers.tsx`
 - Modify: `src/features/dashboard/dashboard-customer-profile.test.tsx`
@@ -387,6 +394,7 @@ git commit -m "feat: translate dashboard bookings"
 - Modify: `src/routes/dashboard/customers/$id.tsx`
 
 **Interfaces:**
+
 - Consumes: English demo customers, existing customer filter, profile dispatch actions, and route lookup.
 - Produces: English searchable directory and customer profile without changing dispatch payloads or route behavior.
 
@@ -432,11 +440,13 @@ git commit -m "feat: translate dashboard customers"
 ### Task 6: English availability, verification guardrails, and final QA
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-availability.test.tsx`
 - Modify: `src/features/dashboard/dashboard-availability.tsx`
 - Modify: `scripts/verify-dashboard.mjs`
 
 **Interfaces:**
+
 - Consumes: English `workingDayLabels`, existing availability/reminder dispatch actions, and all converted dashboard runtime files.
 - Produces: English availability controls and a static verification script that prevents Arabic/RTL regressions.
 

@@ -14,10 +14,12 @@ export async function verifyAdminToken(token: string) {
       audience: origin,
       algorithms: ["EdDSA"],
     });
+    const supervisorId = typeof payload.sub === "string" && payload.sub.length > 0 ? payload.sub : null;
     return {
-      allowed: isAdminEmail(payload.email, DEFAULT_ADMIN_EMAIL),
+      allowed: supervisorId !== null && isAdminEmail(payload.email, DEFAULT_ADMIN_EMAIL),
+      supervisorId,
     };
   } catch {
-    return { allowed: false };
+    return { allowed: false, supervisorId: null };
   }
 }

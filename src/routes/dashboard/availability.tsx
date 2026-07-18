@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { authClient } from "@/features/auth/neon-auth-client";
 import { DashboardAvailability } from "@/features/dashboard/dashboard-availability";
-import { useDashboard } from "@/features/dashboard/dashboard-store";
 import { useDashboardAvailability } from "@/features/dashboard/use-dashboard-availability";
 
 export const Route = createFileRoute("/dashboard/availability")({
@@ -10,7 +9,6 @@ export const Route = createFileRoute("/dashboard/availability")({
 
 function DashboardAvailabilityRoute() {
   const { data: session } = authClient.useSession();
-  const { state, dispatch } = useDashboard();
   const controller = useDashboardAvailability(Boolean(session?.user));
 
   if (controller.loading) return <p className="text-sm text-slate-600">Loading availability…</p>;
@@ -31,8 +29,6 @@ function DashboardAvailabilityRoute() {
       onSaveWeekly={controller.saveWeekly}
       onSaveOverride={controller.saveOverride}
       onDeleteOverride={controller.deleteOverride}
-      reminderSettings={state.reminderSettings}
-      onReminderChange={(settings) => dispatch({ type: "reminders/update", settings })}
     />
   );
 }

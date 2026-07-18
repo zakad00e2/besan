@@ -39,13 +39,13 @@ The reference provides the visual system and hierarchy, while the content is tai
 
 The dashboard uses nested routes so each operational area can be linked and revisited directly:
 
-| Route | Purpose |
-| --- | --- |
-| `/dashboard` | Overview and daily operations |
-| `/dashboard/bookings` | Unified workshop and design bookings |
-| `/dashboard/customers` | Searchable customer directory |
-| `/dashboard/customers/:id` | Dedicated customer profile |
-| `/dashboard/availability` | Weekly availability and reminder settings |
+| Route                      | Purpose                                   |
+| -------------------------- | ----------------------------------------- |
+| `/dashboard`               | Overview and daily operations             |
+| `/dashboard/bookings`      | Unified workshop and design bookings      |
+| `/dashboard/customers`     | Searchable customer directory             |
+| `/dashboard/customers/:id` | Dedicated customer profile                |
+| `/dashboard/availability`  | Weekly availability and reminder settings |
 
 The right-side navigation remains stable between routes. On small screens it becomes a drawer. A compact command header contains the current page title and the primary “New appointment” action where applicable.
 

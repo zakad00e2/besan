@@ -1,8 +1,35 @@
 import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Appointment, Customer } from "./dashboard-model";
 import { stageLabels } from "./dashboard-model";
 import { DashboardEmptyState } from "./dashboard-ui";
+
+export function CustomerListSkeleton() {
+  return (
+    <div role="status" aria-label="Loading customers" aria-busy="true" className="space-y-5">
+      <div className="space-y-2">
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-10 w-full max-w-md" />
+      </div>
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <div className="divide-y divide-slate-100">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div
+              key={index}
+              className="grid gap-2 px-4 py-3 sm:grid-cols-[1.2fr_1fr_1fr_1fr]"
+            >
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function DashboardCustomers({
   customers,
@@ -51,14 +78,14 @@ export function DashboardCustomers({
                 <a
                   key={customer.id}
                   href={`/dashboard/customers/${customer.id}`}
-                  className="grid gap-2 px-4 py-4 transition-colors hover:bg-violet-50 sm:grid-cols-[1.2fr_1fr_1fr_1fr]"
+                  className="grid gap-2 px-4 py-3 text-xs transition-colors hover:bg-violet-50 sm:grid-cols-[1.2fr_1fr_1fr_1fr]"
                 >
-                  <span className="font-medium text-slate-950">{customer.name}</span>
-                  <span className="text-sm text-slate-500" dir="ltr">
+                  <span className="font-normal text-slate-950">{customer.name}</span>
+                  <span className="text-slate-500" dir="ltr">
                     {customer.phone}
                   </span>
-                  <span className="text-sm text-slate-600">{stageLabels[customer.stage]}</span>
-                  <span className="text-sm text-slate-500">
+                  <span className="text-slate-600">{stageLabels[customer.stage]}</span>
+                  <span className="text-slate-500">
                     {upcoming ? (
                       <span dir="ltr">
                         {upcoming.startsAt.slice(0, 10)} · {upcoming.startsAt.slice(11, 16)}

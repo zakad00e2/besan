@@ -12,9 +12,8 @@ function mapCustomer(booking: BookingListItem): Customer {
     name: booking.fullName,
     phone: booking.mobile,
     stage: booking.customerStage,
+    createdAt: booking.customerCreatedAt,
     updatedAt: booking.customerUpdatedAt,
-    notes: [],
-    activity: [],
   };
 }
 
@@ -30,6 +29,7 @@ function mapAppointment(booking: BookingListItem): Appointment {
     notes: booking.notes || undefined,
     startsAt,
     endsAt: end.toISOString(),
+    createdAt: booking.createdAt,
     status: booking.status,
     reminderStatus: booking.reminderStatus,
   };
@@ -44,6 +44,24 @@ export function normalizeBookingList(bookings: BookingListItem[]): DashboardBook
   };
 }
 
+export function mergePersistedBooking(
+  data: DashboardBookingData,
+  booking: BookingListItem,
+): DashboardBookingData {
+  const normalized = normalizeBookingList([booking]);
+  const customer = normalized.customers[0];
+  const appointment = normalized.appointments[0];
+
+  return {
+    customers: data.customers.some((item) => item.id === customer.id)
+      ? data.customers.map((item) => (item.id === customer.id ? customer : item))
+      : [...data.customers, customer],
+    appointments: data.appointments.some((item) => item.id === appointment.id)
+      ? data.appointments.map((item) => (item.id === appointment.id ? appointment : item))
+      : [...data.appointments, appointment],
+  };
+}
+
 export function mergeScheduledNext(
   data: DashboardBookingData,
   currentBooking: BookingListItem,
@@ -54,6 +72,9 @@ export function mergeScheduledNext(
   const next = mapAppointment(nextBooking);
   return {
     customers: data.customers.map((item) => (item.id === customer.id ? customer : item)),
-    appointments: [...data.appointments.map((item) => (item.id === current.id ? current : item)), next],
+    appointments: [
+      ...data.appointments.map((item) => (item.id === current.id ? current : item)),
+      next,
+    ],
   };
 }

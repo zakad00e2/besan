@@ -19,6 +19,10 @@ describe("booking page view repository", () => {
       expect.stringContaining("WHERE supervisor_id = $1"),
       ["supervisor-1"],
     );
+    expect(execute).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining("YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\""),
+    );
   });
 
   it("upserts a monotonic checkpoint", async () => {

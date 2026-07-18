@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_WEEKLY_SCHEDULE } from "./availability-domain";
 import {
@@ -22,6 +23,15 @@ const configurationRow = {
 };
 
 describe("availability repository", () => {
+  it("does not import Node crypto into client-reachable server functions", () => {
+    const source = readFileSync(
+      "src/features/availability/availability-repository.server.ts",
+      "utf8",
+    );
+
+    expect(source).not.toContain('from "node:crypto"');
+  });
+
   it("loads one normalized configuration", async () => {
     const execute = vi.fn<AvailabilityQueryExecutor>().mockResolvedValue([configurationRow]);
     await expect(createAvailabilityRepository(execute).loadConfiguration()).resolves.toEqual({

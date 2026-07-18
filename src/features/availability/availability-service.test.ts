@@ -5,6 +5,8 @@ import {
   getOpenDatesForMonth,
   getSlotsForDate,
   loadAvailabilityForAdmin,
+  loadOpenDatesForAdmin,
+  loadSlotsForAdmin,
   saveOverrideForAdmin,
   saveWeeklyScheduleForAdmin,
 } from "./availability-service";
@@ -53,6 +55,48 @@ describe("availability service", () => {
       success: false,
       reason: "forbidden",
     });
+    expect(deps.repository.loadConfiguration).not.toHaveBeenCalled();
+  });
+
+  it("authorizes admin slot projection and excludes only the edited appointment", async () => {
+    const deps = dependencies();
+    deps.repository.listOccupiedAppointments.mockResolvedValue([
+      {
+        id: "11111111-1111-4111-8111-111111111111",
+        date: "2026-07-19",
+        startsAt: "11:00",
+        status: "confirmed",
+      },
+      {
+        id: "22222222-2222-4222-8222-222222222222",
+        date: "2026-07-19",
+        startsAt: "12:00",
+        status: "confirmed",
+      },
+    ]);
+
+    const result = await loadSlotsForAdmin(
+      {
+        token: "admin-token",
+        date: "2026-07-19",
+        excludeAppointmentId: "11111111-1111-4111-8111-111111111111",
+      },
+      deps,
+    );
+
+    expect(result).toMatchObject({ success: true });
+    if (result.success) {
+      expect(result.slots.map((slot) => slot.startsAt)).toContain("11:00");
+      expect(result.slots.map((slot) => slot.startsAt)).not.toContain("12:00");
+    }
+  });
+
+  it("does not resolve booking availability for a forbidden administrator", async () => {
+    const deps = dependencies(false);
+
+    await expect(
+      loadOpenDatesForAdmin({ token: "bad-token", month: "2026-07" }, deps),
+    ).resolves.toEqual({ success: false, reason: "forbidden" });
     expect(deps.repository.loadConfiguration).not.toHaveBeenCalled();
   });
 

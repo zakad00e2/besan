@@ -7,7 +7,7 @@ vi.mock("@/features/auth/neon-auth-client", () => ({
   authClient: { signIn: { email: signInEmail } },
 }));
 
-import { AuthPage, withTimeout } from "./auth";
+import { AuthPage, getDashboardRedirect, withTimeout } from "./auth";
 
 afterEach(() => {
   cleanup();
@@ -15,6 +15,22 @@ afterEach(() => {
 });
 
 describe("AuthPage", () => {
+  it("uses the dashboard brand and visual shell", () => {
+    render(<AuthPage />);
+
+    expect(screen.getByRole("main").className).toContain("dashboard-app");
+    expect(screen.getByRole("img", { name: "Besan Khalaily" })).toBeTruthy();
+    expect(screen.getByText("Atelier admin dashboard")).toBeTruthy();
+  });
+
+  it("only accepts dashboard paths as post-login redirects", () => {
+    expect(getDashboardRedirect("/dashboard/workshop-bookings?status=new")).toBe(
+      "/dashboard/workshop-bookings?status=new",
+    );
+    expect(getDashboardRedirect("https://example.com/phishing")).toBe("/dashboard/bookings");
+    expect(getDashboardRedirect()).toBe("/dashboard/bookings");
+  });
+
   it("times out an authentication request that never settles", async () => {
     await expect(withTimeout(new Promise(() => undefined), 1)).rejects.toThrow(
       "Authentication request timed out",

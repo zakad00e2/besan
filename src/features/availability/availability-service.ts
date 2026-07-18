@@ -18,11 +18,10 @@ import type { AvailabilityRepository } from "./availability-repository.server";
 export type AvailabilityAdminDependencies = {
   verifyAdminToken: typeof verifyAdminToken;
   now: () => Date;
-} &
-  (
-    | { repository: AvailabilityRepository; getRepository?: never }
-    | { repository?: never; getRepository: () => AvailabilityRepository }
-  );
+} & (
+  | { repository: AvailabilityRepository; getRepository?: never }
+  | { repository?: never; getRepository: () => AvailabilityRepository }
+);
 
 export type AvailabilityMutationResult =
   | { success: true; configuration: AvailabilityConfiguration }
@@ -52,10 +51,17 @@ async function loadCandidateContext(
   return { configuration, appointments };
 }
 
+function excludeAppointment(appointments: OccupiedAppointment[], excludeAppointmentId?: string) {
+  return excludeAppointmentId
+    ? appointments.filter((appointment) => appointment.id !== excludeAppointmentId)
+    : appointments;
+}
+
 export async function getSlotsForDate(
   date: string,
   repository: AvailabilityRepository,
   now = new Date(),
+  excludeAppointmentId?: string,
 ) {
   try {
     const [configuration, appointments] = await Promise.all([
@@ -64,7 +70,12 @@ export async function getSlotsForDate(
     ]);
     return {
       success: true as const,
-      slots: resolveAvailableSlots(configuration, date, appointments, now),
+      slots: resolveAvailableSlots(
+        configuration,
+        date,
+        excludeAppointment(appointments, excludeAppointmentId),
+        now,
+      ),
     };
   } catch {
     return { success: false as const, reason: "load-error" as const };
@@ -75,6 +86,7 @@ export async function getOpenDatesForMonth(
   month: string,
   repository: AvailabilityRepository,
   now = new Date(),
+  excludeAppointmentId?: string,
 ) {
   try {
     const dates = listMonthDates(month);
@@ -82,15 +94,53 @@ export async function getOpenDatesForMonth(
       repository.loadConfiguration(),
       repository.listOccupiedAppointments(dates[0], dates.at(-1) as string),
     ]);
+    const visibleAppointments = excludeAppointment(appointments, excludeAppointmentId);
     return {
       success: true as const,
       openDates: dates.filter(
-        (date) => resolveAvailableSlots(configuration, date, appointments, now).length,
+        (date) => resolveAvailableSlots(configuration, date, visibleAppointments, now).length,
       ),
     };
   } catch {
     return { success: false as const, reason: "load-error" as const };
   }
+}
+
+type AdminProjectionRequest = {
+  token: string;
+  excludeAppointmentId?: string;
+};
+
+export async function loadOpenDatesForAdmin(
+  request: AdminProjectionRequest & { month: string },
+  dependencies: AvailabilityAdminDependencies,
+) {
+  if (!(await isAuthorized(request.token, dependencies))) {
+    return { success: false as const, reason: "forbidden" as const };
+  }
+
+  return getOpenDatesForMonth(
+    request.month,
+    resolveRepository(dependencies),
+    dependencies.now(),
+    request.excludeAppointmentId,
+  );
+}
+
+export async function loadSlotsForAdmin(
+  request: AdminProjectionRequest & { date: string },
+  dependencies: AvailabilityAdminDependencies,
+) {
+  if (!(await isAuthorized(request.token, dependencies))) {
+    return { success: false as const, reason: "forbidden" as const };
+  }
+
+  return getSlotsForDate(
+    request.date,
+    resolveRepository(dependencies),
+    dependencies.now(),
+    request.excludeAppointmentId,
+  );
 }
 
 export async function loadAvailabilityForAdmin(
@@ -103,7 +153,10 @@ export async function loadAvailabilityForAdmin(
   if (!(await isAuthorized(token, dependencies))) return { success: false, reason: "forbidden" };
 
   try {
-    return { success: true, configuration: await resolveRepository(dependencies).loadConfiguration() };
+    return {
+      success: true,
+      configuration: await resolveRepository(dependencies).loadConfiguration(),
+    };
   } catch {
     return { success: false, reason: "load-error" };
   }
@@ -118,7 +171,8 @@ export async function saveWeeklyScheduleForAdmin(
   }
   const repository = resolveRepository(dependencies);
   const parsed = parseWeeklySchedule(request.input);
-  if (!parsed.success) return { success: false, reason: "validation", fieldErrors: parsed.fieldErrors };
+  if (!parsed.success)
+    return { success: false, reason: "validation", fieldErrors: parsed.fieldErrors };
 
   try {
     const now = dependencies.now();
@@ -144,7 +198,8 @@ export async function saveOverrideForAdmin(
   }
   const repository = resolveRepository(dependencies);
   const parsed = parseAvailabilityOverride(request.input);
-  if (!parsed.success) return { success: false, reason: "validation", fieldErrors: parsed.fieldErrors };
+  if (!parsed.success)
+    return { success: false, reason: "validation", fieldErrors: parsed.fieldErrors };
 
   try {
     const now = dependencies.now();
@@ -185,7 +240,8 @@ export async function deleteOverrideForAdmin(
     if (conflicts.length && !request.confirmConflicts) {
       return { success: false, reason: "conflicts", conflicts };
     }
-    if (!(await repository.deleteOverride(request.id))) return { success: false, reason: "not-found" };
+    if (!(await repository.deleteOverride(request.id)))
+      return { success: false, reason: "not-found" };
     return { success: true, configuration: await repository.loadConfiguration() };
   } catch {
     return { success: false, reason: "storage-error" };

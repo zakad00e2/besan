@@ -1,16 +1,23 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { demoDashboardState } from "./dashboard-data";
-import { DashboardCustomers } from "./dashboard-customers";
+import { dashboardFixture } from "@/test/fixtures/dashboard";
+import { CustomerListSkeleton, DashboardCustomers } from "./dashboard-customers";
 
 afterEach(cleanup);
 
 describe("DashboardCustomers", () => {
+  it("shows a skeleton instead of loading copy while the customer list is pending", () => {
+    render(<CustomerListSkeleton />);
+
+    expect(screen.getByRole("status", { name: "Loading customers" })).toBeTruthy();
+    expect(screen.queryByText(/Loading customers/i)).toBeNull();
+  });
+
   it("filters the directory by customer name", () => {
     render(
       <DashboardCustomers
-        customers={demoDashboardState.customers}
-        appointments={demoDashboardState.appointments}
+        customers={dashboardFixture.customers}
+        appointments={dashboardFixture.appointments}
       />,
     );
     fireEvent.change(screen.getByLabelText("Search customers"), { target: { value: "Layan" } });

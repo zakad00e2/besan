@@ -54,6 +54,7 @@
 ### Task 1: Provision Neon and Commit the Reproducible Schema
 
 **Files:**
+
 - Create: `db/migrations/001_create_booking_tables.sql`
 - Create: `.env.example`
 - Modify: `.gitignore`
@@ -61,6 +62,7 @@
 - Modify: `package-lock.json`
 
 **Interfaces:**
+
 - Consumes: Connected Neon organization `org-cold-union-26518648`.
 - Produces: Neon project `besan2`, provisioned Auth URL, `DATABASE_URL`, and database tables used by all later tasks.
 
@@ -176,10 +178,12 @@ git commit -m "chore: provision Neon booking storage"
 ### Task 2: Define and Validate the Booking Domain
 
 **Files:**
+
 - Create: `src/features/book-call/booking-domain.test.ts`
 - Create: `src/features/book-call/booking-domain.ts`
 
 **Interfaces:**
+
 - Consumes: Raw serializable `/book-call` values.
 - Produces: `BookingInput`, `ValidatedBooking`, `BookingListItem`, `parseBookingInput(input)`, and `formatBookingDate(date)`.
 
@@ -294,12 +298,14 @@ git commit -m "feat: validate booking requests"
 ### Task 3: Implement the Server-Only Neon Repository and Use Cases
 
 **Files:**
+
 - Create: `src/features/book-call/booking-repository.server.test.ts`
 - Create: `src/features/book-call/booking-repository.server.ts`
 - Create: `src/features/book-call/booking-service.test.ts`
 - Create: `src/features/book-call/booking-service.ts`
 
 **Interfaces:**
+
 - Consumes: `ValidatedBooking` and a parameterized `QueryExecutor`.
 - Produces: `createBookingRepository(executor)`, `neonBookingRepository`, `submitBookingRequest(input, repository)`, and `listBookingRequests(repository)`.
 
@@ -404,7 +410,8 @@ export async function submitBookingRequest(
   repository: Pick<BookingRepository, "create">,
 ): Promise<BookingSubmissionResult> {
   const parsed = parseBookingInput(input);
-  if (!parsed.success) return { success: false, reason: "validation", fieldErrors: parsed.fieldErrors };
+  if (!parsed.success)
+    return { success: false, reason: "validation", fieldErrors: parsed.fieldErrors };
   try {
     return await repository.create(parsed.data);
   } catch (error) {
@@ -440,11 +447,13 @@ git commit -m "feat: persist Neon booking requests"
 ### Task 4: Submit `/book-call` Through a Server Function
 
 **Files:**
+
 - Create: `src/features/book-call/booking.functions.ts`
 - Create: `src/routes/book-call.test.tsx`
 - Modify: `src/routes/book-call.tsx`
 
 **Interfaces:**
+
 - Consumes: `BookingInput`, `submitBookingRequest`, and `neonBookingRepository`.
 - Produces: `submitBooking({ data: BookingInput })` and a form that displays validation, duplicate-slot, storage, pending, and success states.
 
@@ -545,6 +554,7 @@ git commit -m "feat: submit public bookings to Neon"
 ### Task 5: Add Neon Auth and Server-Enforced Admin Authorization
 
 **Files:**
+
 - Create: `src/features/auth/neon-auth-client.ts`
 - Create: `src/features/auth/admin-auth.test.ts`
 - Create: `src/features/auth/admin-auth.ts`
@@ -559,6 +569,7 @@ git commit -m "feat: submit public bookings to Neon"
 - Modify: `src/styles.css`
 
 **Interfaces:**
+
 - Consumes: Neon Auth JWT from `authClient.token()` and `ADMIN_EMAIL`.
 - Produces: `isAdminEmail(email, configuredEmail)`, `verifyAdminToken(token)`, `checkAdminAccess`, and `AdminGate`.
 
@@ -665,12 +676,14 @@ git commit -m "feat: protect dashboard with Neon Auth"
 ### Task 6: Load and Display Live Neon Bookings
 
 **Files:**
+
 - Modify: `src/features/auth/admin.functions.ts`
 - Modify: `src/routes/dashboard/bookings.tsx`
 - Modify: `src/features/dashboard/dashboard-bookings.tsx`
 - Modify: `src/features/dashboard/dashboard-bookings.test.tsx`
 
 **Interfaces:**
+
 - Consumes: `BookingListItem[]`, verified admin JWT, and `listBookingRequests`.
 - Produces: protected `getBookings({ data: { token } })` plus live filtering and rendering.
 
@@ -720,7 +733,7 @@ Expected: FAIL because the component still consumes in-memory `Customer[]` and `
 Change `DashboardBookings` to:
 
 ```ts
-export function DashboardBookings({ bookings }: { bookings: BookingListItem[] })
+export function DashboardBookings({ bookings }: { bookings: BookingListItem[] });
 ```
 
 Define filters as query, one of the five appointment types or `all`, status or `all`, and date or `all`. Remove `dispatch`, `openNewOnMount`, dialog state, validation, New appointment, and Edit controls. Add Notes and Submitted columns on desktop and the equivalent content on mobile. Retain the WhatsApp link and accessible labels. Use `createdAt` only for display and stable sorting; never infer appointment time from it.
@@ -757,9 +770,11 @@ git commit -m "feat: show live Neon bookings"
 ### Task 7: Verify the Full Integration
 
 **Files:**
+
 - Modify only if verification reveals a defect in a file already owned by Tasks 1–6.
 
 **Interfaces:**
+
 - Consumes: Completed Neon project, local ignored `.env`, application code, and tests.
 - Produces: Evidence that the booking, authorization, database, UI, and build paths work together.
 

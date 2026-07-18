@@ -1,23 +1,33 @@
 import { z } from "zod";
 
-export const appointmentTypes = [
-  "New Design",
-  "First Fitting",
-  "Second Fitting",
-  "Alteration",
-  "Pickup",
-] as const;
+export const appointmentTypes = ["Custom Design", "Consultation", "Dresses for Rent"] as const;
 
 export const nextAppointmentTypes = [
-  "New Design",
-  "Measurements",
+  "Initial Consultation",
   "First Fitting",
   "Second Fitting",
+  "Final Fitting & Pickup",
+] as const;
+
+const legacyNextAppointmentTypes = [
+  "New Design",
+  "Measurements",
   "Alteration",
   "Pickup",
 ] as const;
 
-export type AppointmentType = (typeof nextAppointmentTypes)[number];
+export type PublicAppointmentType = (typeof appointmentTypes)[number];
+export type NextAppointmentType = (typeof nextAppointmentTypes)[number];
+type LegacyNextAppointmentType = (typeof legacyNextAppointmentTypes)[number];
+export type AppointmentType =
+  | PublicAppointmentType
+  | NextAppointmentType
+  | LegacyNextAppointmentType;
+const adminAppointmentTypes = [
+  ...appointmentTypes,
+  ...nextAppointmentTypes,
+  ...legacyNextAppointmentTypes,
+] as const;
 
 export const customerStages = [
   "new-inquiry",
@@ -32,18 +42,20 @@ export const customerStages = [
 
 export type CustomerStage = (typeof customerStages)[number];
 
-const nextAppointmentStage: Record<AppointmentType, CustomerStage> = {
-  "New Design": "initial-appointment",
-  Measurements: "measurements-appointment",
+const nextAppointmentStage: Record<NextAppointmentType, CustomerStage> = {
+  "Initial Consultation": "initial-appointment",
   "First Fitting": "fitting",
   "Second Fitting": "fitting",
-  Alteration: "fitting",
-  Pickup: "ready-delivery",
+  "Final Fitting & Pickup": "ready-delivery",
 };
 
-export function getStageForNextAppointment(appointmentType: AppointmentType): CustomerStage {
+export function getStageForNextAppointment(appointmentType: NextAppointmentType): CustomerStage {
   return nextAppointmentStage[appointmentType];
 }
+
+export const bookingStatuses = ["pending", "confirmed", "completed", "cancelled"] as const;
+
+export type BookingStatus = (typeof bookingStatuses)[number];
 
 export const reminderStatuses = ["not-scheduled", "scheduled", "sent"] as const;
 
@@ -66,20 +78,56 @@ export type BookingListItem = Omit<ValidatedBooking, "appointmentType"> & {
   id: string;
   customerId: string;
   customerStage: CustomerStage;
+  customerCreatedAt: string;
   customerUpdatedAt: string;
   appointmentType: AppointmentType;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  status: BookingStatus;
   reminderStatus: BookingReminderStatus;
   createdAt: string;
 };
+
+export function parseBookingStatus(
+  status: unknown,
+): { success: true; data: BookingStatus } | { success: false } {
+  return typeof status === "string" && bookingStatuses.includes(status as BookingStatus)
+    ? { success: true, data: status as BookingStatus }
+    : { success: false };
+}
 
 export type BookingParseResult =
   | { success: true; data: ValidatedBooking }
   | { success: false; fieldErrors: Partial<Record<keyof BookingInput, string>> };
 
+export type AdminBookingInput = {
+  customerId: string;
+  appointmentType: AppointmentType;
+  appointmentDate: string;
+  appointmentTime: string;
+  notes: string;
+  status: BookingStatus;
+  reminderStatus: BookingReminderStatus;
+};
+
+export type ValidatedAdminBooking = AdminBookingInput;
+
+export type AdminBookingCreateInput = Omit<AdminBookingInput, "customerId"> & {
+  fullName: string;
+  mobile: string;
+};
+
+export type ValidatedAdminBookingCreate = AdminBookingCreateInput;
+
+export type AdminBookingParseResult =
+  | { success: true; data: ValidatedAdminBooking }
+  | { success: false; fieldErrors: Partial<Record<keyof AdminBookingInput, string>> };
+
+export type AdminBookingCreateParseResult =
+  | { success: true; data: ValidatedAdminBookingCreate }
+  | { success: false; fieldErrors: Partial<Record<keyof AdminBookingCreateInput, string>> };
+
 export type ScheduleNextAppointmentInput = {
   currentAppointmentId: string;
-  appointmentType: AppointmentType;
+  appointmentType: NextAppointmentType;
   appointmentDate: string;
   appointmentTime: string;
   notes: string;
@@ -112,6 +160,51 @@ const scheduleNextAppointmentSchema = z.object({
   notes: z.string().max(1000, "Notes must be 1000 characters or fewer."),
   reminderStatus: z.enum(reminderStatuses, { message: "Choose a reminder status." }),
 });
+
+const adminBookingSchema = z.object({
+  customerId: z.string().uuid("Choose a valid customer."),
+  appointmentType: z.enum(adminAppointmentTypes, { message: "Choose an appointment type." }),
+  appointmentDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Choose an available date."),
+  appointmentTime: z.string().regex(/^\d{2}:\d{2}$/, "Choose an available time."),
+  notes: z.string().max(1000, "Notes must be 1000 characters or fewer."),
+  status: z.enum(bookingStatuses, { message: "Choose a booking status." }),
+  reminderStatus: z.enum(reminderStatuses, { message: "Choose a reminder status." }),
+});
+
+const adminBookingCreateSchema = adminBookingSchema.omit({ customerId: true }).extend({
+  fullName: z.string().trim().min(1, "Enter the customer name."),
+  mobile: z.string().trim().min(1, "Enter the customer phone number."),
+});
+
+export function parseAdminBookingInput(input: unknown): AdminBookingParseResult {
+  const parsed = adminBookingSchema.safeParse(input);
+  if (!parsed.success) {
+    const fields = parsed.error.flatten().fieldErrors;
+    return {
+      success: false,
+      fieldErrors: Object.fromEntries(
+        Object.entries(fields).map(([key, messages]) => [key, messages?.[0]]),
+      ) as Partial<Record<keyof AdminBookingInput, string>>,
+    };
+  }
+
+  return { success: true, data: { ...parsed.data, notes: parsed.data.notes.trim() } };
+}
+
+export function parseAdminBookingCreateInput(input: unknown): AdminBookingCreateParseResult {
+  const parsed = adminBookingCreateSchema.safeParse(input);
+  if (!parsed.success) {
+    const fields = parsed.error.flatten().fieldErrors;
+    return {
+      success: false,
+      fieldErrors: Object.fromEntries(
+        Object.entries(fields).map(([key, messages]) => [key, messages?.[0]]),
+      ) as Partial<Record<keyof AdminBookingCreateInput, string>>,
+    };
+  }
+
+  return { success: true, data: { ...parsed.data, notes: parsed.data.notes.trim() } };
+}
 
 export function parseScheduleNextAppointmentInput(
   input: unknown,

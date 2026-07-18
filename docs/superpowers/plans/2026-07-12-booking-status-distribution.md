@@ -35,10 +35,12 @@
 ### Task 1: Derive booking status counts from appointments
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-model.test.ts`
 - Modify: `src/features/dashboard/dashboard-model.ts`
 
 **Interfaces:**
+
 - Consumes: `Appointment[]` and the existing `AppointmentStatus` union.
 - Produces: `BookingStatusDistribution` and `getBookingStatusDistribution(appointments)`.
 
@@ -124,10 +126,12 @@ git commit -m "feat: derive booking status distribution"
 ### Task 2: Replace the rating chart with a booking-status chart
 
 **Files:**
+
 - Create: `src/features/dashboard/booking-status-distribution-chart.test.tsx`
 - Create: `src/features/dashboard/booking-status-distribution-chart.tsx`
 
 **Interfaces:**
+
 - Consumes: `BookingStatusDistribution` from `dashboard-model.ts`.
 - Produces: `BookingStatusDistributionChart({ statusDist })`.
 
@@ -221,11 +225,7 @@ export function BookingStatusDistributionChart({
         Booking status distribution
       </h2>
       <p className="mt-1 text-3xl font-medium tabular-nums">{totalBookings}</p>
-      <div
-        className="mt-4 h-[200px] w-full"
-        role="img"
-        aria-label="Booking status distribution"
-      >
+      <div className="mt-4 h-[200px] w-full" role="img" aria-label="Booking status distribution">
         <dl className="sr-only">
           {chartData.map((entry) => (
             <div key={entry.gradientId}>
@@ -316,6 +316,7 @@ git commit -m "feat: chart booking status distribution"
 ### Task 3: Integrate appointment-derived data into the dashboard
 
 **Files:**
+
 - Modify: `src/features/dashboard/dashboard-overview.test.tsx`
 - Modify: `src/features/dashboard/dashboard-overview.tsx`
 - Modify: `src/features/dashboard/dashboard-model.ts`
@@ -325,6 +326,7 @@ git commit -m "feat: chart booking status distribution"
 - Delete: `src/features/dashboard/score-distribution-chart.tsx`
 
 **Interfaces:**
+
 - Consumes: `getBookingStatusDistribution(appointments)` and `BookingStatusDistributionChart`.
 - Produces: a dashboard chart that updates directly from the overview's appointments prop.
 
@@ -355,12 +357,9 @@ In `dashboard-overview.tsx`:
 import { BookingStatusDistributionChart } from "./booking-status-distribution-chart";
 import { getBookingStatusDistribution } from "./dashboard-model";
 
-const statusDist = useMemo(
-  () => getBookingStatusDistribution(appointments),
-  [appointments],
-);
+const statusDist = useMemo(() => getBookingStatusDistribution(appointments), [appointments]);
 
-<BookingStatusDistributionChart statusDist={statusDist} />
+<BookingStatusDistributionChart statusDist={statusDist} />;
 ```
 
 Remove `ScoreDistribution`, `scoreDist`, and `avgScore` from its imports and props.

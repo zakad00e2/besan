@@ -25,6 +25,7 @@
 ### Task 1: Add the Test Harness
 
 **Files:**
+
 - Create: `vitest.config.ts`
 - Modify: `package.json`
 - Modify: `package-lock.json`
@@ -84,6 +85,7 @@ git commit -m "test: add workshop booking test harness"
 ### Task 2: Build Booking Validation and Payload Normalization
 
 **Files:**
+
 - Create: `src/features/workshop-booking/workshop-booking.test.ts`
 - Create: `src/features/workshop-booking/workshop-booking.ts`
 
@@ -150,9 +152,7 @@ describe("parseWorkshopBooking", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.errors.participants).toBe(
-          "Enter a whole number of at least 1.",
-        );
+        expect(result.errors.participants).toBe("Enter a whole number of at least 1.");
       }
     },
   );
@@ -168,11 +168,7 @@ describe("parseWorkshopBooking", () => {
   });
 
   it("accepts an empty optional email and rejects a malformed email", () => {
-    const emptyEmail = parseWorkshopBooking(
-      workshop,
-      validValues,
-      new Date(2026, 6, 9, 12),
-    );
+    const emptyEmail = parseWorkshopBooking(workshop, validValues, new Date(2026, 6, 9, 12));
     const malformedEmail = parseWorkshopBooking(
       workshop,
       { ...validValues, email: "noor@" },
@@ -360,6 +356,7 @@ git commit -m "feat: validate workshop booking requests"
 ### Task 3: Build the Reusable Booking Dialog
 
 **Files:**
+
 - Create: `src/features/workshop-booking/workshop-booking-dialog.test.tsx`
 - Create: `src/features/workshop-booking/workshop-booking-dialog.tsx`
 
@@ -388,9 +385,7 @@ function futureDate() {
 
 describe("WorkshopBookingDialog", () => {
   it("shows the selected workshop and all booking fields", () => {
-    render(
-      <WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />,
-    );
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
 
     expect(screen.getByRole("dialog").textContent).toContain("Private mini course");
     expect(screen.getByLabelText("Full name")).toBeTruthy();
@@ -402,9 +397,7 @@ describe("WorkshopBookingDialog", () => {
   });
 
   it("preserves entered values and shows field errors after invalid submission", () => {
-    render(
-      <WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />,
-    );
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
 
     const mobile = screen.getByLabelText("Mobile number") as HTMLInputElement;
     fireEvent.change(mobile, { target: { value: "0501234567" } });
@@ -416,9 +409,7 @@ describe("WorkshopBookingDialog", () => {
   });
 
   it("shows an explicit demo-only confirmation after valid submission", () => {
-    render(
-      <WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />,
-    );
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />);
 
     fireEvent.change(screen.getByLabelText("Full name"), {
       target: { value: "Noor Al-Hashemi" },
@@ -441,9 +432,7 @@ describe("WorkshopBookingDialog", () => {
 
   it("reports a close request through the controlled dialog boundary", () => {
     const onOpenChange = vi.fn();
-    render(
-      <WorkshopBookingDialog workshop={workshop} onOpenChange={onOpenChange} />,
-    );
+    render(<WorkshopBookingDialog workshop={workshop} onOpenChange={onOpenChange} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
 
@@ -499,10 +488,7 @@ const initialValues: WorkshopBookingFormValues = {
   notes: "",
 };
 
-export function WorkshopBookingDialog({
-  workshop,
-  onOpenChange,
-}: WorkshopBookingDialogProps) {
+export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookingDialogProps) {
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<WorkshopBookingErrors>({});
   const [submitted, setSubmitted] = useState(false);
@@ -540,15 +526,13 @@ export function WorkshopBookingDialog({
         {submitted ? (
           <div className="flex min-h-[360px] flex-col items-center justify-center px-6 py-12 text-center sm:px-10">
             <Check className="h-8 w-8" aria-hidden="true" />
-            <p className="mt-5 text-xs tracking-[0.2em] text-muted-foreground">
-              DEMO CONFIRMATION
-            </p>
+            <p className="mt-5 text-xs tracking-[0.2em] text-muted-foreground">DEMO CONFIRMATION</p>
             <DialogTitle className="mt-3 font-serif text-4xl font-normal tracking-tighter">
               Booking prepared
             </DialogTitle>
             <p role="status" className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
-              Your {workshop?.name} details are valid. This demo request has not been sent
-              to the atelier.
+              Your {workshop?.name} details are valid. This demo request has not been sent to the
+              atelier.
             </p>
             <DialogClose asChild>
               <button
@@ -562,15 +546,13 @@ export function WorkshopBookingDialog({
         ) : (
           <form onSubmit={handleSubmit}>
             <DialogHeader className="border-b border-foreground/30 px-6 pb-6 pt-8 text-left sm:px-10">
-              <p className="text-xs tracking-[0.2em] text-muted-foreground">
-                WORKSHOP BOOKING
-              </p>
+              <p className="text-xs tracking-[0.2em] text-muted-foreground">WORKSHOP BOOKING</p>
               <DialogTitle className="font-serif text-4xl font-normal tracking-tighter">
                 {workshop?.name}
               </DialogTitle>
               <DialogDescription className="leading-6">
-                Choose a future date and leave your details. This form is currently a
-                demonstration and does not send a request.
+                Choose a future date and leave your details. This form is currently a demonstration
+                and does not send a request.
               </DialogDescription>
             </DialogHeader>
 
@@ -719,6 +701,7 @@ git commit -m "feat: add workshop booking dialog"
 ### Task 4: Connect Every Workshop to the Shared Dialog
 
 **Files:**
+
 - Modify: `scripts/verify-workshops-page.mjs`
 - Modify: `src/routes/workshops.tsx:1-68`
 - Modify: `src/routes/workshops.tsx:103-192`
@@ -847,13 +830,7 @@ function Workshops() {
 Add this component above `FirstWorkshop`:
 
 ```tsx
-function BookingButton({
-  workshop,
-  onBook,
-}: {
-  workshop: WorkshopOption;
-  onBook: BookWorkshop;
-}) {
+function BookingButton({ workshop, onBook }: { workshop: WorkshopOption; onBook: BookWorkshop }) {
   return (
     <button
       type="button"
@@ -942,6 +919,7 @@ git commit -m "test: verify workshop booking integration"
 ### Task 5: Verify the Complete User Flow
 
 **Files:**
+
 - No file changes expected.
 
 - [ ] **Step 1: Start the development server**

@@ -28,7 +28,7 @@
 - Create `src/test/motion-css.test.ts`: CSS token and accessible fallback contracts.
 - Create `src/components/ui/motion-primitives.test.tsx`: live Dialog and Sheet motion contracts.
 - Create `src/components/site-shell.test.tsx`: Reveal transition behavior.
-- Create `src/routes/index.motion.test.tsx`: testimonial and services behavior.
+- Create `src/routes/-index.motion.test.tsx`: testimonial and services behavior; the leading hyphen prevents TanStack Router from treating the test as a route.
 - Create `src/test/motion-source-contracts.test.ts`: scoped source contracts for page-level Tailwind hooks.
 - Modify `src/styles.css`: shared motion tokens, semantic classes, pointer gating, and reduced-motion fallbacks.
 - Modify `src/components/site-shell.tsx`: scoped Reveal and press feedback.
@@ -355,7 +355,7 @@ Expected: no whitespace errors.
 ### Task 4: Homepage testimonial, accordion, images, and CTAs
 
 **Files:**
-- Create: `src/routes/index.motion.test.tsx`
+- Create: `src/routes/-index.motion.test.tsx`
 - Modify: `src/routes/index.tsx:2-5,64-108,114-205`
 
 **Interfaces:**
@@ -365,7 +365,7 @@ Expected: no whitespace errors.
 - [ ] **Step 1: Write failing interaction tests**
 
 ```tsx
-// src/routes/index.motion.test.tsx
+// src/routes/-index.motion.test.tsx
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HowICanHelp, Testimonials } from "./index";
@@ -400,7 +400,7 @@ describe("homepage motion", () => {
 
 - [ ] **Step 2: Run tests and verify RED**
 
-Run: `npm test -- src/routes/index.motion.test.tsx`
+Run: `npm test -- src/routes/-index.motion.test.tsx`
 
 Expected: FAIL because the components are not exported and the transition hooks do not exist.
 
@@ -455,13 +455,13 @@ Replace the hero image's transition classes with `editorial-image grayscale`. Ad
 
 - [ ] **Step 5: Run tests and verify GREEN**
 
-Run: `npm test -- src/routes/index.motion.test.tsx src/components/site-shell.test.tsx`
+Run: `npm test -- src/routes/-index.motion.test.tsx src/components/site-shell.test.tsx`
 
 Expected: PASS.
 
 - [ ] **Step 6: Checkpoint**
 
-Run: `git diff --check -- src/routes/index.tsx src/routes/index.motion.test.tsx`
+Run: `git diff --check -- src/routes/index.tsx src/routes/-index.motion.test.tsx`
 
 Expected: no whitespace errors.
 

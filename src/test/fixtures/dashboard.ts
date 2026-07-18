@@ -1,9 +1,5 @@
-import {
-  createAvailabilitySlots,
-  type Appointment,
-  type Customer,
-  type DashboardState,
-} from "./dashboard-model";
+import type { BookingListItem } from "@/features/book-call/booking-domain";
+import type { Appointment, Customer } from "@/features/dashboard/dashboard-model";
 
 const customers: Customer[] = [
   {
@@ -11,62 +7,48 @@ const customers: Customer[] = [
     name: "Layan Mansour",
     phone: "+970 59 123 4567",
     stage: "new-inquiry",
+    createdAt: "2026-07-05T08:00:00.000Z",
     updatedAt: "2026-07-05T08:00:00.000Z",
-    notes: [],
-    activity: [
-      { id: "activity-1", label: "Customer profile created", createdAt: "2026-07-05T08:00:00.000Z" },
-    ],
   },
   {
     id: "customer-2",
     name: "Sarah Khalil",
     phone: "+970 56 456 7812",
     stage: "measurements-taken",
+    createdAt: "2026-07-08T09:30:00.000Z",
     updatedAt: "2026-07-08T09:30:00.000Z",
-    notes: [
-      {
-        id: "note-1",
-        body: "Prefers natural fabrics with a relaxed silhouette.",
-        createdAt: "2026-07-08T09:30:00.000Z",
-      },
-    ],
-    activity: [],
   },
   {
     id: "customer-3",
     name: "Noor Hamdan",
     phone: "+962 79 222 8811",
     stage: "design-production",
+    createdAt: "2026-07-09T11:00:00.000Z",
     updatedAt: "2026-07-09T11:00:00.000Z",
-    notes: [],
-    activity: [],
   },
   {
     id: "customer-4",
     name: "Mariam Odeh",
     phone: "+970 59 700 4432",
     stage: "fitting",
+    createdAt: "2026-07-06T12:00:00.000Z",
     updatedAt: "2026-07-06T12:00:00.000Z",
-    notes: [],
-    activity: [],
   },
   {
     id: "customer-5",
     name: "Tala Darwish",
     phone: "+962 78 919 3030",
     stage: "ready-delivery",
+    createdAt: "2026-07-10T07:15:00.000Z",
     updatedAt: "2026-07-10T07:15:00.000Z",
-    notes: [],
-    activity: [],
   },
   {
     id: "customer-6",
     name: "Reem Shehadeh",
     phone: "+970 56 333 9021",
     stage: "completed",
+    createdAt: "2026-07-03T16:30:00.000Z",
     updatedAt: "2026-07-03T16:30:00.000Z",
-    notes: [],
-    activity: [],
   },
 ];
 
@@ -173,9 +155,21 @@ const appointments: Appointment[] = [
   },
 ];
 
-export const demoDashboardState: DashboardState = {
-  customers,
-  appointments,
-  availability: createAvailabilitySlots(),
-  reminderSettings: { customerWhatsapp: true, supervisorDashboard: true, hoursBefore: 24 },
+export const dashboardFixture = { customers, appointments };
+
+export const persistedBookingFixture: BookingListItem = {
+  id: "11111111-1111-4111-8111-111111111111",
+  customerId: "22222222-2222-4222-8222-222222222222",
+  fullName: "Noor Al-Hashemi",
+  mobile: "+970591234567",
+  customerStage: "fitting",
+  customerCreatedAt: "2026-06-20T08:00:00.000Z",
+  customerUpdatedAt: "2026-07-01T09:00:00.000Z",
+  appointmentType: "First Fitting",
+  appointmentDate: "2026-07-19",
+  appointmentTime: "11:00",
+  notes: "Bring shoes",
+  status: "confirmed",
+  reminderStatus: "scheduled",
+  createdAt: "2026-07-16T09:00:00.000Z",
 };

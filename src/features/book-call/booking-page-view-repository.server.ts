@@ -12,7 +12,11 @@ SELECT last_seen_at::text
 FROM public.supervisor_booking_page_views
 WHERE supervisor_id = $1`;
 
-const snapshotQuery = `SELECT clock_timestamp()::text AS snapshot_at`;
+const snapshotQuery = `
+SELECT to_char(
+  clock_timestamp() AT TIME ZONE 'UTC',
+  'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+) AS snapshot_at`;
 
 const saveLastSeenQuery = `
 INSERT INTO public.supervisor_booking_page_views (supervisor_id, last_seen_at)

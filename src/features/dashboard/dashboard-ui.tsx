@@ -7,23 +7,23 @@ import { appointmentStatusLabels, type AppointmentStatus } from "./dashboard-mod
 export const dashboardPrimaryButtonClassName = cn(
   "inline-flex items-center justify-center rounded-[10px] bg-gradient-to-b from-[#323232] to-[#222222] font-medium text-white",
   "shadow-[inset_0_0.5px_1px_rgba(255,255,255,0.15),inset_0_-1px_1.2px_0.35px_#121212,0_2px_4px_-1px_rgba(13,13,13,0.5),0_0_0_1px_#333333]",
-  "transition-all duration-200 hover:from-[#383838] hover:to-[#262626]",
-  "active:translate-y-px active:shadow-[inset_0_1px_2px_rgba(18,18,18,0.55),inset_0_0.5px_1px_rgba(255,255,255,0.08),0_1px_2px_-1px_rgba(13,13,13,0.35),0_0_0_1px_#333333]",
+  "motion-press transition-[color,background-color,box-shadow,transform] duration-[var(--motion-duration-color)] ease-[var(--motion-ease-out)] hover:from-[#383838] hover:to-[#262626]",
+  "active:shadow-[inset_0_1px_2px_rgba(18,18,18,0.55),inset_0_0.5px_1px_rgba(255,255,255,0.08),0_1px_2px_-1px_rgba(13,13,13,0.35),0_0_0_1px_#333333]",
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500",
 );
 
 export const dashboardSecondaryButtonClassName = cn(
   "inline-flex items-center justify-center rounded-[10px] bg-gradient-to-b from-white to-[#f3f3f4] font-medium text-[#36373b]",
   "shadow-[inset_0_0.5px_1px_rgba(255,255,255,0.95),inset_0_-1px_1.2px_0.35px_rgba(18,18,18,0.06),0_2px_4px_-1px_rgba(13,13,13,0.08),0_0_0_1px_#dedee1]",
-  "transition-all duration-200 hover:from-[#fafafa] hover:to-[#ececee]",
-  "active:translate-y-px active:shadow-[inset_0_1px_2px_rgba(18,18,18,0.08),inset_0_0.5px_1px_rgba(255,255,255,0.85),0_1px_2px_-1px_rgba(13,13,13,0.06),0_0_0_1px_#dedee1]",
+  "motion-press transition-[color,background-color,box-shadow,transform] duration-[var(--motion-duration-color)] ease-[var(--motion-ease-out)] hover:from-[#fafafa] hover:to-[#ececee]",
+  "active:shadow-[inset_0_1px_2px_rgba(18,18,18,0.08),inset_0_0.5px_1px_rgba(255,255,255,0.85),0_1px_2px_-1px_rgba(13,13,13,0.06),0_0_0_1px_#dedee1]",
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500",
 );
 
 export const dashboardIconButtonClassName = cn(
   "inline-flex items-center justify-center rounded-[10px] bg-gradient-to-b from-white to-[#f3f3f4] text-[#63646a]",
   "shadow-[inset_0_0.5px_1px_rgba(255,255,255,0.95),inset_0_-1px_1.2px_0.35px_rgba(18,18,18,0.06),0_1px_3px_-1px_rgba(13,13,13,0.12),0_0_0_1px_#e5e5e7]",
-  "transition-all duration-200 hover:from-[#fafafa] hover:to-[#ececee]",
+  "motion-press transition-[color,background-color,box-shadow,transform] duration-[var(--motion-duration-color)] ease-[var(--motion-ease-out)] hover:from-[#fafafa] hover:to-[#ececee]",
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500",
 );
 
@@ -32,11 +32,11 @@ export const dashboardToggleGroupClassName =
 
 export const dashboardToggleActiveClassName = cn(
   dashboardPrimaryButtonClassName,
-  "min-h-7 rounded-[8px] px-2.5 text-[9px]",
+  "min-h-6 rounded-[7px] px-2 text-[10px]",
 );
 
 export const dashboardToggleInactiveClassName =
-  "min-h-7 rounded-[8px] px-2.5 text-[9px] font-medium text-[#929399] transition-colors hover:text-[#242428]";
+  "min-h-6 rounded-[7px] px-2 text-[10px] font-medium text-[#929399] transition-colors hover:text-[#242428]";
 
 export const dashboardSlotEnabledClassName = cn(
   dashboardPrimaryButtonClassName,
@@ -60,17 +60,17 @@ export function MetricCard({
   icon: LucideIcon;
 }) {
   return (
-    <section className="group rounded-[10px] border border-[#e7e7e9] bg-white px-3.5 py-3 transition-all duration-200 hover:border-[#d9d9dc] hover:shadow-[0_5px_18px_rgba(24,24,27,0.045)]">
+    <section className="group rounded-[10px] border border-[#e7e7e9] bg-white px-3.5 py-3 transition-[border-color,box-shadow] duration-[var(--motion-duration-color)] ease-[var(--motion-ease-out)] hover:border-[#d9d9dc] hover:shadow-[0_5px_18px_rgba(24,24,27,0.045)]">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[10px] font-medium text-[#55565b]">{label}</span>
+        <span className="text-[11px] font-normal text-[#a4a5aa]">{label}</span>
         <Icon className="size-3.5 stroke-[1.7] text-[#a4a5aa]" aria-hidden="true" />
       </div>
       <p className="mt-1 text-[24px] font-semibold leading-none tracking-[-0.035em] text-[#18181b] tabular-nums">
         {value}
       </p>
-      <p className="mt-2 text-[8px] text-[#9a9ba0]">
+      <p className="mt-2 text-[10px] text-[#9a9ba0]">
         {changePercent === null ? (
-          <span className="font-semibold text-[#16a67a]">New</span>
+          <span className="font-normal text-[#16a67a]">New</span>
         ) : (
           <span
             className={cn(
@@ -103,7 +103,7 @@ export function StatusBadge({ status }: { status: AppointmentStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex rounded-full border px-2 py-0.5 text-[9px] font-medium",
+        "inline-flex rounded-full border px-2 py-0.5 text-[10px] font-normal",
         classes[status],
       )}
     >
