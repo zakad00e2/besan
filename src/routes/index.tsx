@@ -34,21 +34,20 @@ const SERVICES = [
     body: "Custom garments tailored to your measurements and personal style - from first sketch to final fitting, crafted for the way you live.",
   },
   {
-    title: "Bridal & Evening Wear",
-    body: "Signature bridal and occasion pieces designed with delicate detailing, refined silhouettes, and fabrics chosen for a timeless presence.",
-  },
-  {
     title: "Ready-to-Wear Collections",
     body: "Seasonal capsule collections of quiet, versatile essentials - thoughtful cuts and natural fabrics made to layer and last.",
-  },
-  {
-    title: "Personal Styling",
-    body: "One-on-one styling sessions to define your wardrobe, refine your silhouette, and build a cohesive look that feels entirely yours.",
   },
   {
     title: "Design Consultation",
     body: "Collaborative sessions for brands and private clients - from concept and mood direction to pattern, fabric, and finishing choices.",
   },
+];
+
+const ARABIC_CLIENT_TESTIMONIALS = [
+  { quote: "\u0645\u0646 \u0623\u0648\u0644 \u062c\u0644\u0633\u0629 \u062d\u0633\u0651\u064a\u062a \u0625\u0646\u0647 \u0627\u0644\u062a\u0635\u0645\u064a\u0645 \u0645\u0639\u0645\u0648\u0644 \u0625\u0644\u064a\u060c \u0648\u0643\u0644 \u062a\u0641\u0635\u064a\u0644 \u0643\u0627\u0646 \u064a\u0639\u0643\u0633 \u0634\u062e\u0635\u064a\u062a\u064a", name: "\u0639\u0645\u064a\u0644\u0629 \u062e\u0627\u0635\u0629" },
+  { quote: "\u0627\u0644\u0642\u0637\u0639\u0629 \u0643\u0627\u0646\u062a \u0645\u0631\u064a\u062d\u0629 \u0648\u0623\u0646\u064a\u0642\u0629 \u0628\u0646\u0641\u0633 \u0627\u0644\u0648\u0642\u062a\u060c \u0648\u0643\u0644 \u0645\u0631\u0629 \u0623\u0644\u0628\u0633\u0647\u0627 \u0628\u062d\u0633 \u0625\u0646\u0647\u0627 \u0645\u0627 \u0641\u0642\u062f\u062a \u0642\u064a\u0645\u062a\u0647\u0627", name: "\u0645\u0646\u0633\u0642\u0629 \u0623\u0632\u064a\u0627\u0621" },
+  { quote: "\u0628\u064a\u0633\u0627\u0646 \u0641\u0647\u0645\u062a \u062a\u0645\u0627\u0645\u064b\u0627 \u0634\u0648 \u0643\u0646\u062a \u0628\u062a\u062e\u064a\u0644\u060c \u0648\u0627\u0644\u0646\u062a\u064a\u062c\u0629 \u0643\u0627\u0646\u062a \u0623\u062c\u0645\u0644 \u0645\u0645\u0627 \u062a\u0648\u0642\u0639\u062a", name: "\u0639\u0645\u064a\u0644\u0629 \u0632\u0641\u0627\u0641" },
+  { quote: "\u0627\u0644\u062a\u0635\u0645\u064a\u0645 \u0643\u0627\u0646 \u0628\u0633\u064a\u0637\u064b\u0627 \u0628\u0637\u0631\u064a\u0642\u0629 \u0631\u0627\u0642\u064a\u0629\u060c \u0648\u0647\u0630\u0627 \u0628\u0627\u0644\u0636\u0628\u0637 \u0627\u0644\u0644\u064a \u0643\u0646\u062a \u0623\u0628\u062d\u062b \u0639\u0646\u0647", name: "\u0639\u0645\u064a\u0644\u0629 \u0628\u064a\u0633\u0627\u0646" },
 ];
 
 const ARABIC_TESTIMONIALS = [
@@ -58,11 +57,15 @@ const ARABIC_TESTIMONIALS = [
 ];
 
 const ARABIC_SERVICES = [
-  { title: "تصميم حسب المقاس", body: "قطع مخصصة وفق قياساتك وأسلوبك الشخصي، من الرسم الأول حتى جلسة القياس الأخيرة." },
-  { title: "فساتين الزفاف والسهرات", body: "قطع للزفاف والمناسبات بتفاصيل رقيقة وقصّات راقية وأقمشة مختارة بعناية." },
-  { title: "مجموعات جاهزة للارتداء", body: "مجموعات موسمية هادئة وعملية، بقصّات مدروسة وأقمشة طبيعية تدوم." },
-  { title: "تنسيق شخصي", body: "جلسات فردية لتحديد خزانة ملابسك وصقل إطلالتك وبناء مظهر يعبر عنك." },
-  { title: "استشارة تصميم", body: "جلسات تعاونية للعلامات التجارية والعميلات الخاصات، من الفكرة حتى القماش والتشطيب." },
+  { title: "تصميم خاص", body: "قطع مخصصة وفق قياساتك وأسلوبك الشخصي، من الرسم الأول حتى جلسة القياس الأخيرة." },
+  { title: "مجموعات جاهزة للارتداء", body: "استأجري فستانًا جاهزًا بعناية، يجمع بين الأناقة، الجودة، والراحة ليمنحك إطلالة مميزة في كل مناسبة." },
+  { title: "استشارة تصميم", body: "جلسة شخصية لاختيار كل ما يناسبك، من القصة والخامة إلى اللون والتفاصيل، بهدف الوصول إلى تصميم صُنع خصيصًا لك" },
+];
+
+const ORDERED_ARABIC_SERVICES = [
+  ARABIC_SERVICES[1],
+  ARABIC_SERVICES[2],
+  ARABIC_SERVICES[0],
 ];
 
 function Index() {
@@ -109,7 +112,7 @@ function Hero() {
         <Reveal delay={200}>
           <div className={`mt-4 max-w-md text-muted-foreground ${ar ? "space-y-2 text-base leading-6 md:text-lg md:leading-7" : "space-y-4 text-xs leading-relaxed md:text-[13px]"}`}>
             {ar ? (
-              <p>مصممة أزياء مستقلة أبتكر قطعًا هادئة ومدروسة تجمع بين الحِرفة والأنوثة المعاصرة. كل مجموعة مصممة لتشعرك بأنها خاصة بك، بخزانة حميمة ترافقك وتتجاوز المواسم.</p>
+              <p>مصممة أزياء مستقلة أبتكر قطعًا هادئة ومدروسة تجمع بين الحرفة والأناقة المعاصرة. كل مجموعة مصممة لتشعرك بأنها خاصة بك، وترافقك بأسلوب يعكس شخصيتك</p>
             ) : (
               <>
                 <p>I am an independent fashion designer creating quiet, considered pieces where craft meets modern femininity - tailored silhouettes, natural fabrics, and timeless details.</p>
@@ -141,7 +144,7 @@ export function Testimonials() {
   const [visible, setVisible] = useState(true);
   const pendingIndex = useRef(0);
   const swapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const testimonials = ar ? ARABIC_TESTIMONIALS : TESTIMONIALS;
+  const testimonials = ar ? ARABIC_CLIENT_TESTIMONIALS : TESTIMONIALS;
   const t = testimonials[i];
 
   useEffect(
@@ -200,7 +203,7 @@ export function Testimonials() {
 export function HowICanHelp() {
   const { locale } = useSiteLanguage();
   const ar = locale === "ar";
-  const services = ar ? ARABIC_SERVICES : SERVICES;
+  const services = ar ? ORDERED_ARABIC_SERVICES : SERVICES;
   const [open, setOpen] = useState<number | null>(0);
 
   return (

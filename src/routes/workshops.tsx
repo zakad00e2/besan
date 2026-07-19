@@ -308,7 +308,7 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className={ar ? "text-right" : ""}>
-                <p className="text-sm text-muted-foreground">{ar ? "سعر بناء الباترون" : "Pattern Building price"}</p>
+                <p className="text-sm text-muted-foreground">{ar ? "سعر الورشة" : "Pattern Building price"}</p>
                 <p dir="ltr" className="mt-2 font-serif text-4xl">2700 NIS</p>
               </div>
               <div>

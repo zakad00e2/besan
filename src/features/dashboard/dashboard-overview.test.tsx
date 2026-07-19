@@ -19,7 +19,11 @@ describe("DashboardOverview", () => {
       { ...dashboardFixture.appointments[0], reminderStatus: "sent" as const },
       { ...dashboardFixture.appointments[2], reminderStatus: "scheduled" as const },
       { ...dashboardFixture.appointments[5], reminderStatus: "sent" as const },
-      { ...dashboardFixture.appointments[3], status: "cancelled" as const, reminderStatus: "scheduled" as const },
+      {
+        ...dashboardFixture.appointments[3],
+        status: "cancelled" as const,
+        reminderStatus: "scheduled" as const,
+      },
     ];
 
     expect(getReminderProgress(appointments, now)).toEqual({ sent: 1, active: 2, percent: 50 });
@@ -39,7 +43,7 @@ describe("DashboardOverview", () => {
     expect(screen.getByRole("heading", { name: "This week's appointments" })).toBeTruthy();
   });
 
-  it("shows metrics, reminder queue, and follow-up customers", () => {
+  it("shows a five-customer preview and preserves the follow-up metric", () => {
     render(
       <DashboardOverview
         customers={dashboardFixture.customers}
@@ -53,7 +57,20 @@ describe("DashboardOverview", () => {
     expect(screen.getAllByText("Needs follow-up").length).toBeGreaterThan(0);
     expect(screen.getByText("Total bookings")).toBeTruthy();
     expect(screen.getAllByText(/Compared with last month/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Layan Mansour").length).toBeGreaterThan(0);
+
+    const customersCard = screen.getByRole("heading", { name: "Customers" }).closest("article");
+    expect(customersCard).toBeTruthy();
+    expect(within(customersCard!).getByText("Layan Mansour")).toBeTruthy();
+    expect(within(customersCard!).getByText("Tala Darwish")).toBeTruthy();
+    expect(within(customersCard!).queryByText("Reem Shehadeh")).toBeNull();
+    expect(
+      within(customersCard!)
+        .getByRole("link", { name: /Layan Mansour.*View profile/ })
+        .getAttribute("href"),
+    ).toBe("/dashboard/customers/customer-1");
+    expect(
+      within(customersCard!).getByRole("link", { name: "View all customers" }).getAttribute("href"),
+    ).toBe("/dashboard/customers");
     const chart = screen
       .getByRole("heading", { name: "Booking status distribution" })
       .closest("article");
@@ -63,6 +80,23 @@ describe("DashboardOverview", () => {
     expect(within(chart!).getByText("Pending")).toBeTruthy();
     expect(within(chart!).getByText("Completed")).toBeTruthy();
     expect(within(chart!).getByText("Cancelled")).toBeTruthy();
+  });
+
+  it("shows a customer-specific empty state when no customers exist", () => {
+    render(
+      <DashboardOverview
+        customers={[]}
+        appointments={[]}
+        now={new Date("2026-07-10T08:00:00.000Z")}
+      />,
+    );
+
+    const customersCard = screen.getByRole("heading", { name: "Customers" }).closest("article");
+    expect(customersCard).toBeTruthy();
+    expect(within(customersCard!).getByText("No customers yet")).toBeTruthy();
+    expect(
+      within(customersCard!).getByText("Customers will appear here as they are added."),
+    ).toBeTruthy();
   });
 
   it("shows tomorrow's appointments whose reminders have not been sent", () => {

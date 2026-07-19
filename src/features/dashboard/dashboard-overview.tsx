@@ -15,7 +15,6 @@ import {
   getBookingStatusDistribution,
   reminderStatusLabels,
   stageLabels,
-  type CustomerStage,
 } from "./dashboard-model";
 import { cn } from "@/lib/utils";
 import {
@@ -69,15 +68,12 @@ export function getReminderProgress(appointments: Appointment[], now: Date) {
       appointment.status !== "cancelled" &&
       appointment.reminderStatus !== "not-scheduled",
   );
-  const sent = activeAppointments.filter((appointment) => appointment.reminderStatus === "sent").length;
+  const sent = activeAppointments.filter(
+    (appointment) => appointment.reminderStatus === "sent",
+  ).length;
   const active = activeAppointments.length;
 
   return { sent, active, percent: active ? Math.round((sent / active) * 100) : 0 };
-}
-
-function isFollowUpCustomer(customer: Customer, now: Date) {
-  const stale = now.getTime() - new Date(customer.updatedAt).getTime() >= 3 * 24 * 60 * 60 * 1000;
-  return stale && !(["ready-delivery", "completed"] as CustomerStage[]).includes(customer.stage);
 }
 
 function SectionTitle({ title, icon: Icon }: { title: string; icon: LucideIcon }) {
@@ -162,7 +158,7 @@ export function DashboardOverview({
       appointment.status !== "cancelled" &&
       appointment.reminderStatus !== "sent",
   );
-  const followUps = customers.filter((customer) => isFollowUpCustomer(customer, now));
+  const customerPreview = customers.slice(0, 5);
 
   return (
     <div className="space-y-5">
@@ -211,32 +207,40 @@ export function DashboardOverview({
         <BookingStatusDistributionChart statusDist={statusDist} />
 
         <article className="min-h-[218px] rounded-[10px] border border-[#e6e6e8] bg-white p-4">
-          <SectionTitle title="Needs follow-up" icon={CircleAlert} />
-          {followUps.length === 0 ? (
+          <SectionTitle title="Customers" icon={UserPlus} />
+          {customerPreview.length === 0 ? (
             <div className="mt-3">
               <DashboardEmptyState
-                title="All profiles are up to date"
-                body="No follow-up is currently required."
+                title="No customers yet"
+                body="Customers will appear here as they are added."
               />
             </div>
           ) : (
-            <div className="mt-3 divide-y divide-[#f0f0f1]">
-              {followUps.map((customer) => (
-                <a
-                  key={customer.id}
-                  href={`/dashboard/customers/${customer.id}`}
-                  className="flex items-center justify-between gap-3 py-2 text-[11px] transition-colors hover:text-violet-700"
-                >
-                  <span>
-                    <span className="block font-normal leading-tight">{customer.name}</span>
-                    <span className="mt-0.5 block text-[10px] leading-tight text-[#96979c]">
-                      {stageLabels[customer.stage]}
+            <>
+              <div className="mt-3 divide-y divide-[#f0f0f1]">
+                {customerPreview.map((customer) => (
+                  <a
+                    key={customer.id}
+                    href={`/dashboard/customers/${customer.id}`}
+                    className="flex items-center justify-between gap-3 py-2 text-[11px]"
+                  >
+                    <span>
+                      <span className="block font-normal leading-tight">{customer.name}</span>
+                      <span className="mt-0.5 block text-[10px] leading-tight text-[#96979c]">
+                        {stageLabels[customer.stage]}
+                      </span>
                     </span>
-                  </span>
-                  <span className="text-[10px] leading-tight text-[#77787d]">View profile</span>
-                </a>
-              ))}
-            </div>
+                    <span className="text-[10px] leading-tight text-[#77787d]">View profile</span>
+                  </a>
+                ))}
+              </div>
+              <a
+                href="/dashboard/customers"
+                className="mt-3 inline-block text-[10px] leading-tight text-violet-700 transition-colors hover:text-violet-800"
+              >
+                View all customers
+              </a>
+            </>
           )}
         </article>
       </section>
@@ -355,7 +359,7 @@ export function DashboardOverview({
                       className={cn(
                         "text-[10px] font-normal",
                         appointment.reminderStatus === "sent" && "text-emerald-600",
-                        appointment.reminderStatus === "scheduled" && "text-violet-600",
+                        appointment.reminderStatus === "scheduled" && "text-slate-500",
                         appointment.reminderStatus === "not-scheduled" && "text-[#95969b]",
                       )}
                     >

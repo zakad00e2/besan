@@ -29,7 +29,7 @@ describe("homepage motion", () => {
 
   it("uses one continuous accordion indicator and scoped panel transition", () => {
     render(<HowICanHelp />);
-    fireEvent.click(screen.getByRole("button", { name: "Bridal & Evening Wear" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ready-to-Wear Collections" }));
 
     const indicator = screen.getByTestId("service-indicator-1");
     const panel = screen.getByTestId("service-panel-1");
