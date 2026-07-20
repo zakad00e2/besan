@@ -1,6 +1,11 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { HowICanHelp, Testimonials } from "./index";
+import { HomePage, HowICanHelp, Testimonials } from "./index";
+
+vi.mock("@tanstack/react-router", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@tanstack/react-router")>()),
+  useLocation: () => ({ pathname: "/" }),
+}));
 
 afterEach(() => {
   cleanup();
@@ -9,6 +14,18 @@ afterEach(() => {
 });
 
 describe("homepage motion", () => {
+  it("renders the Arabic home route without browser locale storage", () => {
+    render(<HomePage locale="ar" />);
+    expect(screen.getByTestId("public-site").getAttribute("lang")).toBe("ar");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("بيسان");
+  });
+
+  it("keeps the existing English home content on the English route", () => {
+    render(<HomePage locale="en" />);
+    expect(screen.getByTestId("public-site").getAttribute("lang")).toBe("en");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("BESAN");
+  });
+
   it("retargets rapid testimonial navigation to the latest quote", () => {
     vi.useFakeTimers();
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {

@@ -9,19 +9,10 @@ import { PublicSite } from "@/features/site-language/public-site";
 import { useSiteLanguage } from "@/features/site-language/site-language";
 import { WorkshopBookingDialog } from "@/features/workshop-booking/workshop-booking-dialog";
 import { workshopOptions, type WorkshopOption } from "@/features/workshop-booking/workshop-booking";
+import type { SiteLocale } from "@/features/seo/site-config";
 
 export const Route = createFileRoute("/workshops")({
-  component: Workshops,
-  head: () => ({
-    meta: [
-      { title: "Workshops - Besan Khalaily Atelier" },
-      {
-        name: "description",
-        content:
-          "Fashion atelier workshops by Besan Khalaily covering measurements, pattern drafting, corset construction, and private mini courses.",
-      },
-    ],
-  }),
+  component: () => <WorkshopsPage locale="ar" />,
 });
 
 const firstWorkshopPrices = [
@@ -60,8 +51,8 @@ const [patternFoundation, miniCourse, corsetWorkshop] = workshopOptions;
 
 type BookWorkshop = (workshop: WorkshopOption) => void;
 
-function Workshops() {
-  return <PublicSite locale="en"><WorkshopsContent /></PublicSite>;
+export function WorkshopsPage({ locale }: { locale: SiteLocale }) {
+  return <PublicSite locale={locale}><WorkshopsContent /></PublicSite>;
 }
 
 function WorkshopsContent() {
@@ -113,7 +104,7 @@ function WorkshopsHero({ arabic }: { arabic: boolean }) {
         <div className="group mt-4 h-[360px] overflow-hidden md:mt-1 md:h-[560px]">
           <img
             src={workshopsHero}
-            alt="Fashion workshop with dress forms, cutting tables, and sewing machines"
+            alt={arabic ? "ورشة أزياء مع مانيكانات وطاولات قص وماكينات خياطة" : "Fashion workshop with dress forms, cutting tables, and sewing machines"}
             className="workshop-image h-full w-full object-cover"
           />
         </div>

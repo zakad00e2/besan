@@ -23,7 +23,7 @@ Object.defineProperty(window, "matchMedia", {
   value: vi.fn().mockReturnValue({ matches: true }),
 });
 
-import { BookCall } from "./book-call";
+import { BookCallPage } from "./book-call";
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -38,7 +38,7 @@ afterEach(() => {
 
 describe("book-call route", () => {
   it("shows persisted slots after an available date is selected", () => {
-    render(<BookCall />);
+    render(<BookCallPage locale="en" />);
 
     fireEvent.click(screen.getByRole("button", { name: /sunday, july 19th, 2026/i }));
 

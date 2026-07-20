@@ -26,8 +26,7 @@ Object.defineProperty(window, "matchMedia", {
   value: vi.fn().mockReturnValue({ matches: true }),
 });
 
-import { BookCall } from "./book-call";
-import { SITE_LOCALE_STORAGE_KEY } from "@/features/site-language/site-language";
+import { BookCallPage } from "./book-call";
 
 function selectJulyNineteenth() {
   fireEvent.click(screen.getByRole("button", { name: /sunday, july 19th, 2026/i }));
@@ -59,12 +58,11 @@ describe("book-call route", () => {
 
   afterEach(() => {
     cleanup();
-    window.localStorage.removeItem(SITE_LOCALE_STORAGE_KEY);
     vi.useRealTimers();
   });
 
   it("shows only persisted date slots after selecting an open date", () => {
-    render(<BookCall />);
+    render(<BookCallPage locale="en" />);
 
     selectJulyNineteenth();
 
@@ -79,10 +77,8 @@ describe("book-call route", () => {
       expect(locale).toBe("ar-SA-u-ca-gregory");
       return new nativeDateTimeFormat(locale, options);
     } as typeof Intl.DateTimeFormat);
-    window.localStorage.setItem(SITE_LOCALE_STORAGE_KEY, "ar");
-
     try {
-      render(<BookCall />);
+      render(<BookCallPage locale="ar" />);
       expect(screen.getByTestId("public-site").getAttribute("lang")).toBe("ar");
       const day = document.querySelector('[data-day="2026-07-19"] button')!;
       fireEvent.click(day);
@@ -95,7 +91,7 @@ describe("book-call route", () => {
 
   it("shows a retry action and hides time choices when availability cannot load", () => {
     availability.error = "Could not load available appointments.";
-    render(<BookCall />);
+    render(<BookCallPage locale="en" />);
 
     expect(screen.getAllByRole("button", { name: "Try again" })).toHaveLength(2);
     expect(screen.queryByRole("button", { name: "11:00" })).toBeNull();
@@ -103,7 +99,7 @@ describe("book-call route", () => {
 
   it("refreshes and clears a stale slot without losing customer details", async () => {
     submitBooking.mockResolvedValue({ success: false, reason: "slot-unavailable" });
-    render(<BookCall />);
+    render(<BookCallPage locale="en" />);
 
     selectJulyNineteenth();
     fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
@@ -133,7 +129,7 @@ describe("book-call route", () => {
     const pendingSubmission = deferred<{ success: false; reason: "slot-unavailable" }>();
     submitBooking.mockImplementationOnce(() => pendingSubmission.promise);
     availability.openDates = ["2026-07-19", "2026-07-20"];
-    render(<BookCall />);
+    render(<BookCallPage locale="en" />);
 
     selectJulyNineteenth();
     fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
@@ -157,7 +153,7 @@ describe("book-call route", () => {
   it("keeps the displayed month and availability loader unchanged while booking submission is pending", async () => {
     const pendingSubmission = deferred<{ success: false; reason: "slot-unavailable" }>();
     submitBooking.mockImplementationOnce(() => pendingSubmission.promise);
-    render(<BookCall />);
+    render(<BookCallPage locale="en" />);
 
     selectJulyNineteenth();
     fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);

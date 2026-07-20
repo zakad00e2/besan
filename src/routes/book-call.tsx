@@ -15,19 +15,10 @@ import {
   DEFAULT_WHATSAPP_COUNTRY,
   normalizeWhatsAppNumber,
 } from "@/features/whatsapp/whatsapp-number";
+import { getPublicPath, type SiteLocale } from "@/features/seo/site-config";
 
 export const Route = createFileRoute("/book-call")({
-  component: BookCall,
-  head: () => ({
-    meta: [
-      { title: "Book Your Appointment - Besan Khalaily Atelier" },
-      {
-        name: "description",
-        content:
-          "Book an atelier appointment with Besan Khalaily for a custom design, consultation, or dress rental.",
-      },
-    ],
-  }),
+  component: () => <BookCallPage locale="ar" />,
 });
 
 const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
@@ -37,8 +28,8 @@ const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
-export function BookCall() {
-  return <PublicSite locale="en"><BookCallContent /></PublicSite>;
+export function BookCallPage({ locale }: { locale: SiteLocale }) {
+  return <PublicSite locale={locale}><BookCallContent /></PublicSite>;
 }
 
 function BookCallContent() {
@@ -454,7 +445,7 @@ function BookCallContent() {
 
               <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <a
-                  href="/"
+                  href={getPublicPath("home", locale)}
                   className="motion-press inline-flex items-center justify-center gap-3 border border-foreground/40 px-8 py-4 text-xs tracking-[0.1em] transition-colors hover:border-foreground hover:bg-accent/35"
                 >
                   <ArrowLeft className="h-4 w-4" />

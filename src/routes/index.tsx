@@ -5,9 +5,10 @@ import portrait from "@/assets/besan-portrait.png";
 import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
 import { PublicSite } from "@/features/site-language/public-site";
 import { useSiteLanguage } from "@/features/site-language/site-language";
+import { getPublicPath, type SiteLocale } from "@/features/seo/site-config";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: () => <HomePage locale="ar" />,
 });
 
 const TESTIMONIALS = [
@@ -73,9 +74,9 @@ const ORDERED_ARABIC_SERVICES = [
   ARABIC_SERVICES[0],
 ];
 
-function Index() {
+export function HomePage({ locale }: { locale: SiteLocale }) {
   return (
-    <PublicSite locale="en">
+    <PublicSite locale={locale}>
       <div className="min-h-screen bg-background text-foreground">
         <SiteNav />
         <Hero />
@@ -95,7 +96,7 @@ function Hero() {
       <Reveal className="group relative aspect-[4/5] w-full overflow-hidden md:aspect-auto md:h-full">
         <img
           src={portrait}
-          alt="Portrait of Besan Khalaily"
+          alt={ar ? "بيسان خلايلة، مصممة أزياء في سخنين" : "Portrait of Besan Khalaily"}
           width={1024}
           height={1280}
           className="editorial-image main-portrait-image h-full w-full object-cover"
@@ -129,7 +130,7 @@ function Hero() {
         <Reveal delay={320}>
           <div className="mt-10">
             <a
-              href="/workshops"
+              href={getPublicPath("workshops", locale)}
               className={`motion-press relative inline-flex w-48 items-center justify-start border border-foreground px-6 py-4 ${ar ? "text-sm md:text-base" : "text-xs"} font-normal tracking-[0.1em] transition-colors hover:bg-foreground hover:text-background ${ar ? "arabic-name-title" : ""}`}
             >
               {ar ? "ورش العمل" : "WORKSHOPS"}
@@ -219,7 +220,7 @@ export function HowICanHelp() {
             {ar ? <>كيف <em className="not-italic">أساعدك</em></> : <>How <em className="not-italic">I Can Help</em></>}
           </h2>
           <a
-            href="/book-call"
+            href={getPublicPath("bookCall", locale)}
             className={`motion-press mt-6 inline-block border border-foreground px-14 py-4 tracking-[0.1em] transition-colors hover:bg-foreground hover:text-background ${ar ? "arabic-name-title text-base" : "text-xs"}`}
           >
             {ar ? "احجزي موعدًا" : "BOOK A CALL"}

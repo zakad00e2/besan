@@ -14,7 +14,10 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BookCallRouteImport } from './routes/book-call'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EnIndexRouteImport } from './routes/en/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as EnWorkshopsRouteImport } from './routes/en/workshops'
+import { Route as EnBookCallRouteImport } from './routes/en/book-call'
 import { Route as DashboardWorkshopBookingsRouteImport } from './routes/dashboard/workshop-bookings'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard/bookings'
 import { Route as DashboardAvailabilityRouteImport } from './routes/dashboard/availability'
@@ -46,10 +49,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnIndexRoute = EnIndexRouteImport.update({
+  id: '/en/',
+  path: '/en/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const EnWorkshopsRoute = EnWorkshopsRouteImport.update({
+  id: '/en/workshops',
+  path: '/en/workshops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnBookCallRoute = EnBookCallRouteImport.update({
+  id: '/en/book-call',
+  path: '/en/book-call',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardWorkshopBookingsRoute =
   DashboardWorkshopBookingsRouteImport.update({
@@ -87,7 +105,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
   '/dashboard/workshop-bookings': typeof DashboardWorkshopBookingsRoute
+  '/en/book-call': typeof EnBookCallRoute
+  '/en/workshops': typeof EnWorkshopsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/en/': typeof EnIndexRoute
   '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
   '/dashboard/customers/': typeof DashboardCustomersIndexRoute
 }
@@ -99,7 +120,10 @@ export interface FileRoutesByTo {
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
   '/dashboard/workshop-bookings': typeof DashboardWorkshopBookingsRoute
+  '/en/book-call': typeof EnBookCallRoute
+  '/en/workshops': typeof EnWorkshopsRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/en': typeof EnIndexRoute
   '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
   '/dashboard/customers': typeof DashboardCustomersIndexRoute
 }
@@ -113,7 +137,10 @@ export interface FileRoutesById {
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
   '/dashboard/workshop-bookings': typeof DashboardWorkshopBookingsRoute
+  '/en/book-call': typeof EnBookCallRoute
+  '/en/workshops': typeof EnWorkshopsRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/en/': typeof EnIndexRoute
   '/dashboard/customers/$id': typeof DashboardCustomersIdRoute
   '/dashboard/customers/': typeof DashboardCustomersIndexRoute
 }
@@ -128,7 +155,10 @@ export interface FileRouteTypes {
     | '/dashboard/availability'
     | '/dashboard/bookings'
     | '/dashboard/workshop-bookings'
+    | '/en/book-call'
+    | '/en/workshops'
     | '/dashboard/'
+    | '/en/'
     | '/dashboard/customers/$id'
     | '/dashboard/customers/'
   fileRoutesByTo: FileRoutesByTo
@@ -140,7 +170,10 @@ export interface FileRouteTypes {
     | '/dashboard/availability'
     | '/dashboard/bookings'
     | '/dashboard/workshop-bookings'
+    | '/en/book-call'
+    | '/en/workshops'
     | '/dashboard'
+    | '/en'
     | '/dashboard/customers/$id'
     | '/dashboard/customers'
   id:
@@ -153,7 +186,10 @@ export interface FileRouteTypes {
     | '/dashboard/availability'
     | '/dashboard/bookings'
     | '/dashboard/workshop-bookings'
+    | '/en/book-call'
+    | '/en/workshops'
     | '/dashboard/'
+    | '/en/'
     | '/dashboard/customers/$id'
     | '/dashboard/customers/'
   fileRoutesById: FileRoutesById
@@ -164,6 +200,9 @@ export interface RootRouteChildren {
   BookCallRoute: typeof BookCallRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   WorkshopsRoute: typeof WorkshopsRoute
+  EnBookCallRoute: typeof EnBookCallRoute
+  EnWorkshopsRoute: typeof EnWorkshopsRoute
+  EnIndexRoute: typeof EnIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -203,12 +242,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/en/': {
+      id: '/en/'
+      path: '/en'
+      fullPath: '/en/'
+      preLoaderRoute: typeof EnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/en/workshops': {
+      id: '/en/workshops'
+      path: '/en/workshops'
+      fullPath: '/en/workshops'
+      preLoaderRoute: typeof EnWorkshopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en/book-call': {
+      id: '/en/book-call'
+      path: '/en/book-call'
+      fullPath: '/en/book-call'
+      preLoaderRoute: typeof EnBookCallRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/workshop-bookings': {
       id: '/dashboard/workshop-bookings'
@@ -276,6 +336,9 @@ const rootRouteChildren: RootRouteChildren = {
   BookCallRoute: BookCallRoute,
   DashboardRoute: DashboardRouteWithChildren,
   WorkshopsRoute: WorkshopsRoute,
+  EnBookCallRoute: EnBookCallRoute,
+  EnWorkshopsRoute: EnWorkshopsRoute,
+  EnIndexRoute: EnIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
