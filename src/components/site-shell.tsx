@@ -16,8 +16,18 @@ function WhatsAppIcon({ className }: { className?: string }) {
 function SiteSocialLinks() {
   const { messages } = useSiteLanguage();
   const links = [
-    { href: siteContactLinks.instagram, label: messages.footer.instagram, icon: Instagram, external: true },
-    { href: siteContactLinks.whatsapp, label: messages.footer.whatsapp, icon: WhatsAppIcon, external: true },
+    {
+      href: siteContactLinks.instagram,
+      label: messages.footer.instagram,
+      icon: Instagram,
+      external: true,
+    },
+    {
+      href: siteContactLinks.whatsapp,
+      label: messages.footer.whatsapp,
+      icon: WhatsAppIcon,
+      external: true,
+    },
     { href: siteContactLinks.email, label: messages.footer.email, icon: Mail, external: false },
   ] as const;
 
@@ -124,10 +134,17 @@ export function SiteNav() {
           })}
         </nav>
         <div className="col-start-2 flex shrink-0 items-center justify-self-end gap-2 lg:col-start-3">
-          <a href={getAlternateLocalePath(pathname, locale === "en" ? "ar" : "en")} aria-label={messages.nav.switchLanguage} className={`motion-press inline-flex size-[33px] items-center justify-center border border-foreground/50 leading-none transition-colors hover:bg-foreground hover:text-background ${locale === "en" ? "language-switch-arabic text-sm" : "text-xs"}`}>
+          <a
+            href={getAlternateLocalePath(pathname, locale === "en" ? "ar" : "en")}
+            aria-label={messages.nav.switchLanguage}
+            className={`motion-press inline-flex size-[33px] items-center justify-center border border-foreground/50 leading-none transition-colors hover:bg-foreground hover:text-background ${locale === "en" ? "language-switch-arabic text-sm" : "text-xs"}`}
+          >
             {messages.nav.language}
           </a>
-          <a href={getPublicPath("bookCall", locale)} className={`motion-press border border-foreground px-5 py-2 text-[10px] tracking-[0.05em] transition-colors hover:bg-foreground hover:text-background md:text-xs ${locale === "ar" ? "arabic-name-title" : ""} ${pathname === getPublicPath("bookCall", locale) ? "bg-foreground text-background" : ""}`}>
+          <a
+            href={getPublicPath("bookCall", locale)}
+            className={`motion-press border border-foreground px-5 py-2 text-[10px] tracking-[0.05em] transition-colors hover:bg-foreground hover:text-background md:text-xs ${locale === "ar" ? "arabic-name-title" : ""} ${pathname === getPublicPath("bookCall", locale) ? "bg-foreground text-background" : ""}`}
+          >
             {messages.nav.book}
           </a>
         </div>
@@ -149,7 +166,9 @@ export function SiteFooter() {
             className="flex items-center gap-3 text-lg md:text-xl"
           >
             <Globe className="h-5 w-5 rtl:order-last" />
-            <span dir="ltr" className="rtl:order-first">besankhalaily.com</span>
+            <span dir="ltr" className="rtl:order-first">
+              besankhalaily.com
+            </span>
           </a>
         </div>
         <p className="mt-16 text-center text-xs tracking-[0.2em] text-muted-foreground">

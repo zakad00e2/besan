@@ -22,12 +22,14 @@ describe("crawl files", () => {
   });
 
   it("allows public crawling and advertises the production sitemap", () => {
-    expect(buildRobotsTxt()).toBe([
-      "User-agent: *",
-      "Allow: /",
-      "",
-      "Sitemap: https://www.besankhalaily.com/sitemap.xml",
-      "",
-    ].join("\n"));
+    expect(buildRobotsTxt()).toBe(
+      [
+        "User-agent: *",
+        "Allow: /",
+        "",
+        "Sitemap: https://www.besankhalaily.com/sitemap.xml",
+        "",
+      ].join("\n"),
+    );
   });
 });

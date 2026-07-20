@@ -52,29 +52,61 @@ const SERVICES = [
 ];
 
 const ARABIC_CLIENT_TESTIMONIALS = [
-  { quote: "\u0645\u0646 \u0623\u0648\u0644 \u062c\u0644\u0633\u0629 \u062d\u0633\u0651\u064a\u062a \u0625\u0646\u0647 \u0627\u0644\u062a\u0635\u0645\u064a\u0645 \u0645\u0639\u0645\u0648\u0644 \u0625\u0644\u064a\u060c \u0648\u0643\u0644 \u062a\u0641\u0635\u064a\u0644 \u0643\u0627\u0646 \u064a\u0639\u0643\u0633 \u0634\u062e\u0635\u064a\u062a\u064a", name: "\u0639\u0645\u064a\u0644\u0629 \u062e\u0627\u0635\u0629" },
-  { quote: "\u0627\u0644\u0642\u0637\u0639\u0629 \u0643\u0627\u0646\u062a \u0645\u0631\u064a\u062d\u0629 \u0648\u0623\u0646\u064a\u0642\u0629 \u0628\u0646\u0641\u0633 \u0627\u0644\u0648\u0642\u062a\u060c \u0648\u0643\u0644 \u0645\u0631\u0629 \u0623\u0644\u0628\u0633\u0647\u0627 \u0628\u062d\u0633 \u0625\u0646\u0647\u0627 \u0645\u0627 \u0641\u0642\u062f\u062a \u0642\u064a\u0645\u062a\u0647\u0627", name: "\u0645\u0646\u0633\u0642\u0629 \u0623\u0632\u064a\u0627\u0621" },
-  { quote: "\u0628\u064a\u0633\u0627\u0646 \u0641\u0647\u0645\u062a \u062a\u0645\u0627\u0645\u064b\u0627 \u0634\u0648 \u0643\u0646\u062a \u0628\u062a\u062e\u064a\u0644\u060c \u0648\u0627\u0644\u0646\u062a\u064a\u062c\u0629 \u0643\u0627\u0646\u062a \u0623\u062c\u0645\u0644 \u0645\u0645\u0627 \u062a\u0648\u0642\u0639\u062a", name: "\u0639\u0645\u064a\u0644\u0629 \u0632\u0641\u0627\u0641" },
-  { quote: "\u0627\u0644\u062a\u0635\u0645\u064a\u0645 \u0643\u0627\u0646 \u0628\u0633\u064a\u0637\u064b\u0627 \u0628\u0637\u0631\u064a\u0642\u0629 \u0631\u0627\u0642\u064a\u0629\u060c \u0648\u0647\u0630\u0627 \u0628\u0627\u0644\u0636\u0628\u0637 \u0627\u0644\u0644\u064a \u0643\u0646\u062a \u0623\u0628\u062d\u062b \u0639\u0646\u0647", name: "\u0639\u0645\u064a\u0644\u0629 \u0628\u064a\u0633\u0627\u0646" },
+  {
+    quote:
+      "\u0645\u0646 \u0623\u0648\u0644 \u062c\u0644\u0633\u0629 \u062d\u0633\u0651\u064a\u062a \u0625\u0646\u0647 \u0627\u0644\u062a\u0635\u0645\u064a\u0645 \u0645\u0639\u0645\u0648\u0644 \u0625\u0644\u064a\u060c \u0648\u0643\u0644 \u062a\u0641\u0635\u064a\u0644 \u0643\u0627\u0646 \u064a\u0639\u0643\u0633 \u0634\u062e\u0635\u064a\u062a\u064a",
+    name: "\u0639\u0645\u064a\u0644\u0629 \u062e\u0627\u0635\u0629",
+  },
+  {
+    quote:
+      "\u0627\u0644\u0642\u0637\u0639\u0629 \u0643\u0627\u0646\u062a \u0645\u0631\u064a\u062d\u0629 \u0648\u0623\u0646\u064a\u0642\u0629 \u0628\u0646\u0641\u0633 \u0627\u0644\u0648\u0642\u062a\u060c \u0648\u0643\u0644 \u0645\u0631\u0629 \u0623\u0644\u0628\u0633\u0647\u0627 \u0628\u062d\u0633 \u0625\u0646\u0647\u0627 \u0645\u0627 \u0641\u0642\u062f\u062a \u0642\u064a\u0645\u062a\u0647\u0627",
+    name: "\u0645\u0646\u0633\u0642\u0629 \u0623\u0632\u064a\u0627\u0621",
+  },
+  {
+    quote:
+      "\u0628\u064a\u0633\u0627\u0646 \u0641\u0647\u0645\u062a \u062a\u0645\u0627\u0645\u064b\u0627 \u0634\u0648 \u0643\u0646\u062a \u0628\u062a\u062e\u064a\u0644\u060c \u0648\u0627\u0644\u0646\u062a\u064a\u062c\u0629 \u0643\u0627\u0646\u062a \u0623\u062c\u0645\u0644 \u0645\u0645\u0627 \u062a\u0648\u0642\u0639\u062a",
+    name: "\u0639\u0645\u064a\u0644\u0629 \u0632\u0641\u0627\u0641",
+  },
+  {
+    quote:
+      "\u0627\u0644\u062a\u0635\u0645\u064a\u0645 \u0643\u0627\u0646 \u0628\u0633\u064a\u0637\u064b\u0627 \u0628\u0637\u0631\u064a\u0642\u0629 \u0631\u0627\u0642\u064a\u0629\u060c \u0648\u0647\u0630\u0627 \u0628\u0627\u0644\u0636\u0628\u0637 \u0627\u0644\u0644\u064a \u0643\u0646\u062a \u0623\u0628\u062d\u062b \u0639\u0646\u0647",
+    name: "\u0639\u0645\u064a\u0644\u0629 \u0628\u064a\u0633\u0627\u0646",
+  },
 ];
 
 const ARABIC_TESTIMONIALS = [
-  { quote: "صممت بيسان قطعة بدت وكأنها صُنعت لي وحدي؛ القصّة والقماش وكل تفصيل يحمل بصمتها.", name: "عميلة خاصة" },
-  { quote: "نظرتها للقوام والملمس استثنائية. حوّلت بيسان فكرة إلى خزانة أعيش بها حقًا؛ هادئة وخالدة.", name: "منسقة أزياء" },
-  { quote: "مصممة نادرة تستمع بجمال ما تبدع. كانت كل جلسة قياس شخصية، والقطعة النهائية حِرفة خالصة.", name: "عميلة زفاف" },
+  {
+    quote: "صممت بيسان قطعة بدت وكأنها صُنعت لي وحدي؛ القصّة والقماش وكل تفصيل يحمل بصمتها.",
+    name: "عميلة خاصة",
+  },
+  {
+    quote:
+      "نظرتها للقوام والملمس استثنائية. حوّلت بيسان فكرة إلى خزانة أعيش بها حقًا؛ هادئة وخالدة.",
+    name: "منسقة أزياء",
+  },
+  {
+    quote:
+      "مصممة نادرة تستمع بجمال ما تبدع. كانت كل جلسة قياس شخصية، والقطعة النهائية حِرفة خالصة.",
+    name: "عميلة زفاف",
+  },
 ];
 
 const ARABIC_SERVICES = [
-  { title: "تصميم خاص", body: "قطع مخصصة وفق قياساتك وأسلوبك الشخصي، من الرسم الأول حتى جلسة القياس الأخيرة." },
-  { title: "مجموعات جاهزة للارتداء", body: "استأجري فستانًا جاهزًا بعناية، يجمع بين الأناقة، الجودة، والراحة ليمنحك إطلالة مميزة في كل مناسبة." },
-  { title: "استشارة تصميم", body: "جلسة شخصية لاختيار كل ما يناسبك، من القصة والخامة إلى اللون والتفاصيل، بهدف الوصول إلى تصميم صُنع خصيصًا لك" },
+  {
+    title: "تصميم خاص",
+    body: "قطع مخصصة وفق قياساتك وأسلوبك الشخصي، من الرسم الأول حتى جلسة القياس الأخيرة.",
+  },
+  {
+    title: "مجموعات جاهزة للارتداء",
+    body: "استأجري فستانًا جاهزًا بعناية، يجمع بين الأناقة، الجودة، والراحة ليمنحك إطلالة مميزة في كل مناسبة.",
+  },
+  {
+    title: "استشارة تصميم",
+    body: "جلسة شخصية لاختيار كل ما يناسبك، من القصة والخامة إلى اللون والتفاصيل، بهدف الوصول إلى تصميم صُنع خصيصًا لك",
+  },
 ];
 
-const ORDERED_ARABIC_SERVICES = [
-  ARABIC_SERVICES[1],
-  ARABIC_SERVICES[2],
-  ARABIC_SERVICES[0],
-];
+const ORDERED_ARABIC_SERVICES = [ARABIC_SERVICES[1], ARABIC_SERVICES[2], ARABIC_SERVICES[0]];
 
 export function HomePage({ locale }: { locale: SiteLocale }) {
   return (
@@ -109,22 +141,40 @@ function Hero() {
           {ar ? null : <p className="font-serif text-3xl italic md:text-4xl">I am</p>}
         </Reveal>
         <Reveal delay={80}>
-          <h1 className={`mt-3 font-serif text-5xl leading-[0.85] tracking-tighter md:text-7xl ${ar ? "arabic-name-title" : ""}`}>
+          <h1
+            className={`mt-3 font-serif text-5xl leading-[0.85] tracking-tighter md:text-7xl ${ar ? "arabic-name-title" : ""}`}
+          >
             {ar ? (
               <>بيسان خلايلة</>
             ) : (
-              <>BESAN<br />KHALAILY</>
+              <>
+                BESAN
+                <br />
+                KHALAILY
+              </>
             )}
           </h1>
         </Reveal>
         <Reveal delay={200}>
-          <div className={`mt-4 max-w-md text-muted-foreground ${ar ? "space-y-2 text-base leading-6 md:text-lg md:leading-7" : "space-y-4 text-xs leading-relaxed md:text-[13px]"}`}>
+          <div
+            className={`mt-4 max-w-md text-muted-foreground ${ar ? "space-y-2 text-base leading-6 md:text-lg md:leading-7" : "space-y-4 text-xs leading-relaxed md:text-[13px]"}`}
+          >
             {ar ? (
-              <p>مصممة أزياء مستقلة أبتكر قطعًا هادئة ومدروسة تجمع بين الحرفة والأناقة المعاصرة. كل مجموعة مصممة لتشعرك بأنها خاصة بك، وترافقك بأسلوب يعكس شخصيتك</p>
+              <p>
+                مصممة أزياء مستقلة أبتكر قطعًا هادئة ومدروسة تجمع بين الحرفة والأناقة المعاصرة. كل
+                مجموعة مصممة لتشعرك بأنها خاصة بك، وترافقك بأسلوب يعكس شخصيتك
+              </p>
             ) : (
               <>
-                <p>I am an independent fashion designer creating quiet, considered pieces where craft meets modern femininity - tailored silhouettes, natural fabrics, and timeless details.</p>
-                <p>Each collection is designed to feel personal - an intimate wardrobe made to move with you and last beyond seasons.</p>
+                <p>
+                  I am an independent fashion designer creating quiet, considered pieces where craft
+                  meets modern femininity - tailored silhouettes, natural fabrics, and timeless
+                  details.
+                </p>
+                <p>
+                  Each collection is designed to feel personal - an intimate wardrobe made to move
+                  with you and last beyond seasons.
+                </p>
               </>
             )}
           </div>
@@ -136,7 +186,10 @@ function Hero() {
               className={`motion-press relative inline-flex w-48 items-center justify-start border border-foreground px-6 py-4 ${ar ? "text-sm md:text-base" : "text-xs"} font-normal tracking-[0.1em] transition-colors hover:bg-foreground hover:text-background ${ar ? "arabic-name-title" : ""}`}
             >
               {ar ? "ورش العمل" : "WORKSHOPS"}
-              <ArrowUpLeft className={`absolute end-5 size-4 ${ar ? "" : "scale-x-[-1]"}`} aria-hidden="true" />
+              <ArrowUpLeft
+                className={`absolute end-5 size-4 ${ar ? "" : "scale-x-[-1]"}`}
+                aria-hidden="true"
+              />
             </a>
           </div>
         </Reveal>
@@ -218,8 +271,18 @@ export function HowICanHelp() {
     <section id="services" className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 md:py-32">
       <div className="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-24">
         <Reveal>
-          <h2 className={`font-serif text-5xl leading-[1] tracking-tighter md:text-6xl [word-spacing:-0.05em] ${ar ? "arabic-name-title" : ""}`}>
-            {ar ? <>كيف <em className="not-italic">أساعدك</em></> : <>How <em className="not-italic">I Can Help</em></>}
+          <h2
+            className={`font-serif text-5xl leading-[1] tracking-tighter md:text-6xl [word-spacing:-0.05em] ${ar ? "arabic-name-title" : ""}`}
+          >
+            {ar ? (
+              <>
+                كيف <em className="not-italic">أساعدك</em>
+              </>
+            ) : (
+              <>
+                How <em className="not-italic">I Can Help</em>
+              </>
+            )}
           </h2>
           <a
             href={getPublicPath("bookCall", locale)}

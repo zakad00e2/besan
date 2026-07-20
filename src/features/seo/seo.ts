@@ -1,11 +1,6 @@
 import type { MetaDescriptor } from "@tanstack/react-router";
 import { siteContactLinks } from "@/features/site-language/site-contact";
-import {
-  type PublicPageKey,
-  type SiteLocale,
-  SITE_ORIGIN,
-  getPublicUrl,
-} from "./site-config";
+import { type PublicPageKey, type SiteLocale, SITE_ORIGIN, getPublicUrl } from "./site-config";
 
 const OG_IMAGE_URL = `${SITE_ORIGIN}/og-besan-khalaily.png`;
 
@@ -13,34 +8,40 @@ const SEO_COPY = {
   ar: {
     home: {
       title: "مصممة أزياء وفساتين حسب الطلب في سخنين | بيسان خلايلة",
-      description: "بيسان خلايلة، مصممة أزياء في سخنين لتصميم الفساتين حسب الطلب، التأجير، والاستشارات الشخصية. احجزي موعدك في الأتيليه.",
+      description:
+        "بيسان خلايلة، مصممة أزياء في سخنين لتصميم الفساتين حسب الطلب، التأجير، والاستشارات الشخصية. احجزي موعدك في الأتيليه.",
       imageAlt: "بيسان خلايلة، مصممة أزياء في سخنين",
     },
     workshops: {
       title: "ورش خياطة وباترون في سخنين | بيسان خلايلة",
-      description: "ورش خياطة وباترون عملية مع بيسان خلايلة في سخنين، تشمل أخذ القياسات، رسم الباترون، خياطة الكورسيه، ودورات أتيليه خاصة.",
+      description:
+        "ورش خياطة وباترون عملية مع بيسان خلايلة في سخنين، تشمل أخذ القياسات، رسم الباترون، خياطة الكورسيه، ودورات أتيليه خاصة.",
       imageAlt: "ورشة خياطة وباترون في أتيليه بيسان خلايلة",
     },
     bookCall: {
       title: "احجزي موعد تصميم أو قياس فستان | بيسان خلايلة",
-      description: "احجزي موعدًا مع بيسان خلايلة في سخنين لتصميم فستان حسب الطلب، استشارة تصميم، جلسة قياس، أو استئجار فستان.",
+      description:
+        "احجزي موعدًا مع بيسان خلايلة في سخنين لتصميم فستان حسب الطلب، استشارة تصميم، جلسة قياس، أو استئجار فستان.",
       imageAlt: "حجز موعد في أتيليه بيسان خلايلة",
     },
   },
   en: {
     home: {
       title: "Fashion Designer & Made-to-Measure Dresses in Sakhnin | Besan Khalaily",
-      description: "Besan Khalaily is a Sakhnin fashion designer offering made-to-measure dresses, rentals, and personal design consultations.",
+      description:
+        "Besan Khalaily is a Sakhnin fashion designer offering made-to-measure dresses, rentals, and personal design consultations.",
       imageAlt: "Besan Khalaily, fashion designer in Sakhnin",
     },
     workshops: {
       title: "Sewing & Pattern Workshops in Sakhnin | Besan Khalaily",
-      description: "Practical sewing and pattern workshops in Sakhnin covering measurements, drafting, corset construction, and private atelier courses.",
+      description:
+        "Practical sewing and pattern workshops in Sakhnin covering measurements, drafting, corset construction, and private atelier courses.",
       imageAlt: "Sewing and pattern workshop at Besan Khalaily atelier",
     },
     bookCall: {
       title: "Book a Dress Design or Fitting Appointment | Besan Khalaily",
-      description: "Book a Sakhnin atelier appointment for a custom dress, design consultation, fitting, or dress rental with Besan Khalaily.",
+      description:
+        "Book a Sakhnin atelier appointment for a custom dress, design consultation, fitting, or dress rental with Besan Khalaily.",
       imageAlt: "Book an appointment at Besan Khalaily atelier",
     },
   },

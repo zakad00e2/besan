@@ -23,18 +23,25 @@ describe("SEO head generation", () => {
   });
 
   it.each([
-    ["home", "ar"], ["workshops", "ar"], ["bookCall", "ar"],
-    ["home", "en"], ["workshops", "en"], ["bookCall", "en"],
-  ] as const)("adds canonical, language alternates, and social metadata for %s/%s", (page, locale) => {
-    const head = createSeoHead(page, locale);
-    expect(head.links).toContainEqual({ rel: "canonical", href: getPublicUrl(page, locale) });
-    expect(head.links.filter((link) => link.rel === "alternate")).toHaveLength(3);
-    expect(metaValue(head.meta, "property", "og:url")).toBe(getPublicUrl(page, locale));
-    expect(metaValue(head.meta, "property", "og:image")).toBe(
-      "https://www.besankhalaily.com/og-besan-khalaily.png",
-    );
-    expect(metaValue(head.meta, "name", "twitter:card")).toBe("summary_large_image");
-  });
+    ["home", "ar"],
+    ["workshops", "ar"],
+    ["bookCall", "ar"],
+    ["home", "en"],
+    ["workshops", "en"],
+    ["bookCall", "en"],
+  ] as const)(
+    "adds canonical, language alternates, and social metadata for %s/%s",
+    (page, locale) => {
+      const head = createSeoHead(page, locale);
+      expect(head.links).toContainEqual({ rel: "canonical", href: getPublicUrl(page, locale) });
+      expect(head.links.filter((link) => link.rel === "alternate")).toHaveLength(3);
+      expect(metaValue(head.meta, "property", "og:url")).toBe(getPublicUrl(page, locale));
+      expect(metaValue(head.meta, "property", "og:image")).toBe(
+        "https://www.besankhalaily.com/og-besan-khalaily.png",
+      );
+      expect(metaValue(head.meta, "name", "twitter:card")).toBe("summary_large_image");
+    },
+  );
 
   it("emits conservative Sakhnin structured data without the placeholder WhatsApp number", () => {
     const json = JSON.stringify(

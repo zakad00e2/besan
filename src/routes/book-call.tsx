@@ -31,7 +31,11 @@ const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 export function BookCallPage({ locale }: { locale: SiteLocale }) {
-  return <PublicSite locale={locale}><BookCallContent /></PublicSite>;
+  return (
+    <PublicSite locale={locale}>
+      <BookCallContent />
+    </PublicSite>
+  );
 }
 
 function BookCallContent() {
@@ -52,7 +56,12 @@ function BookCallContent() {
 
   const selectedDateKey = selectedDate ? formatBookingDate(selectedDate) : "";
   const selectedDateLabel = selectedDate
-    ? new Intl.DateTimeFormat(ar ? "ar-SA-u-ca-gregory" : "en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(selectedDate)
+    ? new Intl.DateTimeFormat(ar ? "ar-SA-u-ca-gregory" : "en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      }).format(selectedDate)
     : "";
   const availableTimes = availability.slots.map((slot) => slot.startsAt);
 
@@ -105,7 +114,11 @@ function BookCallContent() {
 
     if (!selectedDate || !selectedTime || !fullName || !mobile) {
       setSubmitted(false);
-      setError(ar ? "يرجى اختيار اليوم والوقت وإدخال الاسم الكامل ورقم الجوال." : "Please complete your day, time, full name, and mobile number.");
+      setError(
+        ar
+          ? "يرجى اختيار اليوم والوقت وإدخال الاسم الكامل ورقم الجوال."
+          : "Please complete your day, time, full name, and mobile number.",
+      );
       return;
     }
 
@@ -141,9 +154,17 @@ function BookCallContent() {
       } else if (result.reason === "slot-unavailable") {
         setSelectedTime("");
         await availability.loadDate(formatBookingDate(selectedDate));
-        setError(ar ? "هذا الوقت لم يعد متاحًا. يرجى اختيار وقت آخر." : "That time is no longer available. Please choose another time.");
+        setError(
+          ar
+            ? "هذا الوقت لم يعد متاحًا. يرجى اختيار وقت آخر."
+            : "That time is no longer available. Please choose another time.",
+        );
       } else {
-        setError(ar ? "تعذر حفظ الحجز. يرجى المحاولة مرة أخرى." : "We could not save your booking. Please try again.");
+        setError(
+          ar
+            ? "تعذر حفظ الحجز. يرجى المحاولة مرة أخرى."
+            : "We could not save your booking. Please try again.",
+        );
       }
     } finally {
       setSubmitting(false);
@@ -158,16 +179,30 @@ function BookCallContent() {
           <div className="flex flex-col gap-14 lg:sticky lg:top-8 lg:self-start">
             <div>
               <p data-book-copy className="font-serif text-2xl italic md:text-3xl">
-              {ar ? null : "Atelier booking"}
+                {ar ? null : "Atelier booking"}
               </p>
               <h1
                 data-book-copy
                 className={`mt-4 max-w-3xl font-serif tracking-tighter ${ar ? "arabic-name-title leading-[1.05] text-5xl md:text-6xl" : "leading-[0.85] text-6xl md:text-8xl"}`}
               >
-                {ar ? <>احجزي<br />موعدك</> : <>Book Your<br />Appointment</>}
+                {ar ? (
+                  <>
+                    احجزي
+                    <br />
+                    موعدك
+                  </>
+                ) : (
+                  <>
+                    Book Your
+                    <br />
+                    Appointment
+                  </>
+                )}
               </h1>
               <p data-book-copy className="mt-8 max-w-lg text-base leading-8 text-muted-foreground">
-                {ar ? "اختاري نوع الموعد واليوم والوقت المناسب لك." : "Choose the appointment type, day, and time that suits you."}
+                {ar
+                  ? "اختاري نوع الموعد واليوم والوقت المناسب لك."
+                  : "Choose the appointment type, day, and time that suits you."}
               </p>
             </div>
           </div>
@@ -192,7 +227,15 @@ function BookCallContent() {
                             : "border-foreground/40 hover:border-foreground hover:bg-accent/35"
                         }`}
                       >
-                        <span>{ar ? ({ "Custom Design": "تصميم خاص", Consultation: "استشارة", "Dresses for Rent": "فساتين للإيجار" }[type]) : type}</span>
+                        <span>
+                          {ar
+                            ? {
+                                "Custom Design": "تصميم خاص",
+                                Consultation: "استشارة",
+                                "Dresses for Rent": "فساتين للإيجار",
+                              }[type]
+                            : type}
+                        </span>
                         {selected ? <Check className="h-4 w-4" /> : null}
                       </button>
                     );
@@ -244,25 +287,29 @@ function BookCallContent() {
                           button_next:
                             "border border-foreground/30 hover:border-foreground hover:bg-accent/35",
                           month_grid: "w-full table-fixed border-collapse",
-                          weekday:
-                            `flex h-9 items-center justify-center text-xs tracking-[0.08em] text-muted-foreground ${ar ? "font-light" : ""}`,
+                          weekday: `flex h-9 items-center justify-center text-xs tracking-[0.08em] text-muted-foreground ${ar ? "font-light" : ""}`,
                           week: "mt-3 grid w-full grid-cols-7 gap-1",
                           weekdays: "grid w-full grid-cols-7 gap-1",
                           day: "w-full",
                         }}
                       />
                       <p className="mt-4 border-t border-foreground/20 pt-4 text-sm leading-7 text-muted-foreground">
-                        {ar ? "اختاري أي تاريخ لعرض الأوقات المتاحة." : "Choose any highlighted date to see its current times."}
+                        {ar
+                          ? "اختاري أي تاريخ لعرض الأوقات المتاحة."
+                          : "Choose any highlighted date to see its current times."}
                         {selectedDateLabel ? (
                           <span className="block text-foreground">
-                            {ar ? "المختار: " : "Selected: "}<span dir="ltr">{selectedDateLabel}</span>
+                            {ar ? "المختار: " : "Selected: "}
+                            <span dir="ltr">{selectedDateLabel}</span>
                           </span>
                         ) : null}
                       </p>
                     </div>
 
                     <div className="hidden min-w-0 border-t border-foreground/20 pt-5 lg:block lg:self-stretch lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6 rtl:lg:border-l-0 rtl:lg:border-r rtl:lg:pl-0 rtl:lg:pr-6">
-                      <h3 className={`text-2xl leading-none tracking-tighter ${ar ? "arabic-ui-heading" : "font-serif"}`}>
+                      <h3
+                        className={`text-2xl leading-none tracking-tighter ${ar ? "arabic-ui-heading" : "font-serif"}`}
+                      >
                         {ar ? "الأوقات المتاحة" : "Available Times"}
                       </h3>
                       {availability.error ? (
@@ -285,7 +332,9 @@ function BookCallContent() {
                         </p>
                       ) : selectedDate && availableTimes.length === 0 ? (
                         <p className="mt-6 text-sm text-muted-foreground">
-                          {ar ? "لا توجد أوقات متبقية في هذا التاريخ." : "No times remain on this date."}
+                          {ar
+                            ? "لا توجد أوقات متبقية في هذا التاريخ."
+                            : "No times remain on this date."}
                         </p>
                       ) : selectedDate ? (
                         <div
@@ -315,7 +364,9 @@ function BookCallContent() {
                         </div>
                       ) : (
                         <p className="mt-6 px-1 py-2 text-sm leading-7 text-muted-foreground">
-                          {ar ? "يرجى اختيار يوم أولًا لعرض الأوقات المتاحة." : "Please choose a day first to view available times."}
+                          {ar
+                            ? "يرجى اختيار يوم أولًا لعرض الأوقات المتاحة."
+                            : "Please choose a day first to view available times."}
                         </p>
                       )}
                     </div>
@@ -323,7 +374,9 @@ function BookCallContent() {
                 </fieldset>
 
                 <fieldset className="mt-8 min-w-0 lg:hidden">
-                  <legend className={`text-2xl leading-none tracking-tighter ${ar ? "arabic-ui-heading" : "font-serif"}`}>
+                  <legend
+                    className={`text-2xl leading-none tracking-tighter ${ar ? "arabic-ui-heading" : "font-serif"}`}
+                  >
                     {ar ? "الأوقات المتاحة" : "Available Times"}
                   </legend>
                   <div className="mt-6 border border-foreground/40 p-3 sm:p-5">
@@ -342,10 +395,14 @@ function BookCallContent() {
                         </button>
                       </div>
                     ) : availability.slotsLoading ? (
-                      <p className="mt-6 text-sm text-muted-foreground">{ar ? "جارٍ تحميل الأوقات المتاحة…" : "Loading available times…"}</p>
+                      <p className="mt-6 text-sm text-muted-foreground">
+                        {ar ? "جارٍ تحميل الأوقات المتاحة…" : "Loading available times…"}
+                      </p>
                     ) : selectedDate && availableTimes.length === 0 ? (
                       <p className="mt-6 text-sm text-muted-foreground">
-                        {ar ? "لا توجد أوقات متبقية في هذا التاريخ." : "No times remain on this date."}
+                        {ar
+                          ? "لا توجد أوقات متبقية في هذا التاريخ."
+                          : "No times remain on this date."}
                       </p>
                     ) : selectedDate ? (
                       <div
@@ -375,7 +432,9 @@ function BookCallContent() {
                       </div>
                     ) : (
                       <p className="px-1 py-2 text-sm leading-7 text-muted-foreground">
-                        {ar ? "يرجى اختيار يوم أولًا لعرض الأوقات المتاحة." : "Please choose a day first to view available times."}
+                        {ar
+                          ? "يرجى اختيار يوم أولًا لعرض الأوقات المتاحة."
+                          : "Please choose a day first to view available times."}
                       </p>
                     )}
                   </div>
@@ -383,7 +442,9 @@ function BookCallContent() {
               </div>
 
               <section data-book-panel className="mt-12 border-t border-foreground/70 pt-8">
-                <h2 className="font-serif text-3xl leading-none tracking-tighter">{ar ? "بياناتك" : "Your Details"}</h2>
+                <h2 className="font-serif text-3xl leading-none tracking-tighter">
+                  {ar ? "بياناتك" : "Your Details"}
+                </h2>
                 <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <label className="block text-sm">
                     <span className="text-xs tracking-[0.12em] text-muted-foreground">
@@ -416,12 +477,16 @@ function BookCallContent() {
                 </div>
                 <label className="mt-5 block text-sm">
                   <span className="text-xs tracking-[0.12em] text-muted-foreground">
-                      {ar ? "ملاحظات إضافية" : "Additional Notes"}
+                    {ar ? "ملاحظات إضافية" : "Additional Notes"}
                   </span>
                   <textarea
                     name="notes"
                     rows={5}
-                    placeholder={ar ? "أي تفاصيل تودين مشاركتها معنا…" : "Any details you would like to share with us..."}
+                    placeholder={
+                      ar
+                        ? "أي تفاصيل تودين مشاركتها معنا…"
+                        : "Any details you would like to share with us..."
+                    }
                     className="mt-3 w-full resize-none border border-foreground/40 bg-transparent px-4 py-4 text-sm leading-7 outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-foreground"
                   />
                 </label>
@@ -441,7 +506,14 @@ function BookCallContent() {
                   role="status"
                   className="mt-6 border border-foreground/40 bg-accent/30 px-4 py-4 text-sm leading-7"
                 >
-                  {ar ? "شكرًا لك. تم حفظ طلبك." : <>Thank you. Your {appointmentType.toLowerCase()} request for {selectedDateLabel} at {selectedTime} has been saved.</>}
+                  {ar ? (
+                    "شكرًا لك. تم حفظ طلبك."
+                  ) : (
+                    <>
+                      Thank you. Your {appointmentType.toLowerCase()} request for{" "}
+                      {selectedDateLabel} at {selectedTime} has been saved.
+                    </>
+                  )}
                 </p>
               ) : null}
 
@@ -463,7 +535,13 @@ function BookCallContent() {
                       <Check className="h-4 w-4" />
                     </span>
                   ) : null}
-                  {submitting ? (ar ? "جارٍ حفظ الحجز…" : "Saving booking…") : (ar ? "تأكيد الحجز" : "Confirm Booking")}
+                  {submitting
+                    ? ar
+                      ? "جارٍ حفظ الحجز…"
+                      : "Saving booking…"
+                    : ar
+                      ? "تأكيد الحجز"
+                      : "Confirm Booking"}
                 </button>
               </div>
             </form>

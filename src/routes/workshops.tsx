@@ -54,7 +54,11 @@ const [patternFoundation, miniCourse, corsetWorkshop] = workshopOptions;
 type BookWorkshop = (workshop: WorkshopOption) => void;
 
 export function WorkshopsPage({ locale }: { locale: SiteLocale }) {
-  return <PublicSite locale={locale}><WorkshopsContent /></PublicSite>;
+  return (
+    <PublicSite locale={locale}>
+      <WorkshopsContent />
+    </PublicSite>
+  );
 }
 
 function WorkshopsContent() {
@@ -91,13 +95,25 @@ function WorkshopsHero({ arabic }: { arabic: boolean }) {
               arabic ? "leading-[1.15] pb-1" : "leading-[0.9]"
             }`}
           >
-            {arabic ? "ورش الأتيليه" : <>ATELIER<br />WORKSHOPS</>}
+            {arabic ? (
+              "ورش الأتيليه"
+            ) : (
+              <>
+                ATELIER
+                <br />
+                WORKSHOPS
+              </>
+            )}
           </h1>
         </Reveal>
         <Reveal delay={120} className="mt-3 flex flex-col justify-end md:mt-0">
-          <div className={`max-w-xl text-sm leading-5 text-muted-foreground md:text-base md:leading-6 ${arabic ? "arabic-name-title" : ""}`}>
+          <div
+            className={`max-w-xl text-sm leading-5 text-muted-foreground md:text-base md:leading-6 ${arabic ? "arabic-name-title" : ""}`}
+          >
             <p>
-              {arabic ? "ورش أتيليه متخصصة لتعلّم القياسات ورسم الباترون والخياطة العملية. صُمم كل مسار لتغادري بخبرة واضحة ومفيدة قابلة للتطوير." : "Focused atelier workshops for learning measurements, pattern drafting, and practical sewing. Each format is built so you leave with something clear, useful, and ready to keep developing."}
+              {arabic
+                ? "ورش أتيليه متخصصة لتعلّم القياسات ورسم الباترون والخياطة العملية. صُمم كل مسار لتغادري بخبرة واضحة ومفيدة قابلة للتطوير."
+                : "Focused atelier workshops for learning measurements, pattern drafting, and practical sewing. Each format is built so you leave with something clear, useful, and ready to keep developing."}
             </p>
           </div>
         </Reveal>
@@ -106,7 +122,11 @@ function WorkshopsHero({ arabic }: { arabic: boolean }) {
         <div className="group mt-4 h-[360px] overflow-hidden md:mt-1 md:h-[560px]">
           <img
             src={workshopsHero}
-            alt={arabic ? "ورشة أزياء مع مانيكانات وطاولات قص وماكينات خياطة" : "Fashion workshop with dress forms, cutting tables, and sewing machines"}
+            alt={
+              arabic
+                ? "ورشة أزياء مع مانيكانات وطاولات قص وماكينات خياطة"
+                : "Fashion workshop with dress forms, cutting tables, and sewing machines"
+            }
             className="workshop-image h-full w-full object-cover"
           />
         </div>
@@ -160,9 +180,21 @@ function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
               />
               <div className="editorial-overlay absolute inset-0 bg-foreground/55 group-hover:opacity-70" />
               <div className="relative flex min-h-[356px] flex-col justify-end md:min-h-[500px]">
-                <p className="text-xs tracking-[0.22em] text-background/80">{ar ? "الورشة الأولى" : "WORKSHOP 01"}</p>
-                <h2 className={`font-serif text-4xl leading-[0.8] tracking-tighter md:text-6xl ${ar ? "mt-4" : "mt-2"}`}>
-                  {ar ? "أساسيات الباترون" : <>Pattern<br />foundation</>}
+                <p className="text-xs tracking-[0.22em] text-background/80">
+                  {ar ? "الورشة الأولى" : "WORKSHOP 01"}
+                </p>
+                <h2
+                  className={`font-serif text-4xl leading-[0.8] tracking-tighter md:text-6xl ${ar ? "mt-4" : "mt-2"}`}
+                >
+                  {ar ? (
+                    "أساسيات الباترون"
+                  ) : (
+                    <>
+                      Pattern
+                      <br />
+                      foundation
+                    </>
+                  )}
                 </h2>
               </div>
             </div>
@@ -188,17 +220,25 @@ function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
                 <ul className="mt-3 space-y-1 text-base leading-5 text-muted-foreground">
                   <li className="flex gap-4">
                     <span className="mt-2.5 h-px w-5 shrink-0 bg-foreground/60" />
-                    <span>{ar ? "كيفية أخذ قياسات الجسم بدقة وبأسلوب واضح وعملي." : "How to take accurate body measurements in a clear, practical way."}</span>
+                    <span>
+                      {ar
+                        ? "كيفية أخذ قياسات الجسم بدقة وبأسلوب واضح وعملي."
+                        : "How to take accurate body measurements in a clear, practical way."}
+                    </span>
                   </li>
                   <li className="flex gap-4">
                     <span className="mt-2.5 h-px w-5 shrink-0 bg-foreground/60" />
                     <span>
-                      {ar ? "كيفية تشكيل القصة على المانيكان ونقلها إلى باترون ورقي." : "How to create a cut on the dress form and transfer it into a paper pattern."}
+                      {ar
+                        ? "كيفية تشكيل القصة على المانيكان ونقلها إلى باترون ورقي."
+                        : "How to create a cut on the dress form and transfer it into a paper pattern."}
                     </span>
                   </li>
                 </ul>
                 <p className="mt-3 max-w-2xl text-base leading-5 text-muted-foreground">
-                  {ar ? "في نهاية الورشة سيكون لديك باترون أساسي يمكنك الاحتفاظ به واستخدامه لاحقًا." : "By the end of the workshop, you will have a base pattern that you can keep and use later."}
+                  {ar
+                    ? "في نهاية الورشة سيكون لديك باترون أساسي يمكنك الاحتفاظ به واستخدامه لاحقًا."
+                    : "By the end of the workshop, you will have a base pattern that you can keep and use later."}
                 </p>
               </article>
             </Reveal>
@@ -212,10 +252,14 @@ function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
                 </h4>
                 <div className="mt-3 space-y-2 text-base leading-6 text-muted-foreground">
                   <p>
-                    {ar ? "توجد ورشة متابعة اختيارية ومكثفة. نكمل فيها من الباترون نفسه ونتعلم خياطة الكورسيه خطوة بخطوة." : "There is an optional follow-up workshop. It is intensive and focused: we continue from the same pattern and work through corset sewing step by step."}
+                    {ar
+                      ? "توجد ورشة متابعة اختيارية ومكثفة. نكمل فيها من الباترون نفسه ونتعلم خياطة الكورسيه خطوة بخطوة."
+                      : "There is an optional follow-up workshop. It is intensive and focused: we continue from the same pattern and work through corset sewing step by step."}
                   </p>
                   <p>
-                    {ar ? "الورشة الثانية ليست إلزامية؛ يمكنك الانضمام للأولى فقط، أو إضافة اللقاء الثاني لمشاهدة المسار العملي الكامل من الباترون إلى القطعة النهائية." : "The second workshop is not required. You can join only the first one, or add the second meeting if you want to see the full practical process from pattern to finished structure."}
+                    {ar
+                      ? "الورشة الثانية ليست إلزامية؛ يمكنك الانضمام للأولى فقط، أو إضافة اللقاء الثاني لمشاهدة المسار العملي الكامل من الباترون إلى القطعة النهائية."
+                      : "The second workshop is not required. You can join only the first one, or add the second meeting if you want to see the full practical process from pattern to finished structure."}
                   </p>
                 </div>
               </article>
@@ -230,7 +274,9 @@ function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
                   className="grid grid-cols-[1fr_auto] items-baseline gap-6 border-b border-foreground/30 py-2.5 last:border-b-0"
                 >
                   <p className="text-base text-muted-foreground">{price.label}</p>
-                  <p dir="ltr" className="font-serif text-3xl tracking-tight">{price.value}</p>
+                  <p dir="ltr" className="font-serif text-3xl tracking-tight">
+                    {price.value}
+                  </p>
                 </div>
               ))}
               <BookingButton workshop={patternFoundation} onBook={onBook} className="lg:hidden" />
@@ -247,8 +293,14 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
   const ar = locale === "ar";
   const days = ar
     ? [
-        { title: "اليوم الأول", body: "نتعلم رسم الباترون الأساسي على المانيكان مع شرح مركز يساعدك على فهم الأساس بوضوح، ثم تختارين القصة التي سنعمل عليها." },
-        { title: "من اليوم الثاني إلى الرابع", body: "نكمل الباترون الذي أنشأناه وننتقل إلى العمل العملي بالقماش: القص والخياطة بالماكينة وتقنيات الكورسيه والتفاصيل النهائية." },
+        {
+          title: "اليوم الأول",
+          body: "نتعلم رسم الباترون الأساسي على المانيكان مع شرح مركز يساعدك على فهم الأساس بوضوح، ثم تختارين القصة التي سنعمل عليها.",
+        },
+        {
+          title: "من اليوم الثاني إلى الرابع",
+          body: "نكمل الباترون الذي أنشأناه وننتقل إلى العمل العملي بالقماش: القص والخياطة بالماكينة وتقنيات الكورسيه والتفاصيل النهائية.",
+        },
       ]
     : miniCourseDays;
   return (
@@ -264,7 +316,9 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
             />
             <div className="editorial-overlay absolute inset-0 bg-foreground/55 group-hover:opacity-70" />
             <div className="relative flex min-h-[356px] flex-col justify-end md:min-h-[500px]">
-              <p className="text-xs tracking-[0.22em] text-background/80">{ar ? "الورشة الثانية" : "WORKSHOP 02"}</p>
+              <p className="text-xs tracking-[0.22em] text-background/80">
+                {ar ? "الورشة الثانية" : "WORKSHOP 02"}
+              </p>
               <h2 className="mt-2 font-serif text-4xl leading-[0.8] tracking-tighter md:text-6xl">
                 {ar ? "بناء الباترون" : "Pattern Building"}
               </h2>
@@ -288,12 +342,18 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
                 />
               </div>
               <p className="text-base leading-7 text-muted-foreground">
-                {ar ? "هذه ورشة خاصة ومكثفة تمنحك الاستفادة الكاملة. نبني الأساس أولًا، ثم ننتقل إلى العمل العملي بالقماش والتفاصيل النهائية." : "This is a private, concentrated workshop designed to make sure you get the full benefit. We build the foundation first, then continue into practical fabric work and finishing details."}
+                {ar
+                  ? "هذه ورشة خاصة ومكثفة تمنحك الاستفادة الكاملة. نبني الأساس أولًا، ثم ننتقل إلى العمل العملي بالقماش والتفاصيل النهائية."
+                  : "This is a private, concentrated workshop designed to make sure you get the full benefit. We build the foundation first, then continue into practical fabric work and finishing details."}
               </p>
               <div className="space-y-6">
                 {days.map((day) => (
                   <article key={day.title}>
-                    <h3 className={`tracking-tighter ${ar ? "text-lg md:text-xl arabic-ui-heading" : "text-xl md:text-2xl font-serif font-medium"}`}>{day.title}</h3>
+                    <h3
+                      className={`tracking-tighter ${ar ? "text-lg md:text-xl arabic-ui-heading" : "text-xl md:text-2xl font-serif font-medium"}`}
+                    >
+                      {day.title}
+                    </h3>
                     <p className="mt-3 text-base leading-7 text-muted-foreground">{day.body}</p>
                   </article>
                 ))}
@@ -301,12 +361,18 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className={ar ? "text-right" : ""}>
-                <p className="text-sm text-muted-foreground">{ar ? "سعر الورشة" : "Pattern Building price"}</p>
-                <p dir="ltr" className="mt-2 font-serif text-4xl">2700 NIS</p>
+                <p className="text-sm text-muted-foreground">
+                  {ar ? "سعر الورشة" : "Pattern Building price"}
+                </p>
+                <p dir="ltr" className="mt-2 font-serif text-4xl">
+                  2700 NIS
+                </p>
               </div>
               <div>
                 <p className="text-sm leading-6 text-muted-foreground">
-                  {ar ? "تحصل المشاركات العائدات على خصم 10% من السعر الأساسي عند التسجيل مرة أخرى." : "Returning participants receive 10% off the base price when registering again."}
+                  {ar
+                    ? "تحصل المشاركات العائدات على خصم 10% من السعر الأساسي عند التسجيل مرة أخرى."
+                    : "Returning participants receive 10% off the base price when registering again."}
                 </p>
               </div>
             </div>
@@ -323,9 +389,18 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
   const ar = locale === "ar";
   const details = ar
     ? [
-        { title: "تجربة الأتيليه", body: "ورشة مركزة ليوم واحد، نحو أربع ساعات، ضمن جلسة أتيليه جميلة ومشتركة." },
-        { title: "خياطة كورسيه كامل", body: "نخيط كورسيه كاملًا من الصفر، لتغادر كل مشاركة بقطعتها التي صنعتها خلال الورشة." },
-        { title: "مواد مجهزة", body: "القماش والباترونات والمواد مجهزة مسبقًا، مع مساحة لاحتفال صغير في الختام." },
+        {
+          title: "تجربة الأتيليه",
+          body: "ورشة مركزة ليوم واحد، نحو أربع ساعات، ضمن جلسة أتيليه جميلة ومشتركة.",
+        },
+        {
+          title: "خياطة كورسيه كامل",
+          body: "نخيط كورسيه كاملًا من الصفر، لتغادر كل مشاركة بقطعتها التي صنعتها خلال الورشة.",
+        },
+        {
+          title: "مواد مجهزة",
+          body: "القماش والباترونات والمواد مجهزة مسبقًا، مع مساحة لاحتفال صغير في الختام.",
+        },
       ]
     : corsetWorkshopDetails;
   return (
@@ -335,13 +410,19 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
           <div className="group relative min-h-[420px] overflow-hidden text-background md:min-h-[580px]">
             <img
               src={workshopCorset}
-              alt={ar ? "مانيكانات كورسيه مصطفة في الأتيليه" : "Corset dress forms lined up in an atelier"}
+              alt={
+                ar
+                  ? "مانيكانات كورسيه مصطفة في الأتيليه"
+                  : "Corset dress forms lined up in an atelier"
+              }
               className="workshop-image editorial-image absolute inset-0 h-full w-full object-cover"
             />
             <div className="editorial-overlay absolute inset-0 bg-foreground/35 group-hover:opacity-40" />
             <div className="relative flex min-h-[420px] items-end p-6 md:min-h-[580px] md:p-8">
               <div className="w-full">
-                <p className="text-xs tracking-[0.24em] text-background/80">{ar ? "ورشة ليوم واحد" : "ONE DAY WORKSHOP"}</p>
+                <p className="text-xs tracking-[0.24em] text-background/80">
+                  {ar ? "ورشة ليوم واحد" : "ONE DAY WORKSHOP"}
+                </p>
                 <h2 className="mt-2 font-serif text-4xl leading-[0.8] tracking-tighter md:text-6xl">
                   {ar ? "ورشة كورسيه" : "corset workshop"}
                 </h2>
@@ -366,7 +447,9 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
                 />
               </div>
               <p className="mt-5 max-w-2xl text-base leading-6 text-muted-foreground">
-                {ar ? "ورشة خياطة كورسيه في أتيليه مركز، مبنية على التطبيق العملي من أول غرزة حتى المقاس النهائي." : "Corset sewing workshop in a focused atelier format, built around hands-on construction from the first stitch to the final fit."}
+                {ar
+                  ? "ورشة خياطة كورسيه في أتيليه مركز، مبنية على التطبيق العملي من أول غرزة حتى المقاس النهائي."
+                  : "Corset sewing workshop in a focused atelier format, built around hands-on construction from the first stitch to the final fit."}
               </p>
               <div className="mt-6">
                 {details.map((detail, index) => (
@@ -387,8 +470,12 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
               </div>
             </div>
             <div className={ar ? "text-right" : ""}>
-              <p className="text-sm text-muted-foreground">{ar ? "سعر ورشة الكورسيه" : "Corset workshop price"}</p>
-              <p dir="ltr" className="mt-2 font-serif text-4xl">850 NIS</p>
+              <p className="text-sm text-muted-foreground">
+                {ar ? "سعر ورشة الكورسيه" : "Corset workshop price"}
+              </p>
+              <p dir="ltr" className="mt-2 font-serif text-4xl">
+                850 NIS
+              </p>
               <BookingButton workshop={corsetWorkshop} onBook={onBook} className="lg:hidden" />
             </div>
           </div>

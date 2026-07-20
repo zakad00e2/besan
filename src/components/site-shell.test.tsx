@@ -24,7 +24,11 @@ describe("Reveal", () => {
 describe("SiteNav", () => {
   it("links an Arabic page to its English equivalent", () => {
     pathname = "/workshops";
-    render(<PublicSite locale="ar"><SiteNav /></PublicSite>);
+    render(
+      <PublicSite locale="ar">
+        <SiteNav />
+      </PublicSite>,
+    );
 
     expect(screen.getByRole("link", { name: "تغيير اللغة" }).getAttribute("href")).toBe(
       "/en/workshops",
@@ -33,7 +37,11 @@ describe("SiteNav", () => {
 
   it("links an English page to its Arabic equivalent", () => {
     pathname = "/en/book-call";
-    render(<PublicSite locale="en"><SiteNav /></PublicSite>);
+    render(
+      <PublicSite locale="en">
+        <SiteNav />
+      </PublicSite>,
+    );
 
     expect(screen.getByRole("link", { name: "Switch language" }).getAttribute("href")).toBe(
       "/book-call",

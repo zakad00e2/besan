@@ -73,7 +73,10 @@ describe("book-call route", () => {
 
   it("uses the Gregorian calendar for Arabic selected-date labels", () => {
     const nativeDateTimeFormat = Intl.DateTimeFormat;
-    const formatter = vi.spyOn(Intl, "DateTimeFormat").mockImplementation(function (locale, options) {
+    const formatter = vi.spyOn(Intl, "DateTimeFormat").mockImplementation(function (
+      locale,
+      options,
+    ) {
       expect(locale).toBe("ar-SA-u-ca-gregory");
       return new nativeDateTimeFormat(locale, options);
     } as typeof Intl.DateTimeFormat);

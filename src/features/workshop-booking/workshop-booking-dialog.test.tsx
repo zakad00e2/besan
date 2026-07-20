@@ -2,9 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { submitWorkshopBooking } from "./workshop-booking.functions";
 import { WorkshopBookingDialog } from "./workshop-booking-dialog";
-import {
-  SiteLanguageProvider,
-} from "@/features/site-language/site-language";
+import { SiteLanguageProvider } from "@/features/site-language/site-language";
 
 vi.mock("./workshop-booking.functions", () => ({
   submitWorkshopBooking: vi.fn(),
