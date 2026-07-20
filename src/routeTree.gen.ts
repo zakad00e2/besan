@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkshopsRouteImport } from './routes/workshops'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as BookCallRouteImport } from './routes/book-call'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -27,6 +29,16 @@ import { Route as DashboardCustomersIdRouteImport } from './routes/dashboard/cus
 const WorkshopsRoute = WorkshopsRouteImport.update({
   id: '/workshops',
   path: '/workshops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -101,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/book-call': typeof BookCallRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/workshops': typeof WorkshopsRoute
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
@@ -116,6 +130,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/book-call': typeof BookCallRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/workshops': typeof WorkshopsRoute
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
@@ -133,6 +149,8 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/book-call': typeof BookCallRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/workshops': typeof WorkshopsRoute
   '/dashboard/availability': typeof DashboardAvailabilityRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
@@ -151,6 +169,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/book-call'
     | '/dashboard'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/workshops'
     | '/dashboard/availability'
     | '/dashboard/bookings'
@@ -166,6 +186,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/book-call'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/workshops'
     | '/dashboard/availability'
     | '/dashboard/bookings'
@@ -182,6 +204,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/book-call'
     | '/dashboard'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/workshops'
     | '/dashboard/availability'
     | '/dashboard/bookings'
@@ -199,6 +223,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BookCallRoute: typeof BookCallRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WorkshopsRoute: typeof WorkshopsRoute
   EnBookCallRoute: typeof EnBookCallRoute
   EnWorkshopsRoute: typeof EnWorkshopsRoute
@@ -212,6 +238,20 @@ declare module '@tanstack/react-router' {
       path: '/workshops'
       fullPath: '/workshops'
       preLoaderRoute: typeof WorkshopsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -335,6 +375,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BookCallRoute: BookCallRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   WorkshopsRoute: WorkshopsRoute,
   EnBookCallRoute: EnBookCallRoute,
   EnWorkshopsRoute: EnWorkshopsRoute,
