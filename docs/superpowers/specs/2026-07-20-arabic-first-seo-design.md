@@ -144,8 +144,9 @@ The graph may include:
   ISO country code required by schema consumers.
 - `areaServed` phrased conservatively around Sakhnin and the wider service area
   confirmed by the user.
-- Existing public Instagram, WhatsApp, and email links from
-  `site-contact.ts`.
+- Confirmed public contact links from `site-contact.ts`. The Instagram and
+  email links may be used; the current placeholder WhatsApp number must be
+  omitted until it is replaced with a confirmed public number.
 - Service names already present in visible site content.
 
 It must not include unconfirmed ratings, price ranges, opening hours, a street
