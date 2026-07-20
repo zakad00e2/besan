@@ -5,12 +5,14 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useLocation,
   useRouter,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { getDocumentAttributes } from "@/features/seo/site-config";
 
 function NotFoundComponent() {
   return (
@@ -77,26 +79,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Besan Khalaily - Fashion Atelier" },
-      {
-        name: "description",
-        content:
-          "Besan Khalaily is an independent fashion atelier for made-to-measure garments, bridal work, styling, and hands-on fashion workshops.",
-      },
-      { property: "og:title", content: "Besan Khalaily - Fashion Atelier" },
-      {
-        property: "og:description",
-        content:
-          "Made-to-measure fashion, bridal pieces, styling, and hands-on atelier workshops by Besan Khalaily.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Besan Khalaily - Fashion Atelier" },
-      {
-        name: "twitter:description",
-        content:
-          "Made-to-measure fashion, bridal pieces, styling, and hands-on atelier workshops by Besan Khalaily.",
-      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -116,8 +98,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  const documentAttributes = getDocumentAttributes(pathname);
+
   return (
-    <html lang="en">
+    <html lang={documentAttributes.lang} dir={documentAttributes.dir}>
       <head>
         <HeadContent />
       </head>

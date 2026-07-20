@@ -5,9 +5,10 @@ import { authClient } from "@/features/auth/neon-auth-client";
 import { DashboardShell } from "@/features/dashboard/dashboard-shell";
 import { cn } from "@/lib/utils";
 import { AuthPage } from "./auth";
+import { PRIVATE_ROBOTS_META } from "@/features/seo/seo";
 
 export const Route = createFileRoute("/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard | Besan Khalaily" }] }),
+  head: () => ({ meta: [{ title: "Dashboard | Besan Khalaily" }, PRIVATE_ROBOTS_META] }),
   component: DashboardLayout,
 });
 

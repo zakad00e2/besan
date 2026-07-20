@@ -5,8 +5,12 @@ import besanLogo from "@/assets/besan-logo.png";
 import { authClient } from "@/features/auth/neon-auth-client";
 import { dashboardPrimaryButtonClassName } from "@/features/dashboard/dashboard-ui";
 import { cn } from "@/lib/utils";
+import { PRIVATE_ROBOTS_META } from "@/features/seo/seo";
 
-export const Route = createFileRoute("/auth")({ component: AuthPage });
+export const Route = createFileRoute("/auth")({
+  head: () => ({ meta: [{ title: "Sign in | Besan Khalaily" }, PRIVATE_ROBOTS_META] }),
+  component: AuthPage,
+});
 
 export function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return new Promise((resolve, reject) => {

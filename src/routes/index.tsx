@@ -6,9 +6,11 @@ import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
 import { PublicSite } from "@/features/site-language/public-site";
 import { useSiteLanguage } from "@/features/site-language/site-language";
 import { getPublicPath, type SiteLocale } from "@/features/seo/site-config";
+import { createSeoHead } from "@/features/seo/seo";
 
 export const Route = createFileRoute("/")({
   component: () => <HomePage locale="ar" />,
+  head: () => createSeoHead("home", "ar"),
 });
 
 const TESTIMONIALS = [

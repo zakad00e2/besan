@@ -10,9 +10,11 @@ import { useSiteLanguage } from "@/features/site-language/site-language";
 import { WorkshopBookingDialog } from "@/features/workshop-booking/workshop-booking-dialog";
 import { workshopOptions, type WorkshopOption } from "@/features/workshop-booking/workshop-booking";
 import type { SiteLocale } from "@/features/seo/site-config";
+import { createSeoHead } from "@/features/seo/seo";
 
 export const Route = createFileRoute("/workshops")({
   component: () => <WorkshopsPage locale="ar" />,
+  head: () => createSeoHead("workshops", "ar"),
 });
 
 const firstWorkshopPrices = [

@@ -16,9 +16,11 @@ import {
   normalizeWhatsAppNumber,
 } from "@/features/whatsapp/whatsapp-number";
 import { getPublicPath, type SiteLocale } from "@/features/seo/site-config";
+import { createSeoHead } from "@/features/seo/seo";
 
 export const Route = createFileRoute("/book-call")({
   component: () => <BookCallPage locale="ar" />,
+  head: () => createSeoHead("bookCall", "ar"),
 });
 
 const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
