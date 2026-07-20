@@ -23,7 +23,7 @@ describe("homepage motion", () => {
 
     expect(screen.getByTestId("testimonial-copy").className).toContain("opacity-0");
     act(() => vi.advanceTimersByTime(90));
-    expect(screen.getByText(/A rare designer who listens/)).toBeTruthy();
+    expect(screen.getByText(/Besan understood exactly what I had in mind/)).toBeTruthy();
     expect(screen.getByTestId("testimonial-copy").className).toContain("opacity-100");
   });
 

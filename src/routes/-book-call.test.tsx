@@ -27,6 +27,7 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 import { BookCall } from "./book-call";
+import { SITE_LOCALE_STORAGE_KEY } from "@/features/site-language/site-language";
 
 function selectJulyNineteenth() {
   fireEvent.click(screen.getByRole("button", { name: /sunday, july 19th, 2026/i }));
@@ -58,6 +59,7 @@ describe("book-call route", () => {
 
   afterEach(() => {
     cleanup();
+    window.localStorage.removeItem(SITE_LOCALE_STORAGE_KEY);
     vi.useRealTimers();
   });
 
@@ -69,6 +71,26 @@ describe("book-call route", () => {
     expect(availability.loadDate).toHaveBeenCalledWith("2026-07-19");
     expect(screen.getAllByRole("button", { name: "11:00" })).toHaveLength(2);
     expect(screen.queryByRole("button", { name: "12:30" })).toBeNull();
+  });
+
+  it("uses the Gregorian calendar for Arabic selected-date labels", () => {
+    const nativeDateTimeFormat = Intl.DateTimeFormat;
+    const formatter = vi.spyOn(Intl, "DateTimeFormat").mockImplementation(function (locale, options) {
+      expect(locale).toBe("ar-SA-u-ca-gregory");
+      return new nativeDateTimeFormat(locale, options);
+    } as typeof Intl.DateTimeFormat);
+    window.localStorage.setItem(SITE_LOCALE_STORAGE_KEY, "ar");
+
+    try {
+      render(<BookCall />);
+      expect(screen.getByTestId("public-site").getAttribute("lang")).toBe("ar");
+      const day = document.querySelector('[data-day="2026-07-19"] button')!;
+      fireEvent.click(day);
+
+      expect(formatter).toHaveBeenCalledOnce();
+    } finally {
+      formatter.mockRestore();
+    }
   });
 
   it("shows a retry action and hides time choices when availability cannot load", () => {
@@ -124,7 +146,7 @@ describe("book-call route", () => {
     selectJulyTwentieth();
 
     expect(availability.loadDate).toHaveBeenCalledTimes(1);
-    expect(screen.getByText(/selected: sunday, july 19, 2026/i)).toBeTruthy();
+    expect(screen.getByText(/sunday, july 19, 2026/i)).toBeTruthy();
 
     await act(async () => {
       pendingSubmission.resolve({ success: false, reason: "slot-unavailable" });

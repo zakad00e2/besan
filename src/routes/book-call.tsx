@@ -59,7 +59,7 @@ function BookCallContent() {
 
   const selectedDateKey = selectedDate ? formatBookingDate(selectedDate) : "";
   const selectedDateLabel = selectedDate
-    ? new Intl.DateTimeFormat(ar ? "ar-SA" : "en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(selectedDate)
+    ? new Intl.DateTimeFormat(ar ? "ar-SA-u-ca-gregory" : "en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }).format(selectedDate)
     : "";
   const availableTimes = availability.slots.map((slot) => slot.startsAt);
 

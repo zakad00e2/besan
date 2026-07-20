@@ -142,7 +142,15 @@
   letter-spacing: 0;
 }
 
-.public-site-arabic { font-family: "Thmanyah Sans", ui-sans-serif, system-ui, sans-serif; font-weight: 400; }
+.public-site-arabic {
+  font-family: "Thmanyah Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.public-site-arabic * {
+  /* Arabic glyphs must not be letter-spaced: spacing breaks contextual joining. */
+  letter-spacing: normal;
+}
 .public-site-arabic .font-serif { font-family: "Thmanyah Serif Display", "Thmanyah Sans", ui-serif, serif; font-weight: 500; letter-spacing: 0; }
 .arabic-name-title { font-feature-settings: "ss01", "cv11"; }
 .arabic-ui-heading { font-family: "Thmanyah Sans", ui-sans-serif, system-ui, sans-serif; font-weight: 500; letter-spacing: 0; }

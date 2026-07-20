@@ -13,18 +13,23 @@ export const Route = createFileRoute("/")({
 const TESTIMONIALS = [
   {
     quote:
-      "Besan designed a piece that felt made for me - the cut, the fabric, every detail carried her signature. I've never felt more elegant in something I own.",
+      "From our first session, I felt the design was made for me; every detail reflected my personality.",
     name: "Private Client",
   },
   {
     quote:
-      "Her eye for silhouette and texture is remarkable. Working with Besan turned an idea into a wardrobe I truly live in - timeless, quiet, unmistakable.",
+      "The piece was comfortable and elegant at the same time. Every time I wear it, it still feels just as special.",
     name: "Editorial Stylist",
   },
   {
     quote:
-      "A rare designer who listens as beautifully as she creates. Every fitting felt personal, and the final piece was pure craftsmanship.",
+      "Besan understood exactly what I had in mind, and the result was even more beautiful than I expected.",
     name: "Bridal Client",
+  },
+  {
+    quote:
+      "The design was simple in such an elegant way, and that was exactly what I had been looking for.",
+    name: "Besan Client",
   },
 ];
 
