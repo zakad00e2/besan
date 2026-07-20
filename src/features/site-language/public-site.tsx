@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
+import type { SiteLocale } from "@/features/seo/site-config";
 import { SiteLanguageProvider, useSiteLanguage } from "./site-language";
 
-export function PublicSite({ children }: { children: ReactNode }) {
-  return <SiteLanguageProvider><PublicSiteBoundary>{children}</PublicSiteBoundary></SiteLanguageProvider>;
+export function PublicSite({ locale, children }: { locale: SiteLocale; children: ReactNode }) {
+  return <SiteLanguageProvider locale={locale}><PublicSiteBoundary>{children}</PublicSiteBoundary></SiteLanguageProvider>;
 }
 
 function PublicSiteBoundary({ children }: { children: ReactNode }) {

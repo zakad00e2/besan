@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { submitWorkshopBooking } from "./workshop-booking.functions";
 import { WorkshopBookingDialog } from "./workshop-booking-dialog";
 import {
-  SITE_LOCALE_STORAGE_KEY,
   SiteLanguageProvider,
 } from "@/features/site-language/site-language";
 
@@ -13,7 +12,6 @@ vi.mock("./workshop-booking.functions", () => ({
 
 afterEach(() => {
   cleanup();
-  window.localStorage.clear();
 });
 
 const workshop = {
@@ -57,9 +55,8 @@ function deferred<T>() {
 
 describe("WorkshopBookingDialog", () => {
   it("uses the Arabic font and correct field directions", () => {
-    window.localStorage.setItem(SITE_LOCALE_STORAGE_KEY, "ar");
     render(
-      <SiteLanguageProvider>
+      <SiteLanguageProvider locale="ar">
         <WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />
       </SiteLanguageProvider>,
     );

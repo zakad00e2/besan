@@ -3,7 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { PublicSite } from "@/features/site-language/public-site";
 import { Reveal, SiteNav } from "./site-shell";
 
-vi.mock("@tanstack/react-router", () => ({ useLocation: () => ({ pathname: "/" }) }));
+let pathname = "/";
+vi.mock("@tanstack/react-router", () => ({ useLocation: () => ({ pathname }) }));
 
 afterEach(cleanup);
 
@@ -21,12 +22,21 @@ describe("Reveal", () => {
 });
 
 describe("SiteNav", () => {
-  it("switches the public shell to Arabic", () => {
-    render(<PublicSite><SiteNav /></PublicSite>);
+  it("links an Arabic page to its English equivalent", () => {
+    pathname = "/workshops";
+    render(<PublicSite locale="ar"><SiteNav /></PublicSite>);
 
-    fireEvent.click(screen.getByRole("button", { name: /switch language/i }));
+    expect(screen.getByRole("link", { name: "تغيير اللغة" }).getAttribute("href")).toBe(
+      "/en/workshops",
+    );
+  });
 
-    expect(screen.getByTestId("public-site").getAttribute("dir")).toBe("rtl");
-    expect(screen.getByRole("link", { name: "احجزي موعدًا" })).toBeTruthy();
+  it("links an English page to its Arabic equivalent", () => {
+    pathname = "/en/book-call";
+    render(<PublicSite locale="en"><SiteNav /></PublicSite>);
+
+    expect(screen.getByRole("link", { name: "Switch language" }).getAttribute("href")).toBe(
+      "/book-call",
+    );
   });
 });

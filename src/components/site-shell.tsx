@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Globe, Instagram, Mail } from "lucide-react";
 import { siteContactLinks } from "@/features/site-language/site-contact";
 import { useSiteLanguage } from "@/features/site-language/site-language";
+import { getAlternateLocalePath, getPublicPath } from "@/features/seo/site-config";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -89,28 +90,26 @@ export function Reveal({
 export function SiteNav() {
   const location = useLocation();
   const pathname = location.pathname;
-  const { direction, locale, messages, setLocale } = useSiteLanguage();
+  const { direction, locale, messages } = useSiteLanguage();
+  const homePath = getPublicPath("home", locale);
   const nav = [
-    { label: messages.nav.about, href: "/#about" },
-    { label: messages.nav.opinions, href: "/#opinions" },
-    { label: messages.nav.services, href: "/#services" },
+    { label: messages.nav.about, href: `${homePath}#about` },
+    { label: messages.nav.opinions, href: `${homePath}#opinions` },
+    { label: messages.nav.services, href: `${homePath}#services` },
   ];
 
   return (
     <header data-testid="site-nav" dir={direction} className="w-full border-b border-foreground/70">
       <div className="mx-auto grid max-w-[1400px] grid-cols-[1fr_auto] items-center gap-5 px-6 py-3 md:px-10 lg:grid-cols-[1fr_auto_1fr]">
         <a
-          href="/"
+          href={homePath}
           className={`whitespace-nowrap font-serif font-medium leading-tight tracking-normal lg:col-start-1 ${locale === "ar" ? "text-xl md:text-2xl" : "text-lg md:text-xl"}`}
         >
           {locale === "ar" ? "بيسان خلايلة" : "BESAN KHALAILY"}
         </a>
         <nav className="hidden items-center justify-self-center gap-7 lg:col-start-2 lg:flex">
           {nav.map((item) => {
-            const active =
-              item.href === "/workshops"
-                ? pathname === "/workshops"
-                : pathname === "/" && item.href === "/#about";
+            const active = pathname === homePath && item.href === `${homePath}#about`;
             return (
               <a
                 key={item.label}
@@ -125,10 +124,10 @@ export function SiteNav() {
           })}
         </nav>
         <div className="col-start-2 flex shrink-0 items-center justify-self-end gap-2 lg:col-start-3">
-          <button type="button" aria-label="Switch language" onClick={() => setLocale(locale === "en" ? "ar" : "en")} className={`motion-press inline-flex size-[33px] items-center justify-center border border-foreground/50 leading-none transition-colors hover:bg-foreground hover:text-background ${locale === "en" ? "language-switch-arabic text-sm" : "text-xs"}`}>
+          <a href={getAlternateLocalePath(pathname, locale === "en" ? "ar" : "en")} aria-label={messages.nav.switchLanguage} className={`motion-press inline-flex size-[33px] items-center justify-center border border-foreground/50 leading-none transition-colors hover:bg-foreground hover:text-background ${locale === "en" ? "language-switch-arabic text-sm" : "text-xs"}`}>
             {messages.nav.language}
-          </button>
-          <a href="/book-call" className={`motion-press border border-foreground px-5 py-2 text-[10px] tracking-[0.05em] transition-colors hover:bg-foreground hover:text-background md:text-xs ${locale === "ar" ? "arabic-name-title" : ""} ${pathname === "/book-call" ? "bg-foreground text-background" : ""}`}>
+          </a>
+          <a href={getPublicPath("bookCall", locale)} className={`motion-press border border-foreground px-5 py-2 text-[10px] tracking-[0.05em] transition-colors hover:bg-foreground hover:text-background md:text-xs ${locale === "ar" ? "arabic-name-title" : ""} ${pathname === getPublicPath("bookCall", locale) ? "bg-foreground text-background" : ""}`}>
             {messages.nav.book}
           </a>
         </div>

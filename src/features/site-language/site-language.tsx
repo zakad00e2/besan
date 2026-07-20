@@ -1,12 +1,7 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import type { SiteLocale } from "@/features/seo/site-config";
 
-export const SITE_LOCALE_STORAGE_KEY = "besan.site-locale";
-export type SiteLocale = "en" | "ar";
 export type SiteDirection = "ltr" | "rtl";
-
-export function getStoredSiteLocale(storage: Pick<Storage, "getItem"> | undefined): SiteLocale {
-  return storage?.getItem(SITE_LOCALE_STORAGE_KEY) === "ar" ? "ar" : "en";
-}
 
 const messages = {
   en: {
@@ -25,33 +20,15 @@ type SiteLanguageContextValue = {
   locale: SiteLocale;
   direction: SiteDirection;
   messages: (typeof messages)[SiteLocale];
-  setLocale: (locale: SiteLocale) => void;
 };
 
 const SiteLanguageContext = createContext<SiteLanguageContextValue | null>(null);
 
-export function SiteLanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<SiteLocale>(() => {
-    if (typeof window === "undefined") return "en";
-    try {
-      return getStoredSiteLocale(window.localStorage);
-    } catch {
-      return "en";
-    }
-  });
-
+export function SiteLanguageProvider({ locale, children }: { locale: SiteLocale; children: ReactNode }) {
   const value = useMemo<SiteLanguageContextValue>(() => ({
     locale,
     direction: locale === "ar" ? "rtl" : "ltr",
     messages: messages[locale],
-    setLocale(nextLocale) {
-      setLocaleState(nextLocale);
-      try {
-        window.localStorage.setItem(SITE_LOCALE_STORAGE_KEY, nextLocale);
-      } catch {
-        // The visible language change remains available when storage is blocked.
-      }
-    },
   }), [locale]);
 
   return <SiteLanguageContext.Provider value={value}>{children}</SiteLanguageContext.Provider>;
@@ -63,6 +40,5 @@ export function useSiteLanguage() {
     locale: "en" as const,
     direction: "ltr" as const,
     messages: messages.en,
-    setLocale: () => undefined,
   };
 }

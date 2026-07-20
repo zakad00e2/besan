@@ -75,7 +75,7 @@ const ORDERED_ARABIC_SERVICES = [
 
 function Index() {
   return (
-    <PublicSite>
+    <PublicSite locale="en">
       <div className="min-h-screen bg-background text-foreground">
         <SiteNav />
         <Hero />

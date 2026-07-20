@@ -61,7 +61,7 @@ const [patternFoundation, miniCourse, corsetWorkshop] = workshopOptions;
 type BookWorkshop = (workshop: WorkshopOption) => void;
 
 function Workshops() {
-  return <PublicSite><WorkshopsContent /></PublicSite>;
+  return <PublicSite locale="en"><WorkshopsContent /></PublicSite>;
 }
 
 function WorkshopsContent() {

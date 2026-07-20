@@ -38,7 +38,7 @@ const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 export function BookCall() {
-  return <PublicSite><BookCallContent /></PublicSite>;
+  return <PublicSite locale="en"><BookCallContent /></PublicSite>;
 }
 
 function BookCallContent() {
