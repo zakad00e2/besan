@@ -30,6 +30,11 @@ const dateLabelFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
+const ATELIER_MAP_URL =
+  "https://www.google.com/maps?q=32.866546630859375,35.29303741455078&z=17&hl=ar";
+const ATELIER_MAP_EMBED_URL =
+  "https://www.google.com/maps?q=32.866546630859375%2C35.29303741455078&z=17&hl=ar&output=embed";
+
 export function BookCallPage({ locale }: { locale: SiteLocale }) {
   return (
     <PublicSite locale={locale}>
@@ -170,6 +175,59 @@ function BookCallContent() {
       setSubmitting(false);
     }
   };
+
+  if (submitted) {
+    return (
+      <div ref={pageRef} className="min-h-screen bg-background text-foreground">
+        <SiteNav />
+        <main>
+          <section className="mx-auto max-w-[960px] border-b border-foreground/70 px-6 py-16 md:px-10 md:py-24">
+            <div className="border border-foreground/40 p-6 sm:p-10">
+              <span
+                className="t-success-check inline-flex border border-foreground p-3"
+                data-state="in"
+                aria-hidden="true"
+              >
+                <Check className="h-5 w-5" />
+              </span>
+              <p className="mt-7 font-serif text-4xl tracking-tighter md:text-5xl">
+                {ar ? "تم تأكيد حجزك" : "Your booking is confirmed"}
+              </p>
+              <p className="mt-4 text-sm leading-7 text-muted-foreground">
+                {ar ? "موعدك: " : "Your appointment: "}
+                <span dir="ltr" className="text-foreground">
+                  {selectedDateLabel} · {selectedTime}
+                </span>
+              </p>
+              <p className="mt-10 text-xs tracking-[0.12em] text-muted-foreground">
+                {ar ? "اضغطي على الخريطة لفتح الموقع" : "Tap the map to open the location"}
+              </p>
+              <div className="relative mt-4 aspect-[4/3] overflow-hidden border border-foreground/40 sm:aspect-[16/9]">
+                <iframe
+                  title="Atelier location"
+                  src={ATELIER_MAP_EMBED_URL}
+                  className="h-full w-full border-0"
+                  loading="lazy"
+                />
+                <a
+                  href={ATELIER_MAP_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={
+                    ar ? "فتح موقع المشغل في خرائط جوجل" : "Open atelier location in Google Maps"
+                  }
+                  className="absolute inset-0 z-10"
+                >
+                  <span className="sr-only">{ar ? "فتح الموقع" : "Open location"}</span>
+                </a>
+              </div>
+            </div>
+          </section>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
     <div ref={pageRef} className="min-h-screen bg-background text-foreground">

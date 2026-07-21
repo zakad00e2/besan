@@ -36,6 +36,15 @@ function selectJulyTwentieth() {
   fireEvent.click(screen.getByRole("button", { name: /monday, july 20th, 2026/i }));
 }
 
+function fillBookingForm() {
+  selectJulyNineteenth();
+  fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
+  fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Noor Al-Hashemi" } });
+  fireEvent.change(screen.getByLabelText("WhatsApp Number"), {
+    target: { value: "+970591234567" },
+  });
+}
+
 function deferred<T>() {
   let resolve!: (value: T) => void;
   const promise = new Promise<T>((resolvePromise) => {
@@ -98,6 +107,45 @@ describe("book-call route", () => {
 
     expect(screen.getAllByRole("button", { name: "Try again" })).toHaveLength(2);
     expect(screen.queryByRole("button", { name: "11:00" })).toBeNull();
+  });
+
+  it("replaces the booking form with a clickable location confirmation after a successful booking", async () => {
+    submitBooking.mockResolvedValue({ success: true, appointmentId: "appointment-1" });
+    render(<BookCallPage locale="en" />);
+
+    fillBookingForm();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Confirm Booking" }));
+      await Promise.resolve();
+    });
+
+    expect(screen.getByText("Your booking is confirmed")).toBeTruthy();
+    expect(screen.getByText(/sunday, july 19, 2026.*11:00/i)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Confirm Booking" })).toBeNull();
+    expect(screen.getByTitle("Atelier location").getAttribute("src")).toContain(
+      "32.866546630859375%2C35.29303741455078",
+    );
+    expect(
+      screen
+        .getByRole("link", { name: "Open atelier location in Google Maps" })
+        .getAttribute("href"),
+    ).toBe("https://www.google.com/maps?q=32.866546630859375,35.29303741455078&z=17&hl=ar");
+  });
+
+  it("keeps the booking form visible when the booking is not saved", async () => {
+    submitBooking.mockResolvedValue({ success: false, reason: "storage-error" });
+    render(<BookCallPage locale="en" />);
+
+    fillBookingForm();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Confirm Booking" }));
+      await Promise.resolve();
+    });
+
+    expect(screen.getByRole("button", { name: "Confirm Booking" })).toBeTruthy();
+    expect(screen.queryByText("Your booking is confirmed")).toBeNull();
+    expect(screen.queryByTitle("Atelier location")).toBeNull();
+    expect(screen.getByRole("alert").textContent).toContain("We could not save your booking");
   });
 
   it("refreshes and clears a stale slot without losing customer details", async () => {
