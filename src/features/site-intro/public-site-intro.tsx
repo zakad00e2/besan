@@ -37,9 +37,7 @@ export function PublicSiteIntro() {
     }
 
     rememberIntro();
-    const previousBodyInert = document.body.inert;
     document.documentElement.classList.add("public-site-intro-active");
-    document.body.inert = true;
     setPhase("shown");
 
     const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -48,7 +46,6 @@ export function PublicSiteIntro() {
     const hideTimer = window.setTimeout(() => setPhase("hiding"), hideDelay);
     const removeTimer = window.setTimeout(() => {
       document.documentElement.classList.remove("public-site-intro-active");
-      document.body.inert = previousBodyInert;
       setPhase("done");
     }, removeDelay);
 
@@ -56,7 +53,6 @@ export function PublicSiteIntro() {
       window.clearTimeout(hideTimer);
       window.clearTimeout(removeTimer);
       document.documentElement.classList.remove("public-site-intro-active");
-      document.body.inert = previousBodyInert;
     };
   }, []);
 

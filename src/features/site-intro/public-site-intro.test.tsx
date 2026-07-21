@@ -20,7 +20,7 @@ afterEach(() => {
 });
 
 describe("PublicSiteIntro", () => {
-  it("renders the monogram and 13 independently animated letters on first visit", () => {
+  it("renders the monogram without making the application body inert", () => {
     render(<PublicSiteIntro />);
 
     expect(screen.getByTestId("public-site-intro")).not.toBeNull();
@@ -29,7 +29,7 @@ describe("PublicSiteIntro", () => {
     expect(screen.getAllByTestId("intro-letter")).toHaveLength(13);
     expect(sessionStorage.getItem(PUBLIC_SITE_INTRO_SESSION_KEY)).toBe("1");
     expect(document.documentElement.classList.contains("public-site-intro-active")).toBe(true);
-    expect(document.body.inert).toBe(true);
+    expect(document.body.inert).not.toBe(true);
   });
 
   it("starts hiding at 1800ms and unmounts at 2000ms", () => {
