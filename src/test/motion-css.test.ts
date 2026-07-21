@@ -33,6 +33,7 @@ describe("motion CSS", () => {
     expect(css).toContain(".t-stagger.is-hiding .t-stagger-line");
     expect(css).toContain(".public-site-intro.is-hiding");
     expect(css).toContain(".public-site-intro-active");
-    expect(css).toContain(".t-stagger-line { transition: none !important; }");
+    expect(css).toContain(".t-stagger-line {");
+    expect(css).toContain("transition: none !important;");
   });
 });

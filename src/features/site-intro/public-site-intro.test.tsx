@@ -1,9 +1,6 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  PUBLIC_SITE_INTRO_SESSION_KEY,
-  PublicSiteIntro,
-} from "./public-site-intro";
+import { PUBLIC_SITE_INTRO_SESSION_KEY, PublicSiteIntro } from "./public-site-intro";
 
 const normalMotion = vi.fn().mockReturnValue({ matches: false });
 

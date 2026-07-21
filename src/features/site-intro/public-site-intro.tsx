@@ -78,13 +78,23 @@ export function PublicSiteIntro() {
         <p className="public-site-intro__wordmark" aria-label={WORDMARK}>
           {Array.from(WORDMARK).map((character, index) => {
             if (character === " ") {
-              return <span key={`space-${index}`} className="public-site-intro__space" aria-hidden="true" />;
+              return (
+                <span
+                  key={`space-${index}`}
+                  className="public-site-intro__space"
+                  aria-hidden="true"
+                />
+              );
             }
 
             const delay = 300 + letterIndex * 45;
             letterIndex += 1;
             return (
-              <span key={`${character}-${index}`} className="public-site-intro__letter" aria-hidden="true">
+              <span
+                key={`${character}-${index}`}
+                className="public-site-intro__letter"
+                aria-hidden="true"
+              >
                 <span
                   data-testid="intro-letter"
                   className="t-stagger-line"

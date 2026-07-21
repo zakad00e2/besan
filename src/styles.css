@@ -3,10 +3,34 @@
 @source "../src";
 @import "tw-animate-css";
 
-@font-face { font-family: "Thmanyah Sans"; src: url("./assets/thmanyahsans-Light.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
-@font-face { font-family: "Thmanyah Sans"; src: url("./assets/thmanyahsans-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: "Thmanyah Sans"; src: url("./assets/thmanyahsans-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: "Thmanyah Serif Display"; src: url("./assets/thmanyahserifdisplay-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("./assets/thmanyahsans-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("./assets/thmanyahsans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Sans";
+  src: url("./assets/thmanyahsans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah Serif Display";
+  src: url("./assets/thmanyahserifdisplay-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -157,10 +181,23 @@
   /* Arabic glyphs must not be letter-spaced: spacing breaks contextual joining. */
   letter-spacing: normal;
 }
-.public-site-arabic .font-serif { font-family: "Thmanyah Serif Display", "Thmanyah Sans", ui-serif, serif; font-weight: 500; letter-spacing: 0; }
-.arabic-name-title { font-feature-settings: "ss01", "cv11"; }
-.arabic-ui-heading { font-family: "Thmanyah Sans", ui-sans-serif, system-ui, sans-serif; font-weight: 500; letter-spacing: 0; }
-.language-switch-arabic { font-family: "Thmanyah Serif Display", "Thmanyah Sans", ui-serif, serif; font-weight: 500; }
+.public-site-arabic .font-serif {
+  font-family: "Thmanyah Serif Display", "Thmanyah Sans", ui-serif, serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.arabic-name-title {
+  font-feature-settings: "ss01", "cv11";
+}
+.arabic-ui-heading {
+  font-family: "Thmanyah Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.language-switch-arabic {
+  font-family: "Thmanyah Serif Display", "Thmanyah Sans", ui-serif, serif;
+  font-weight: 500;
+}
 
 .dashboard-app ::selection {
   background: rgb(124 58 237 / 0.16);
@@ -186,7 +223,10 @@
 }
 /* overflow: visible keeps the stroke from clipping while it
    draws; display: block kills the inline whitespace under SVGs. */
-.t-success-check svg { display: block; overflow: visible; }
+.t-success-check svg {
+  display: block;
+  overflow: visible;
+}
 /* Stroke-draw setup for the Lucide Check path (rounded up from 22.63). */
 .t-success-check svg path {
   stroke-dasharray: 24;
@@ -195,29 +235,53 @@
 
 .t-success-check[data-state="in"] {
   animation:
-    t-check-fade   var(--check-opacity-dur) var(--check-ease-opacity) forwards,
-    t-check-rotate var(--check-rotate-dur)  var(--check-ease-rotate)  forwards,
-    t-check-blur   var(--check-blur-dur)    var(--check-ease-out)     forwards,
-    t-check-bob    var(--check-bob-dur)     var(--check-ease-bob)     forwards;
+    t-check-fade var(--check-opacity-dur) var(--check-ease-opacity) forwards,
+    t-check-rotate var(--check-rotate-dur) var(--check-ease-rotate) forwards,
+    t-check-blur var(--check-blur-dur) var(--check-ease-out) forwards,
+    t-check-bob var(--check-bob-dur) var(--check-ease-bob) forwards;
 }
 .t-success-check[data-state="in"] svg path {
-  animation: t-check-draw var(--check-path-dur) var(--check-ease-path) var(--check-path-delay, 0ms) forwards;
+  animation: t-check-draw var(--check-path-dur) var(--check-ease-path) var(--check-path-delay, 0ms)
+    forwards;
 }
 
-@keyframes t-check-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes t-check-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 @keyframes t-check-rotate {
-  from { transform: rotate(var(--check-rotate-from)); }
-  to   { transform: rotate(0deg); }
+  from {
+    transform: rotate(var(--check-rotate-from));
+  }
+  to {
+    transform: rotate(0deg);
+  }
 }
 @keyframes t-check-blur {
-  from { filter: blur(var(--check-blur-from)); }
-  to   { filter: blur(0); }
+  from {
+    filter: blur(var(--check-blur-from));
+  }
+  to {
+    filter: blur(0);
+  }
 }
 @keyframes t-check-bob {
-  from { translate: 0 var(--check-y-amount); }
-  to   { translate: 0 0; }
+  from {
+    translate: 0 var(--check-y-amount);
+  }
+  to {
+    translate: 0 0;
+  }
 }
-@keyframes t-check-draw { to { stroke-dashoffset: 0; } }
+@keyframes t-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
 
 .motion-state-enter {
   animation: motion-state-enter var(--motion-duration-reveal) var(--motion-ease-out) both;
@@ -355,7 +419,9 @@
     filter var(--stagger-dur) var(--stagger-ease);
   will-change: transform, opacity, filter;
 }
-.t-stagger-line--2 { transition-delay: var(--stagger-stagger); }
+.t-stagger-line--2 {
+  transition-delay: var(--stagger-stagger);
+}
 
 .t-stagger.is-shown .t-stagger-line {
   opacity: 1;
@@ -394,8 +460,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .t-success-check { animation: none !important; opacity: 1; }
-  .t-success-check svg path { animation: none !important; stroke-dashoffset: 0 !important; }
+  .t-success-check {
+    animation: none !important;
+    opacity: 1;
+  }
+  .t-success-check svg path {
+    animation: none !important;
+    stroke-dashoffset: 0 !important;
+  }
 
   html {
     scroll-behavior: auto !important;
@@ -414,7 +486,9 @@
     transition-duration: 100ms;
   }
 
-  .t-stagger-line { transition: none !important; }
+  .t-stagger-line {
+    transition: none !important;
+  }
 
   .editorial-image {
     transform: none !important;
