@@ -26,14 +26,4 @@ describe("motion CSS", () => {
     expect(css).toContain("animation-name: motion-fade-in");
     expect(css).not.toContain(".dashboard-app *::after");
   });
-
-  it("defines the public intro stagger, exit, and reduced-motion contracts", () => {
-    expect(css).toContain("--stagger-stagger: 40ms");
-    expect(css).toContain(".t-stagger.is-shown .t-stagger-line");
-    expect(css).toContain(".t-stagger.is-hiding .t-stagger-line");
-    expect(css).toContain(".public-site-intro.is-hiding");
-    expect(css).toContain(".public-site-intro-active");
-    expect(css).toContain(".t-stagger-line {");
-    expect(css).toContain("transition: none !important;");
-  });
 });

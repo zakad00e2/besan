@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { PublicSiteIntro } from "@/features/site-intro/public-site-intro";
 import type { SiteLocale } from "@/features/seo/site-config";
 import { SiteLanguageProvider, useSiteLanguage } from "./site-language";
 
@@ -20,7 +19,6 @@ function PublicSiteBoundary({ children }: { children: ReactNode }) {
       dir={direction}
       className={locale === "ar" ? "public-site-arabic" : ""}
     >
-      <PublicSiteIntro />
       {children}
     </div>
   );

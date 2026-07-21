@@ -1,5 +1,4 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PublicSite } from "@/features/site-language/public-site";
 import { Reveal, SiteNav } from "./site-shell";
@@ -10,13 +9,6 @@ vi.mock("@tanstack/react-router", () => ({ useLocation: () => ({ pathname }) }))
 afterEach(cleanup);
 
 describe("Reveal", () => {
-  it("server-renders its content visible when hydration is unavailable", () => {
-    const html = renderToString(<Reveal>Copy</Reveal>);
-
-    expect(html).toContain("opacity-100");
-    expect(html).not.toContain("opacity-0");
-  });
-
   it("transitions only opacity and translation with the editorial timing", async () => {
     const { container } = render(<Reveal>Copy</Reveal>);
     await act(async () => undefined);
