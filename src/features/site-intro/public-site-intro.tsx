@@ -9,7 +9,7 @@ const NORMAL_REMOVE_DELAY = 2_000;
 const REDUCED_HIDE_DELAY = 50;
 const REDUCED_REMOVE_DELAY = 150;
 
-type IntroPhase = "checking" | "shown" | "hiding" | "done";
+type IntroPhase = "shown" | "hiding" | "done";
 
 function hasSeenIntro() {
   try {
@@ -28,11 +28,10 @@ function rememberIntro() {
 }
 
 export function PublicSiteIntro() {
-  const [phase, setPhase] = useState<IntroPhase>("checking");
+  const [phase, setPhase] = useState<IntroPhase>("done");
 
   useEffect(() => {
     if (hasSeenIntro()) {
-      setPhase("done");
       return;
     }
 

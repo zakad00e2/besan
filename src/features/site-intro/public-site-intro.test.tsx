@@ -1,4 +1,5 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { PUBLIC_SITE_INTRO_SESSION_KEY, PublicSiteIntro } from "./public-site-intro";
 
@@ -20,6 +21,12 @@ afterEach(() => {
 });
 
 describe("PublicSiteIntro", () => {
+  it("does not server-render a blank overlay before hydration", () => {
+    const html = renderToString(<PublicSiteIntro />);
+
+    expect(html).not.toContain('data-testid="public-site-intro"');
+  });
+
   it("renders the monogram without making the application body inert", () => {
     render(<PublicSiteIntro />);
 
