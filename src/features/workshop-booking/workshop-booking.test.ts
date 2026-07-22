@@ -10,8 +10,8 @@ import {
 } from "./workshop-booking";
 
 const workshop = {
-  id: "pattern-foundation",
-  name: "Pattern foundation",
+  id: "corset-workshop",
+  name: "One-day corset workshop",
 };
 
 const validValues: WorkshopBookingFormValues = {
@@ -34,12 +34,46 @@ const validInput = {
   notes: "Vegetarian lunch",
 };
 
+const validAdminInput = {
+  fullName: "Noor Khalil",
+  mobile: "+970 59 123 4567",
+  email: "noor@example.com",
+  date: "2026-07-13",
+  participants: 4,
+};
+
 describe("parseWorkshopBookingInput", () => {
-  it("normalizes a valid server submission", () => {
+  it("normalizes an assigned date away from a customer submission for a supervisor-assigned workshop", () => {
     expect(parseWorkshopBookingInput(validInput, new Date("2026-07-12T08:00:00Z"))).toEqual({
       success: true,
-      data: { ...validInput, mobile: "+970591234567" },
+      data: { ...validInput, mobile: "+970591234567", date: null },
     });
+  });
+
+  it.each([
+    ["pattern-foundation", "Pattern foundation"],
+    ["mini-course", "Private mini course"],
+  ])("normalizes a customer date to null for %s", (workshopId, workshopName) => {
+    expect(
+      parseWorkshopBookingInput(
+        { ...validInput, workshopId, workshopName, date: "2026-08-20" },
+        new Date(2026, 6, 12, 8),
+      ),
+    ).toMatchObject({ success: true, data: { date: null } });
+  });
+
+  it("requires a future customer date for the corset workshop", () => {
+    expect(
+      parseWorkshopBookingInput(
+        {
+          ...validInput,
+          workshopId: "corset-workshop",
+          workshopName: "One-day corset workshop",
+          date: null,
+        },
+        new Date(2026, 6, 12, 8),
+      ),
+    ).toMatchObject({ success: false, errors: { date: "Choose a workshop date." } });
   });
 
   it("rejects unknown and mismatched workshops", () => {
@@ -73,6 +107,7 @@ describe("parseWorkshopBookingAdminUpdate", () => {
   it("normalizes editable values while accepting an historic booking date", () => {
     expect(
       parseWorkshopBookingAdminUpdate({
+        workshopId: "mini-course",
         fullName: "  Noor Khalil ",
         mobile: " +970 59 123 4567 ",
         email: " noor@example.com ",
@@ -82,6 +117,7 @@ describe("parseWorkshopBookingAdminUpdate", () => {
     ).toEqual({
       success: true,
       data: {
+        workshopId: "mini-course",
         fullName: "Noor Khalil",
         mobile: "+970591234567",
         email: "noor@example.com",
@@ -89,6 +125,18 @@ describe("parseWorkshopBookingAdminUpdate", () => {
         participants: 4,
       },
     });
+  });
+
+  it("accepts an unset supervisor date for a supervisor-assigned workshop", () => {
+    expect(
+      parseWorkshopBookingAdminUpdate({ ...validAdminInput, workshopId: "mini-course", date: null }),
+    ).toMatchObject({ success: true, data: { workshopId: "mini-course", date: null } });
+  });
+
+  it("requires a supervisor date for the corset workshop", () => {
+    expect(
+      parseWorkshopBookingAdminUpdate({ ...validAdminInput, workshopId: "corset-workshop", date: null }),
+    ).toMatchObject({ success: false, errors: { date: "Choose a workshop date." } });
   });
 });
 
@@ -165,8 +213,8 @@ describe("parseWorkshopBooking", () => {
     expect(result).toEqual({
       success: true,
       data: {
-        workshopId: "pattern-foundation",
-        workshopName: "Pattern foundation",
+        workshopId: "corset-workshop",
+        workshopName: "One-day corset workshop",
         fullName: "Noor Al-Hashemi",
         mobile: "0501234567",
         date: "2026-07-10",
@@ -176,7 +224,7 @@ describe("parseWorkshopBooking", () => {
     });
   });
 
-  it("requires a workshop, full name, mobile, and date", () => {
+  it("requires a workshop, full name, and mobile", () => {
     const result = parseWorkshopBooking(
       null,
       {
@@ -196,7 +244,6 @@ describe("parseWorkshopBooking", () => {
         workshop: "Choose a workshop.",
         fullName: "Enter your full name.",
         mobile: "Enter your mobile number.",
-        date: "Choose a workshop date.",
       },
     });
   });

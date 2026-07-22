@@ -6,6 +6,8 @@ export const workshopOptions = [
   { id: "corset-workshop", name: "One-day corset workshop" },
 ] as const;
 
+export type WorkshopId = (typeof workshopOptions)[number]["id"];
+
 export const workshopBookingStatuses = ["pending", "confirmed", "completed", "cancelled"] as const;
 
 export type WorkshopBookingStatus = (typeof workshopBookingStatuses)[number];
@@ -30,20 +32,25 @@ export type WorkshopBookingInput = {
   fullName: string;
   mobile: string;
   email?: string;
-  date: string;
+  date?: string | null;
   participants: number;
   notes?: string;
 };
 
 export type WorkshopBookingAdminUpdateInput = {
+  workshopId: WorkshopId;
   fullName: string;
   mobile: string;
   email: string;
-  date: string;
+  date: string | null;
   participants: number;
 };
 
-export type ValidatedWorkshopBooking = WorkshopBookingInput & { email: string; notes: string };
+export type ValidatedWorkshopBooking = Omit<WorkshopBookingInput, "date" | "email" | "notes"> & {
+  date: string | null;
+  email: string;
+  notes: string;
+};
 
 export type WorkshopBookingListItem = ValidatedWorkshopBooking & {
   id: string;
@@ -73,7 +80,7 @@ const workshopBookingInputSchema = z.object({
   fullName: z.string(),
   mobile: z.string(),
   email: z.string().optional(),
-  date: z.string(),
+  date: z.string().nullable().optional(),
   participants: z.number(),
   notes: z.string().optional(),
 });
@@ -81,10 +88,11 @@ const workshopBookingInputSchema = z.object({
 const workshopBookingStatusSchema = z.enum(workshopBookingStatuses);
 
 const workshopBookingAdminUpdateSchema = z.object({
+  workshopId: z.string(),
   fullName: z.string(),
   mobile: z.string(),
   email: z.string(),
-  date: z.string(),
+  date: z.string().nullable(),
   participants: z.number(),
 });
 
@@ -149,6 +157,10 @@ export function getTomorrowDateMinimum(today = new Date()) {
   return formatLocalDate(tomorrow);
 }
 
+export function customerSelectsWorkshopDate(workshopId: string) {
+  return workshopId === "corset-workshop";
+}
+
 export function parseWorkshopBookingInput(
   input: unknown,
   today = new Date(),
@@ -163,7 +175,7 @@ export function parseWorkshopBookingInput(
   const fullName = parsed.data.fullName.trim();
   const mobile = normalizeMobile(parsed.data.mobile.trim());
   const email = (parsed.data.email ?? "").trim();
-  const date = parsed.data.date.trim();
+  const suppliedDate = parsed.data.date?.trim() || null;
   const notes = (parsed.data.notes ?? "").trim();
   const { participants } = parsed.data;
   const errors: WorkshopBookingErrors = {};
@@ -171,6 +183,7 @@ export function parseWorkshopBookingInput(
   if (!workshopOptions.some((option) => option.id === workshopId && option.name === workshopName)) {
     errors.workshop = "Choose a valid workshop.";
   }
+  const date = customerSelectsWorkshopDate(workshopId) ? suppliedDate : null;
   if (fullName.length < 2) {
     errors.fullName = "Enter your full name.";
   } else if (fullName.length > 120) {
@@ -186,10 +199,12 @@ export function parseWorkshopBookingInput(
   if (email && (!emailPattern.test(email) || email.length > 254)) {
     errors.email = "Enter a valid email address.";
   }
-  if (!date || !isCalendarDate(date)) {
-    errors.date = "Choose a workshop date.";
-  } else if (date < getTomorrowDateMinimum(today)) {
-    errors.date = "Choose a date after today.";
+  if (customerSelectsWorkshopDate(workshopId)) {
+    if (!date || !isCalendarDate(date)) {
+      errors.date = "Choose a workshop date.";
+    } else if (date < getTomorrowDateMinimum(today)) {
+      errors.date = "Choose a date after today.";
+    }
   }
   if (!Number.isInteger(participants) || participants < 1) {
     errors.participants = "Enter a whole number of at least 1.";
@@ -229,15 +244,20 @@ export function parseWorkshopBookingAdminUpdate(input: unknown):
     return { success: false, errors: inputTypeErrors(input) };
   }
 
+  const workshopId = parsed.data.workshopId.trim();
   const fullName = parsed.data.fullName.trim();
   const mobile = normalizeMobile(parsed.data.mobile.trim());
   const email = parsed.data.email.trim();
-  const date = parsed.data.date.trim();
+  const date = parsed.data.date?.trim() || null;
   const { participants } = parsed.data;
   const errors: Pick<
     WorkshopBookingErrors,
     "fullName" | "mobile" | "email" | "date" | "participants"
   > = {};
+
+  if (!workshopOptions.some((option) => option.id === workshopId)) {
+    errors.date = "Choose a workshop date.";
+  }
 
   if (fullName.length < 2) {
     errors.fullName = "Enter your full name.";
@@ -254,7 +274,9 @@ export function parseWorkshopBookingAdminUpdate(input: unknown):
   if (email && (!emailPattern.test(email) || email.length > 254)) {
     errors.email = "Enter a valid email address.";
   }
-  if (!date || !isCalendarDate(date)) {
+  if (customerSelectsWorkshopDate(workshopId) && (!date || !isCalendarDate(date))) {
+    errors.date = "Choose a workshop date.";
+  } else if (date && !isCalendarDate(date)) {
     errors.date = "Choose a workshop date.";
   }
   if (!Number.isInteger(participants) || participants < 1) {
@@ -263,7 +285,10 @@ export function parseWorkshopBookingAdminUpdate(input: unknown):
 
   if (Object.keys(errors).length > 0) return { success: false, errors };
 
-  return { success: true, data: { fullName, mobile, email, date, participants } };
+  return {
+    success: true,
+    data: { workshopId: workshopId as WorkshopId, fullName, mobile, email, date, participants },
+  };
 }
 
 export function parseWorkshopBooking(
