@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  customerSelectsWorkshopDate,
   getTomorrowDateMinimum,
   parseWorkshopBooking,
   type WorkshopBookingErrors,
@@ -46,6 +47,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
         "corset-workshop": "ورشة الكورسيه ليوم واحد",
       }[workshop?.id ?? ""] ?? workshop?.name)
     : workshop?.name;
+  const customerChoosesDate = customerSelectsWorkshopDate(workshop?.id ?? "");
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<WorkshopBookingErrors>({});
   const [submitted, setSubmitted] = useState(false);
@@ -184,6 +186,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
                 }}
                 onValueChange={(value) => updateValue("mobile", value)}
               />
+              {customerChoosesDate ? (
               <Field id="workshop-date" label={ar ? "تاريخ الورشة" : "Workshop date"} error={errors.date}>
                 <input
                   value={values.date}
@@ -194,6 +197,7 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
                   className={inputClass}
                 />
               </Field>
+              ) : null}
               <Field id="workshop-participants" label={ar ? "عدد المشاركات" : "Number of participants"} error={errors.participants}>
                 <input
                   value={values.participants}
