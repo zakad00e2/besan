@@ -277,6 +277,11 @@
   }
 }
 
+html:has(.opening-splash),
+body:has(.opening-splash) {
+  overflow: hidden;
+}
+
 .opening-splash {
   position: fixed;
   inset: 0;

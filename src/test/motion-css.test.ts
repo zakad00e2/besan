@@ -38,6 +38,8 @@ describe("motion CSS", () => {
     expect(css).toContain("@keyframes opening-splash-lockup-exit");
     expect(css).not.toContain("clip-path: circle(0% at 50% 50%)");
     expect(css).not.toContain("filter: blur(0.2rem)");
+    expect(css).toContain("html:has(.opening-splash)");
+    expect(css).toContain("body:has(.opening-splash)");
     expect(css).toContain(".opening-splash__letter");
     expect(css).toContain("width: clamp(6.5rem, 14vw, 10rem)");
     expect(css).toContain("animation: none !important");

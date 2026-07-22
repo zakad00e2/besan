@@ -1,38 +1,15 @@
 import { useEffect, useLayoutEffect, useState, type CSSProperties } from "react";
 import monogram from "@/assets/besan-logo.png";
 
-export const OPENING_SPLASH_STORAGE_KEY = "besan-opening-splash:v1";
-
 const BRAND_NAME = "BESAN KHALAILY";
 const useClientLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 type SplashState = "active" | "exiting" | "hidden";
 
-function hasCompletedSplash() {
-  try {
-    return window.sessionStorage.getItem(OPENING_SPLASH_STORAGE_KEY) === "complete";
-  } catch {
-    return false;
-  }
-}
-
-function recordSplashCompletion() {
-  try {
-    window.sessionStorage.setItem(OPENING_SPLASH_STORAGE_KEY, "complete");
-  } catch {
-    // Storage may be blocked; revealing the page still takes priority.
-  }
-}
-
 export function OpeningSplash() {
   const [state, setState] = useState<SplashState>("active");
 
   useClientLayoutEffect(() => {
-    if (hasCompletedSplash()) {
-      setState("hidden");
-      return;
-    }
-
     const root = document.documentElement;
     const previousOverflow = root.style.overflow;
     const reducedMotion =
@@ -44,7 +21,6 @@ export function OpeningSplash() {
     root.style.overflow = "hidden";
     const exitTimer = window.setTimeout(() => setState("exiting"), exitAt);
     const removeTimer = window.setTimeout(() => {
-      recordSplashCompletion();
       root.style.overflow = previousOverflow;
       setState("hidden");
     }, removeAt);

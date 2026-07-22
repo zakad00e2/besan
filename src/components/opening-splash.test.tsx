@@ -1,17 +1,16 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { OPENING_SPLASH_STORAGE_KEY, OpeningSplash } from "./opening-splash";
+import { OpeningSplash } from "./opening-splash";
 
 afterEach(() => {
   cleanup();
-  sessionStorage.clear();
   document.documentElement.style.overflow = "";
   vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
 describe("OpeningSplash", () => {
-  it("runs once, exits, and records completion", () => {
+  it("runs, exits, and restores scrolling", () => {
     vi.useFakeTimers();
     render(<OpeningSplash />);
 
@@ -27,14 +26,13 @@ describe("OpeningSplash", () => {
 
     act(() => vi.advanceTimersByTime(300));
     expect(screen.queryByTestId("opening-splash")).toBeNull();
-    expect(sessionStorage.getItem(OPENING_SPLASH_STORAGE_KEY)).toBe("complete");
     expect(document.documentElement.style.overflow).toBe("");
   });
 
-  it("skips after completion in the current tab", () => {
-    sessionStorage.setItem(OPENING_SPLASH_STORAGE_KEY, "complete");
+  it("plays again after the home page mounts in the same tab", () => {
+    sessionStorage.setItem("besan-opening-splash:v1", "complete");
     render(<OpeningSplash />);
-    expect(screen.queryByTestId("opening-splash")).toBeNull();
+    expect(screen.getByTestId("opening-splash").dataset.state).toBe("active");
   });
 
   it("uses short timings when reduced motion is requested", () => {
