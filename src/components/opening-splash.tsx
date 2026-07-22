@@ -38,8 +38,8 @@ export function OpeningSplash() {
     const reducedMotion =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const exitAt = reducedMotion ? 250 : 660;
-    const removeAt = reducedMotion ? 430 : 910;
+    const exitAt = reducedMotion ? 250 : 875;
+    const removeAt = reducedMotion ? 430 : 1125;
 
     root.style.overflow = "hidden";
     const exitTimer = window.setTimeout(() => setState("exiting"), exitAt);

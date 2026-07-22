@@ -19,7 +19,10 @@ describe("OpeningSplash", () => {
     expect(screen.getByText("BESAN KHALAILY")).toBeTruthy();
     expect(document.documentElement.style.overflow).toBe("hidden");
 
-    act(() => vi.advanceTimersByTime(660));
+    act(() => vi.advanceTimersByTime(874));
+    expect(screen.getByTestId("opening-splash").dataset.state).toBe("active");
+
+    act(() => vi.advanceTimersByTime(1));
     expect(screen.getByTestId("opening-splash").dataset.state).toBe("exiting");
 
     act(() => vi.advanceTimersByTime(250));
