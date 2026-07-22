@@ -29,14 +29,15 @@ describe("motion CSS", () => {
 
   it("defines the opening splash and reduced-motion fallback", () => {
     expect(css).toContain('.opening-splash[data-state="exiting"]');
-    expect(css).toContain("animation: opening-splash-exit 250ms");
-    expect(css).toContain("animation: opening-splash-lockup-exit 120ms");
+    expect(css).toContain("animation: opening-splash-exit 300ms");
+    expect(css).toContain("animation: opening-splash-lockup-exit 180ms");
     expect(css).toContain("animation: opening-splash-mark-in 350ms var(--motion-ease-out) 40ms");
     expect(css).toContain("animation: opening-splash-letter-in 250ms");
     expect(css).toContain("animation-delay: calc(320ms + var(--opening-letter-index) * 23ms)");
     expect(css).toContain("@keyframes opening-splash-exit");
     expect(css).toContain("@keyframes opening-splash-lockup-exit");
-    expect(css).toContain("clip-path: circle(0% at 50% 50%)");
+    expect(css).not.toContain("clip-path: circle(0% at 50% 50%)");
+    expect(css).not.toContain("filter: blur(0.2rem)");
     expect(css).toContain(".opening-splash__letter");
     expect(css).toContain("width: clamp(6.5rem, 14vw, 10rem)");
     expect(css).toContain("animation: none !important");

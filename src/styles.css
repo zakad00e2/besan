@@ -290,11 +290,11 @@
   direction: ltr;
   pointer-events: none;
   isolation: isolate;
-  will-change: clip-path, opacity;
+  will-change: opacity;
 }
 
 .opening-splash[data-state="exiting"] {
-  animation: opening-splash-exit 250ms var(--motion-ease-out) both;
+  animation: opening-splash-exit 300ms var(--motion-ease-out) both;
 }
 
 .opening-splash__lockup {
@@ -305,7 +305,7 @@
 }
 
 .opening-splash[data-state="exiting"] .opening-splash__lockup {
-  animation: opening-splash-lockup-exit 120ms var(--motion-ease-out) both;
+  animation: opening-splash-lockup-exit 180ms var(--motion-ease-out) both;
 }
 
 .opening-splash__monogram {
@@ -330,11 +330,9 @@
 .opening-splash__letter {
   display: inline-block;
   opacity: 0;
-  filter: blur(0.2rem);
   transform: translateY(0.5rem);
   animation: opening-splash-letter-in 250ms var(--motion-ease-out) both;
   animation-delay: calc(320ms + var(--opening-letter-index) * 23ms);
-  will-change: transform, opacity, filter;
 }
 
 @keyframes opening-splash-mark-in {
@@ -347,25 +345,24 @@
 @keyframes opening-splash-letter-in {
   to {
     opacity: 1;
-    filter: blur(0);
     transform: translateY(0);
   }
 }
 
 @keyframes opening-splash-exit {
   from {
-    clip-path: circle(150% at 50% 50%);
+    opacity: 1;
   }
 
   to {
-    clip-path: circle(0% at 50% 50%);
+    opacity: 0;
   }
 }
 
 @keyframes opening-splash-lockup-exit {
   to {
     opacity: 0;
-    transform: translateY(-0.5rem) scale(0.96);
+    transform: translateY(-0.25rem) scale(0.98);
   }
 }
 
