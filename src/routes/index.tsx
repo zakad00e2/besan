@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import portrait from "@/assets/besan-portrait.png";
+import { OpeningSplash } from "@/components/opening-splash";
 import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
 import { PublicSite } from "@/features/site-language/public-site";
 import { useSiteLanguage } from "@/features/site-language/site-language";
@@ -111,6 +112,7 @@ const ORDERED_ARABIC_SERVICES = [ARABIC_SERVICES[1], ARABIC_SERVICES[2], ARABIC_
 export function HomePage({ locale }: { locale: SiteLocale }) {
   return (
     <PublicSite locale={locale}>
+      <OpeningSplash />
       <div className="min-h-screen bg-background text-foreground">
         <SiteNav />
         <Hero />

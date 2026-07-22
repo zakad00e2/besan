@@ -1,5 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { OPENING_SPLASH_STORAGE_KEY } from "@/components/opening-splash";
 import { HomePage, HowICanHelp, Testimonials } from "./index";
 
 vi.mock("@tanstack/react-router", async (importOriginal) => ({
@@ -9,11 +10,19 @@ vi.mock("@tanstack/react-router", async (importOriginal) => ({
 
 afterEach(() => {
   cleanup();
+  sessionStorage.clear();
   vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
 describe("homepage motion", () => {
+  it("mounts the opening splash as the first home-page layer", () => {
+    render(<HomePage locale="ar" />);
+    const publicSite = screen.getByTestId("public-site");
+    expect(publicSite.firstElementChild?.getAttribute("data-testid")).toBe("opening-splash");
+    expect(sessionStorage.getItem(OPENING_SPLASH_STORAGE_KEY)).toBeNull();
+  });
+
   it("renders the Arabic home route without browser locale storage", () => {
     render(<HomePage locale="ar" />);
     expect(screen.getByTestId("public-site").getAttribute("lang")).toBe("ar");

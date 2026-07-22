@@ -26,4 +26,12 @@ describe("motion CSS", () => {
     expect(css).toContain("animation-name: motion-fade-in");
     expect(css).not.toContain(".dashboard-app *::after");
   });
+
+  it("defines the opening splash and reduced-motion fallback", () => {
+    expect(css).toContain('.opening-splash[data-state="exiting"]');
+    expect(css).toContain("animation-delay: calc(700ms + var(--opening-letter-index) * 55ms)");
+    expect(css).toContain("@keyframes opening-splash-exit");
+    expect(css).toContain(".opening-splash__letter");
+    expect(css).toContain("animation: none !important");
+  });
 });

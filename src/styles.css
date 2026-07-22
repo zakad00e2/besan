@@ -277,6 +277,84 @@
   }
 }
 
+.opening-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: max(2rem, env(safe-area-inset-top)) 1.5rem max(2rem, env(safe-area-inset-bottom));
+  background: var(--color-background);
+  color: var(--color-foreground);
+  direction: ltr;
+  pointer-events: none;
+  isolation: isolate;
+  will-change: transform, opacity;
+}
+
+.opening-splash[data-state="exiting"] {
+  animation: opening-splash-exit 600ms var(--motion-ease-move) both;
+}
+
+.opening-splash__lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-1.5vh);
+}
+
+.opening-splash__monogram {
+  width: clamp(8.5rem, 18vw, 13rem);
+  height: auto;
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.985);
+  animation: opening-splash-mark-in 700ms var(--motion-ease-out) 120ms forwards;
+}
+
+.opening-splash__wordmark {
+  margin-top: clamp(1.25rem, 3vh, 2rem);
+  padding-left: 0.28em;
+  white-space: nowrap;
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 2.4vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.28em;
+}
+
+.opening-splash__letter {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(0.2rem);
+  transform: translateY(0.5rem);
+  animation: opening-splash-letter-in 420ms var(--motion-ease-out) both;
+  animation-delay: calc(700ms + var(--opening-letter-index) * 55ms);
+  will-change: transform, opacity, filter;
+}
+
+@keyframes opening-splash-mark-in {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes opening-splash-letter-in {
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes opening-splash-exit {
+  to {
+    opacity: 0.98;
+    transform: translateY(-100%);
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .group:hover .editorial-image,
   .editorial-image:hover {
@@ -297,6 +375,18 @@
 @media (prefers-reduced-motion: reduce) {
   .t-success-check { animation: none !important; opacity: 1; }
   .t-success-check svg path { animation: none !important; stroke-dashoffset: 0 !important; }
+
+  .opening-splash[data-state="exiting"] {
+    animation: motion-fade-out 180ms linear both;
+  }
+
+  .opening-splash__monogram,
+  .opening-splash__letter {
+    animation: none !important;
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
 
   html {
     scroll-behavior: auto !important;
