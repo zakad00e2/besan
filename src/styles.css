@@ -230,7 +230,7 @@
 .workshop-image {
   filter: grayscale(1);
   transition-property: transform, filter;
-  transition-duration: 650ms;
+  transition-duration: 800ms;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 

@@ -24,7 +24,13 @@ import {
   type WorkshopBookingListItem,
   type WorkshopBookingStatus,
 } from "@/features/workshop-booking/workshop-booking";
-import { DashboardEmptyState, StatusBadge } from "./dashboard-ui";
+import {
+  DashboardEmptyState,
+  StatusBadge,
+  dashboardPrimaryButtonClassName,
+  dashboardSecondaryButtonClassName,
+} from "./dashboard-ui";
+import { cn } from "@/lib/utils";
 
 export type WorkshopBookingFilters = {
   query: string;
@@ -126,7 +132,7 @@ export function DashboardWorkshopBookings({
 }) {
   type WorkshopBookingEditForm = Omit<
     WorkshopBookingAdminUpdateInput,
-    "workshopId" | "date"
+    "workshopId" | "date" | "email"
   > & { date: string };
   const [filters, setFilters] = useState<WorkshopBookingFilters>({
     query: "",
@@ -140,7 +146,6 @@ export function DashboardWorkshopBookings({
   const [editForm, setEditForm] = useState<WorkshopBookingEditForm>({
     fullName: "",
     mobile: "",
-    email: "",
     date: "",
     participants: 1,
   });
@@ -160,7 +165,6 @@ export function DashboardWorkshopBookings({
     setEditForm({
       fullName: booking.fullName,
       mobile: booking.mobile,
-      email: booking.email,
       date: booking.date ?? "",
       participants: booking.participants,
     });
@@ -175,7 +179,7 @@ export function DashboardWorkshopBookings({
       workshopId: editingBooking.workshopId as WorkshopId,
       fullName: editForm.fullName.trim(),
       mobile: editForm.mobile.trim(),
-      email: editForm.email.trim(),
+      email: editingBooking.email,
       date: editForm.date || null,
       participants: Number(editForm.participants),
     };
@@ -466,7 +470,9 @@ export function DashboardWorkshopBookings({
       >
         <DialogContent dir="ltr" className="max-w-md bg-white">
           <DialogHeader>
-            <DialogTitle>Edit workshop booking</DialogTitle>
+            <DialogTitle className="text-lg font-medium leading-none tracking-tight">
+              Edit workshop booking
+            </DialogTitle>
             <DialogDescription>
               Update the customer and attendance details for this workshop.
             </DialogDescription>
@@ -490,16 +496,6 @@ export function DashboardWorkshopBookings({
                 onChange={(event) => setEditForm({ ...editForm, mobile: event.target.value })}
                 className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
                 required
-              />
-            </label>
-            <label className="block text-sm text-slate-700">
-              Email
-              <input
-                aria-label="Email"
-                type="email"
-                value={editForm.email}
-                onChange={(event) => setEditForm({ ...editForm, email: event.target.value })}
-                className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
               />
             </label>
             <label className="block text-sm text-slate-700">
@@ -537,14 +533,17 @@ export function DashboardWorkshopBookings({
               <button
                 type="button"
                 onClick={() => setEditingBooking(null)}
-                className="rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                className={cn(dashboardSecondaryButtonClassName, "min-h-9 px-4 text-xs font-normal")}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={editingId === editingBooking?.id}
-                className="rounded-lg bg-violet-600 px-3 py-2 text-sm text-white disabled:opacity-60"
+                className={cn(
+                  dashboardPrimaryButtonClassName,
+                  "min-h-9 px-5 text-xs font-normal disabled:opacity-60",
+                )}
               >
                 Save changes
               </button>

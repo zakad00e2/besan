@@ -3,7 +3,7 @@ import { z } from "zod";
 export const workshopOptions = [
   { id: "pattern-foundation", name: "Pattern foundation" },
   { id: "mini-course", name: "Private mini course" },
-  { id: "corset-workshop", name: "One-day corset workshop" },
+  { id: "corset-workshop", name: "Gift workshop" },
 ] as const;
 
 export type WorkshopId = (typeof workshopOptions)[number]["id"];

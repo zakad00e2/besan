@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import workshopCorset from "@/assets/workshop-corset.jpg";
-import workshopsHero from "@/assets/workshops-hero-wide.png";
+import workshopCorset from "@/assets/workshop-corset-studio.jpg";
+import workshopsHero from "@/assets/workshops-hero-new.png";
 import workshopMiniCourse from "@/assets/workshop-mini-course.jpg";
 import workshopPatternFoundation from "@/assets/workshop-pattern-foundation.jpg";
 import { Reveal, SiteFooter, SiteNav } from "@/components/site-shell";
@@ -18,9 +18,9 @@ export const Route = createFileRoute("/workshops")({
 });
 
 const firstWorkshopPrices = [
-  { label: "Basic workshop", value: "550 NIS" },
-  { label: "Second meeting", value: "750 NIS" },
-  { label: "Two-day workshop package", value: "1300 NIS" },
+  { label: "Basic workshop", value: "550₪" },
+  { label: "Second meeting", value: "800₪" },
+  { label: "Both workshops together", value: "1200₪" },
 ];
 
 const miniCourseDays = [
@@ -36,16 +36,20 @@ const miniCourseDays = [
 
 const corsetWorkshopDetails = [
   {
-    title: "Atelier experience",
-    body: "A focused one-day format, around 4 hours, built as a beautiful shared atelier session.",
+    title: "All tools and materials",
+    body: "",
   },
   {
-    title: "Full corset sewing",
-    body: "We sew a full corset from zero, so each participant leaves with a corset made through the workshop process.",
+    title: "Fabrics and patterns",
+    body: "",
   },
   {
-    title: "Prepared materials",
-    body: "Fabric, patterns, and materials are prepared in advance, with room for a small celebration at the end.",
+    title: "Step-by-step guidance throughout the workshop",
+    body: "",
+  },
+  {
+    title: "A simple end-of-day celebration for the guest of honor",
+    body: "",
   },
 ];
 
@@ -151,7 +155,17 @@ function BookingButton({
       onClick={() => onBook(workshop)}
       className={`motion-press mt-6 w-full border border-foreground bg-transparent px-8 py-4 ${locale === "ar" ? "text-sm md:text-base arabic-name-title" : "text-xs"} tracking-[0.12em] text-foreground transition-colors hover:bg-foreground hover:text-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:w-auto ${className}`}
     >
-      {locale === "ar" ? "احجزي هذه الورشة" : "BOOK THIS WORKSHOP"}
+      {locale === "ar"
+        ? workshop.id === "mini-course"
+          ? "احجزي هذا الكورس"
+          : workshop.id === "corset-workshop"
+            ? "احجزي هذه التجربة"
+            : "احجزي هذه الورشة"
+        : workshop.id === "mini-course"
+          ? "BOOK THIS COURSE"
+          : workshop.id === "corset-workshop"
+            ? "BOOK THIS EXPERIENCE"
+            : "BOOK THIS WORKSHOP"}
     </button>
   );
 }
@@ -161,9 +175,9 @@ function FirstWorkshop({ onBook }: { onBook: BookWorkshop }) {
   const ar = locale === "ar";
   const prices = ar
     ? [
-        { label: "الورشة الأساسية", value: "550 NIS" },
-        { label: "اللقاء الثاني", value: "750 NIS" },
-        { label: "باقة الورشتين", value: "1300 NIS" },
+        { label: "الورشة الأساسية", value: "550₪" },
+        { label: "اللقاء الثاني", value: "800₪" },
+        { label: "الورشتان معًا", value: "1200₪" },
       ]
     : firstWorkshopPrices;
   return (
@@ -317,10 +331,10 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
             <div className="editorial-overlay absolute inset-0 bg-foreground/55 group-hover:opacity-70" />
             <div className="relative flex min-h-[356px] flex-col justify-end md:min-h-[500px]">
               <p className="text-xs tracking-[0.22em] text-background/80">
-                {ar ? "الورشة الثانية" : "WORKSHOP 02"}
+                {ar ? "كورس خاص" : "COURSE 02"}
               </p>
               <h2 className="mt-2 font-serif text-4xl leading-[0.8] tracking-tighter md:text-6xl">
-                {ar ? "بناء الباترون" : "Pattern Building"}
+                {ar ? "بناء الكورسيه" : "Corset Construction Course"}
               </h2>
             </div>
           </div>
@@ -333,7 +347,7 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
                 <h3
                   className={`${ar ? "text-3xl md:text-4xl arabic-ui-heading" : "font-serif text-4xl md:text-5xl"} leading-none tracking-tighter`}
                 >
-                  {ar ? "بناء الباترون" : "Pattern Building"}
+                  {ar ? "الكورسيه من الصفر" : "Corset Construction Course"}
                 </h3>
                 <BookingButton
                   workshop={miniCourse}
@@ -343,8 +357,8 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
               </div>
               <p className="text-base leading-7 text-muted-foreground">
                 {ar
-                  ? "هذه ورشة خاصة ومكثفة تمنحك الاستفادة الكاملة. نبني الأساس أولًا، ثم ننتقل إلى العمل العملي بالقماش والتفاصيل النهائية."
-                  : "This is a private, concentrated workshop designed to make sure you get the full benefit. We build the foundation first, then continue into practical fabric work and finishing details."}
+                  ? "هذا كورس خاص ومكثّف يمنحك الاستفادة الكاملة. نبني الأساس أولًا، ثم ننتقل إلى العمل العملي بالقماش وتفاصيل الكورسيه النهائية."
+                  : "This is a private, concentrated course designed to make sure you get the full benefit. We build the foundation first, then continue into practical fabric work and corset finishing details."}
               </p>
               <div className="space-y-6">
                 {days.map((day) => (
@@ -362,17 +376,17 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className={ar ? "text-right" : ""}>
                 <p className="text-sm text-muted-foreground">
-                  {ar ? "سعر الورشة" : "Pattern Building price"}
+                  {ar ? "سعر الكورس" : "Course price"}
                 </p>
                 <p dir="ltr" className="mt-2 font-serif text-4xl">
-                  2700 NIS
+                  2700₪
                 </p>
               </div>
               <div>
                 <p className="text-sm leading-6 text-muted-foreground">
                   {ar
-                    ? "تحصل المشاركات العائدات على خصم 10% من السعر الأساسي عند التسجيل مرة أخرى."
-                    : "Returning participants receive 10% off the base price when registering again."}
+                    ? "تحصل المشاركات العائدات على خصم 10% من سعر الكورس عند التسجيل مرة أخرى."
+                    : "Returning participants receive 10% off the course price when registering again."}
                 </p>
               </div>
             </div>
@@ -387,22 +401,14 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
 function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
   const { locale } = useSiteLanguage();
   const ar = locale === "ar";
-  const details = ar
+  const includes = ar
     ? [
-        {
-          title: "تجربة الأتيليه",
-          body: "ورشة مركزة ليوم واحد، نحو أربع ساعات، ضمن جلسة أتيليه جميلة ومشتركة.",
-        },
-        {
-          title: "خياطة كورسيه كامل",
-          body: "نخيط كورسيه كاملًا من الصفر، لتغادر كل مشاركة بقطعتها التي صنعتها خلال الورشة.",
-        },
-        {
-          title: "مواد مجهزة",
-          body: "القماش والباترونات والمواد مجهزة مسبقًا، مع مساحة لاحتفال صغير في الختام.",
-        },
+        "جميع الأدوات والخامات.",
+        "الأقمشة والـ Patterns.",
+        "الإرشاد خطوة بخطوة طوال الورشة.",
+        "احتفال بسيط في نهاية اليوم احتفالاً بصاحبة المناسبة.",
       ]
-    : corsetWorkshopDetails;
+    : corsetWorkshopDetails.map((detail) => detail.title);
   return (
     <section id="booking" className="border-t border-foreground/70">
       <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-12 px-6 py-20 md:grid-cols-[0.95fr_1.05fr] md:px-10 md:py-28">
@@ -421,10 +427,10 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
             <div className="relative flex min-h-[420px] items-end p-6 md:min-h-[580px] md:p-8">
               <div className="w-full">
                 <p className="text-xs tracking-[0.24em] text-background/80">
-                  {ar ? "ورشة ليوم واحد" : "ONE DAY WORKSHOP"}
+                  {ar ? "تجربة تهدى" : "GIFT EXPERIENCE"}
                 </p>
                 <h2 className="mt-2 font-serif text-4xl leading-[0.8] tracking-tighter md:text-6xl">
-                  {ar ? "ورشة كورسيه" : "corset workshop"}
+                  {ar ? "ورشة هدية" : "Gift Workshop"}
                 </h2>
               </div>
             </div>
@@ -438,7 +444,7 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
                 <h3
                   className={`${ar ? "text-3xl md:text-4xl arabic-ui-heading" : "font-serif text-4xl md:text-5xl"} leading-none tracking-tighter`}
                 >
-                  {ar ? "أتيليه الكورسيه" : "Corset Atelier"}
+                  {ar ? "اصنعي لها ذكرى" : "Gift Workshop"}
                 </h3>
                 <BookingButton
                   workshop={corsetWorkshop}
@@ -446,38 +452,59 @@ function PrivateGathering({ onBook }: { onBook: BookWorkshop }) {
                   className="hidden shrink-0 lg:inline-flex lg:mt-0"
                 />
               </div>
-              <p className="mt-5 max-w-2xl text-base leading-6 text-muted-foreground">
-                {ar
-                  ? "ورشة خياطة كورسيه في أتيليه مركز، مبنية على التطبيق العملي من أول غرزة حتى المقاس النهائي."
-                  : "Corset sewing workshop in a focused atelier format, built around hands-on construction from the first stitch to the final fit."}
-              </p>
-              <div className="mt-6">
-                {details.map((detail, index) => (
-                  <article key={detail.title} className="py-3.5">
-                    <div className="flex items-baseline gap-4">
-                      <p className="shrink-0 text-xs tracking-[0.22em] text-muted-foreground">
+              <div className={`mt-4 max-w-2xl text-base text-muted-foreground ${ar ? "space-y-2 leading-6" : "space-y-3 leading-6"}`}>
+                <p>
+                  {ar
+                    ? "قدّمي لصاحبتك تجربة مختلفة لا تُنسى."
+                    : "Give her an unforgettable experience."}
+                </p>
+                <p>
+                  {ar
+                    ? "ورشة خاصة مصممة لتكون هدية مميزة، تجمع بين التعلّم والوقت الجميل معًا."
+                    : "A private workshop designed as a special gift — learning and quality time together."}
+                </p>
+                <p>
+                  {ar
+                    ? "خلال حوالي 4 ساعات، ستتعلّم كل مشاركة كيفية خياطة كورسيه كامل من البداية حتى النهاية، وبإشراف كامل. وفي نهاية الورشة ستغادر كل واحدة ومعها الكورسيه الذي صنعته بنفسها."
+                    : "Over about four hours, each participant learns to sew a complete corset from start to finish, with full guidance. Everyone leaves with the corset they made themselves."}
+                </p>
+              </div>
+              <div className={ar ? "mt-7" : "mt-8"}>
+                <p className={`text-sm text-muted-foreground ${ar ? "text-right" : ""}`}>
+                  {ar ? "يشمل الاشتراك:" : "What's included:"}
+                </p>
+                <div className={`${ar ? "mt-3 space-y-2.5" : "mt-3 space-y-3"}`}>
+                  {includes.map((item, index) => (
+                    <article key={item} className="flex items-baseline gap-4">
+                      <p className="shrink-0 text-sm tracking-[0.22em] text-muted-foreground">
                         {String(index + 1).padStart(2, "0")}
                       </p>
-                      <h3
-                        className={`leading-none tracking-tighter ${ar ? "text-xl arabic-ui-heading" : "text-2xl font-serif"}`}
+                      <p
+                        className={`text-base text-muted-foreground ${ar ? "text-right leading-6" : "leading-7"}`}
                       >
-                        {detail.title}
-                      </h3>
-                    </div>
-                    <p className="mt-2 text-sm leading-5 text-muted-foreground">{detail.body}</p>
-                  </article>
-                ))}
+                        {item}
+                      </p>
+                    </article>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className={ar ? "text-right" : ""}>
-              <p className="text-sm text-muted-foreground">
-                {ar ? "سعر ورشة الكورسيه" : "Corset workshop price"}
-              </p>
-              <p dir="ltr" className="mt-2 font-serif text-4xl">
-                850 NIS
-              </p>
-              <BookingButton workshop={corsetWorkshop} onBook={onBook} className="lg:hidden" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className={ar ? "text-right" : ""}>
+                <p className="text-sm text-muted-foreground">
+                  {ar ? "سعر المشاركة للفرد" : "Price per participant"}
+                </p>
+                <p dir="ltr" className="mt-2 font-serif text-4xl">
+                  850₪
+                </p>
+              </div>
+              <div className={`${ar ? "text-right" : ""} sm:flex sm:flex-col sm:justify-end`}>
+                <p className="text-sm text-muted-foreground">
+                  {ar ? "مدة الورشة: حوالي 4 ساعات" : "Workshop duration: about 4 hours"}
+                </p>
+              </div>
             </div>
+            <BookingButton workshop={corsetWorkshop} onBook={onBook} className="lg:hidden" />
           </div>
         </Reveal>
       </div>

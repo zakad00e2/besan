@@ -3,7 +3,7 @@ import { DEFAULT_ADMIN_EMAIL, isAdminEmail, requireConfiguredAdminEmail } from "
 
 describe("admin authorization", () => {
   it("uses the current dashboard administrator", () => {
-    expect(DEFAULT_ADMIN_EMAIL).toBe("zeka12345678998765432@gmail.com");
+    expect(DEFAULT_ADMIN_EMAIL).toBe("besankkhalaily@gmail.com");
   });
 
   it("matches the configured email without casing or surrounding whitespace", () => {

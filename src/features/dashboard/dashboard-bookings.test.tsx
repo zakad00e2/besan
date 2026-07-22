@@ -171,6 +171,26 @@ describe("DashboardBookings", () => {
     expect(screen.getByText("Available date")).toBeTruthy();
   });
 
+  it("does not offer pending confirmation as a design-booking status", () => {
+    render(
+      <DashboardBookings
+        customers={dashboardFixture.customers}
+        appointments={dashboardFixture.appointments}
+      />,
+    );
+
+    expect(within(screen.getByLabelText("Status")).queryByRole("option", {
+      name: "Pending confirmation",
+    })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "New appointment" }));
+    expect(
+      within(screen.getByLabelText("Booking status")).queryByRole("option", {
+        name: "Pending confirmation",
+      }),
+    ).toBeNull();
+  });
+
   it("renders time-only availability values in the appointment form", () => {
     render(
       <DashboardBookings

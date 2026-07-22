@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   appointmentTypes,
+  bookingStatuses,
   formatBookingDate,
   getStageForNextAppointment,
   nextAppointmentTypes,
   parseAdminBookingCreateInput,
   parseAdminBookingInput,
   parseBookingInput,
+  parseBookingStatus,
   parseScheduleNextAppointmentInput,
 } from "./booking-domain";
 
@@ -94,6 +96,16 @@ describe("parseAdminBookingInput", () => {
     expect(parseAdminBookingInput(adminInput)).toEqual({
       success: true,
       data: { ...adminInput, notes: "Bring shoes" },
+    });
+  });
+
+  it("keeps confirmed as the initial design-booking status and rejects pending", () => {
+    expect(bookingStatuses).toEqual(["confirmed", "completed", "cancelled"]);
+    expect(parseBookingStatus("confirmed")).toEqual({ success: true, data: "confirmed" });
+    expect(parseBookingStatus("pending")).toEqual({ success: false });
+    expect(parseAdminBookingInput({ ...adminInput, status: "pending" })).toMatchObject({
+      success: false,
+      fieldErrors: { status: expect.any(String) },
     });
   });
 

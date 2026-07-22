@@ -43,8 +43,8 @@ export function WorkshopBookingDialog({ workshop, onOpenChange }: WorkshopBookin
   const workshopName = ar
     ? ({
         "pattern-foundation": "أساسيات الباترون",
-        "mini-course": "الدورة المصغرة الخاصة",
-        "corset-workshop": "ورشة الكورسيه ليوم واحد",
+        "mini-course": "كورس بناء الكورسيه",
+        "corset-workshop": "ورشة هدية",
       }[workshop?.id ?? ""] ?? workshop?.name)
     : workshop?.name;
   const customerChoosesDate = customerSelectsWorkshopDate(workshop?.id ?? "");

@@ -53,9 +53,10 @@ export function getStageForNextAppointment(appointmentType: NextAppointmentType)
   return nextAppointmentStage[appointmentType];
 }
 
-export const bookingStatuses = ["pending", "confirmed", "completed", "cancelled"] as const;
+export const bookingStatuses = ["confirmed", "completed", "cancelled"] as const;
 
 export type BookingStatus = (typeof bookingStatuses)[number];
+export type PersistedBookingStatus = BookingStatus | "pending";
 
 export const reminderStatuses = ["not-scheduled", "scheduled", "sent"] as const;
 
@@ -81,7 +82,7 @@ export type BookingListItem = Omit<ValidatedBooking, "appointmentType"> & {
   customerCreatedAt: string;
   customerUpdatedAt: string;
   appointmentType: AppointmentType;
-  status: BookingStatus;
+  status: PersistedBookingStatus;
   reminderStatus: BookingReminderStatus;
   createdAt: string;
 };

@@ -59,7 +59,7 @@ import {
 
 export type BookingFilters = {
   query: string;
-  status: AppointmentStatus | "all";
+  status: BookingStatus | "all";
   date: string | "all";
   period: "all" | "upcoming" | "past";
 };
@@ -73,7 +73,7 @@ export type AppointmentFormValues = {
   notes: string;
   date: string;
   time: string;
-  status: AppointmentStatus;
+  status: BookingStatus;
   reminderStatus: ReminderStatus;
 };
 
@@ -186,10 +186,14 @@ function StatusSelect({
   updating: boolean;
   onStatusChange: (id: string, status: BookingStatus) => void;
 }) {
+  const displayedStatus = bookingStatuses.includes(appointment.status as BookingStatus)
+    ? appointment.status
+    : "confirmed";
+
   return (
     <select
       aria-label={`Status for ${appointment.purpose}`}
-      value={appointment.status}
+      value={displayedStatus}
       disabled={updating}
       onChange={(event) => onStatusChange(appointment.id, event.target.value as BookingStatus)}
       className="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs text-slate-700 disabled:cursor-wait disabled:opacity-60"
@@ -389,7 +393,9 @@ export function DashboardBookings({
       notes: appointment.notes ?? "",
       date: appointment.startsAt.slice(0, 10),
       time: appointment.startsAt.slice(11, 16),
-      status: appointment.status,
+      status: bookingStatuses.includes(appointment.status as BookingStatus)
+        ? appointment.status
+        : "confirmed",
       reminderStatus: appointment.reminderStatus,
     });
     setErrors({});
@@ -465,10 +471,11 @@ export function DashboardBookings({
             className="mt-1 block h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm lg:w-auto"
           >
             <option value="all">All</option>
-            <option value="pending">Pending confirmation</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            {bookingStatuses.map((status) => (
+              <option key={status} value={status}>
+                {appointmentStatusLabels[status]}
+              </option>
+            ))}
           </select>
         </label>
         <label className="min-w-0 text-xs font-normal text-slate-600">
