@@ -294,7 +294,7 @@
 }
 
 .opening-splash[data-state="exiting"] {
-  animation: opening-splash-exit 600ms var(--motion-ease-move) both;
+  animation: opening-splash-exit 400ms var(--motion-ease-move) both;
 }
 
 .opening-splash__lockup {
