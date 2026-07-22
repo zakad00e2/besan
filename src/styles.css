@@ -336,8 +336,8 @@ body:has(.opening-splash) {
   display: inline-block;
   opacity: 0;
   transform: translateY(0.5rem);
-  animation: opening-splash-letter-in 400ms var(--motion-ease-out) both;
-  animation-delay: calc(720ms + var(--opening-letter-index) * 25ms);
+  animation: opening-splash-letter-in 450ms var(--motion-ease-out) both;
+  animation-delay: calc(720ms + var(--opening-letter-index) * 28ms);
 }
 
 @keyframes opening-splash-mark-in {
