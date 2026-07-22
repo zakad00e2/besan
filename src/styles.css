@@ -309,7 +309,7 @@
   height: auto;
   opacity: 0;
   transform: translateY(0.75rem) scale(0.985);
-  animation: opening-splash-mark-in 700ms var(--motion-ease-out) 120ms forwards;
+  animation: opening-splash-mark-in 500ms var(--motion-ease-out) 80ms forwards;
 }
 
 .opening-splash__wordmark {
@@ -328,8 +328,8 @@
   opacity: 0;
   filter: blur(0.2rem);
   transform: translateY(0.5rem);
-  animation: opening-splash-letter-in 420ms var(--motion-ease-out) both;
-  animation-delay: calc(700ms + var(--opening-letter-index) * 55ms);
+  animation: opening-splash-letter-in 300ms var(--motion-ease-out) both;
+  animation-delay: calc(500ms + var(--opening-letter-index) * 42ms);
   will-change: transform, opacity, filter;
 }
 
@@ -350,8 +350,9 @@
 
 @keyframes opening-splash-exit {
   to {
-    opacity: 0.98;
-    transform: translateY(-100%);
+    opacity: 0;
+    filter: blur(0.35rem);
+    transform: translateY(-8%);
   }
 }
 
