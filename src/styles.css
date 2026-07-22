@@ -290,11 +290,11 @@
   direction: ltr;
   pointer-events: none;
   isolation: isolate;
-  will-change: transform, opacity;
+  will-change: clip-path, opacity;
 }
 
 .opening-splash[data-state="exiting"] {
-  animation: opening-splash-exit 500ms var(--motion-ease-move) both;
+  animation: opening-splash-exit 350ms var(--motion-ease-out) both;
 }
 
 .opening-splash__lockup {
@@ -305,7 +305,7 @@
 }
 
 .opening-splash[data-state="exiting"] .opening-splash__lockup {
-  animation: opening-splash-lockup-exit 500ms var(--motion-ease-out) both;
+  animation: opening-splash-lockup-exit 250ms var(--motion-ease-out) both;
 }
 
 .opening-splash__monogram {
@@ -313,7 +313,7 @@
   height: auto;
   opacity: 0;
   transform: translateY(0.75rem) scale(0.985);
-  animation: opening-splash-mark-in 500ms var(--motion-ease-out) 80ms forwards;
+  animation: opening-splash-mark-in 260ms var(--motion-ease-out) 30ms forwards;
 }
 
 .opening-splash__wordmark {
@@ -332,8 +332,8 @@
   opacity: 0;
   filter: blur(0.2rem);
   transform: translateY(0.5rem);
-  animation: opening-splash-letter-in 300ms var(--motion-ease-out) both;
-  animation-delay: calc(500ms + var(--opening-letter-index) * 42ms);
+  animation: opening-splash-letter-in 180ms var(--motion-ease-out) both;
+  animation-delay: calc(240ms + var(--opening-letter-index) * 18ms);
   will-change: transform, opacity, filter;
 }
 
@@ -353,18 +353,19 @@
 }
 
 @keyframes opening-splash-exit {
+  from {
+    clip-path: circle(150% at 50% 50%);
+  }
+
   to {
-    opacity: 0;
-    filter: blur(0.35rem);
-    transform: translateY(-8%);
+    clip-path: circle(0% at 50% 50%);
   }
 }
 
 @keyframes opening-splash-lockup-exit {
   to {
     opacity: 0;
-    filter: blur(0.8rem);
-    transform: translateY(-4vh) scale(1.16);
+    transform: translateY(-0.5rem) scale(0.96);
   }
 }
 
