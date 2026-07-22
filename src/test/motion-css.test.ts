@@ -31,9 +31,9 @@ describe("motion CSS", () => {
     expect(css).toContain('.opening-splash[data-state="exiting"]');
     expect(css).toContain("animation: opening-splash-exit 300ms");
     expect(css).toContain("animation: opening-splash-lockup-exit 180ms");
-    expect(css).toContain("animation: opening-splash-mark-in 650ms var(--motion-ease-out) 60ms");
-    expect(css).toContain("animation: opening-splash-letter-in 450ms");
-    expect(css).toContain("animation-delay: calc(720ms + var(--opening-letter-index) * 28ms)");
+    expect(css).toContain("animation: opening-splash-mark-in 800ms var(--motion-ease-out) 80ms");
+    expect(css).toContain("animation: opening-splash-letter-in 550ms");
+    expect(css).toContain("animation-delay: calc(900ms + var(--opening-letter-index) * 55ms)");
     expect(css).toContain("@keyframes opening-splash-exit");
     expect(css).toContain("@keyframes opening-splash-lockup-exit");
     expect(css).not.toContain("clip-path: circle(0% at 50% 50%)");

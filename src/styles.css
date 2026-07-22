@@ -318,7 +318,7 @@ body:has(.opening-splash) {
   height: auto;
   opacity: 0;
   transform: translateY(0.75rem) scale(0.985);
-  animation: opening-splash-mark-in 650ms var(--motion-ease-out) 60ms forwards;
+  animation: opening-splash-mark-in 800ms var(--motion-ease-out) 80ms forwards;
 }
 
 .opening-splash__wordmark {
@@ -336,8 +336,8 @@ body:has(.opening-splash) {
   display: inline-block;
   opacity: 0;
   transform: translateY(0.5rem);
-  animation: opening-splash-letter-in 450ms var(--motion-ease-out) both;
-  animation-delay: calc(720ms + var(--opening-letter-index) * 28ms);
+  animation: opening-splash-letter-in 550ms var(--motion-ease-out) both;
+  animation-delay: calc(900ms + var(--opening-letter-index) * 55ms);
 }
 
 @keyframes opening-splash-mark-in {
