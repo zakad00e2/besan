@@ -305,7 +305,7 @@
 }
 
 .opening-splash__monogram {
-  width: clamp(8.5rem, 18vw, 13rem);
+  width: clamp(6.5rem, 14vw, 10rem);
   height: auto;
   opacity: 0;
   transform: translateY(0.75rem) scale(0.985);

@@ -32,6 +32,7 @@ describe("motion CSS", () => {
     expect(css).toContain("animation-delay: calc(700ms + var(--opening-letter-index) * 55ms)");
     expect(css).toContain("@keyframes opening-splash-exit");
     expect(css).toContain(".opening-splash__letter");
+    expect(css).toContain("width: clamp(6.5rem, 14vw, 10rem)");
     expect(css).toContain("animation: none !important");
   });
 });
