@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { submitWorkshopBooking } from "./workshop-booking.functions";
 import { WorkshopBookingDialog } from "./workshop-booking-dialog";
+import { workshopOptions } from "./workshop-booking";
 import { SiteLanguageProvider } from "@/features/site-language/site-language";
 
 vi.mock("./workshop-booking.functions", () => ({
@@ -17,10 +18,7 @@ const workshop = {
   name: "Private mini course",
 };
 
-const corsetWorkshop = {
-  id: "corset-workshop",
-  name: "Gift workshop",
-};
+const corsetWorkshop = workshopOptions[2];
 
 function futureDate() {
   const date = new Date();

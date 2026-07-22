@@ -9,10 +9,7 @@ import {
   workshopOptions,
 } from "./workshop-booking";
 
-const workshop = {
-  id: "corset-workshop",
-  name: "One-day corset workshop",
-};
+const workshop = workshopOptions[2];
 
 const validValues: WorkshopBookingFormValues = {
   fullName: "  Noor Al-Hashemi  ",
@@ -68,7 +65,7 @@ describe("parseWorkshopBookingInput", () => {
         {
           ...validInput,
           workshopId: "corset-workshop",
-          workshopName: "One-day corset workshop",
+          workshopName: workshop.name,
           date: null,
         },
         new Date(2026, 6, 12, 8),
@@ -214,7 +211,7 @@ describe("parseWorkshopBooking", () => {
       success: true,
       data: {
         workshopId: "corset-workshop",
-        workshopName: "One-day corset workshop",
+        workshopName: workshop.name,
         fullName: "Noor Al-Hashemi",
         mobile: "0501234567",
         date: "2026-07-10",
