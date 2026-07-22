@@ -453,4 +453,3 @@ git diff -- src/components/opening-splash.tsx src/components/opening-splash.test
 ~~~
 
 Expected: the feature touches only the planned files, diff checks are clean, and pre-existing unrelated changes remain untouched.
-
