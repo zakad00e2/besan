@@ -294,7 +294,7 @@
 }
 
 .opening-splash[data-state="exiting"] {
-  animation: opening-splash-exit 350ms var(--motion-ease-out) both;
+  animation: opening-splash-exit 250ms var(--motion-ease-out) both;
 }
 
 .opening-splash__lockup {
@@ -305,7 +305,7 @@
 }
 
 .opening-splash[data-state="exiting"] .opening-splash__lockup {
-  animation: opening-splash-lockup-exit 250ms var(--motion-ease-out) both;
+  animation: opening-splash-lockup-exit 120ms var(--motion-ease-out) both;
 }
 
 .opening-splash__monogram {
