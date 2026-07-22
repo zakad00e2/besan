@@ -11,7 +11,7 @@ const bookings: WorkshopBookingListItem[] = [
     fullName: "Noor Al-Hashemi",
     mobile: "+970591234567",
     email: "noor@example.com",
-    date: "2026-07-13",
+    date: null,
     participants: 3,
     notes: "Vegetarian lunch",
     status: "pending",
@@ -104,6 +104,18 @@ describe("DashboardWorkshopBookings", () => {
     expect(onStatusChange).toHaveBeenCalledWith("workshop-booking-1", "confirmed");
   });
 
+  it("shows an unset date and keeps confirmation independent from date assignment", () => {
+    const onStatusChange = vi.fn();
+    render(<DashboardWorkshopBookings bookings={bookings} onStatusChange={onStatusChange} />);
+
+    expect(screen.getAllByText("Not set")).toHaveLength(2);
+    fireEvent.change(screen.getAllByLabelText("Status for Noor Al-Hashemi")[0], {
+      target: { value: "confirmed" },
+    });
+
+    expect(onStatusChange).toHaveBeenCalledWith("workshop-booking-1", "confirmed");
+  });
+
   it("shows an empty state when no workshop bookings match", () => {
     render(<DashboardWorkshopBookings bookings={bookings} onStatusChange={vi.fn()} />);
 
@@ -146,17 +158,24 @@ describe("DashboardWorkshopBookings", () => {
       screen.getAllByLabelText("Send reminder to Noor Al-Hashemi")[0].getAttribute("href"),
     ).toContain("https://wa.me/970591234567?text=");
     expect(
+      decodeURIComponent(
+        screen.getAllByLabelText("Send reminder to Noor Al-Hashemi")[0].getAttribute("href") ?? "",
+      ),
+    ).not.toContain(" on null");
+    expect(
       screen.getAllByLabelText("Message Noor Al-Hashemi on WhatsApp")[0].getAttribute("href"),
     ).toBe("https://wa.me/970591234567");
 
     fireEvent.click(screen.getAllByLabelText("Edit Noor Al-Hashemi")[0]);
+    expect(screen.getByLabelText("Date")).toHaveProperty("value", "");
     fireEvent.change(screen.getByLabelText("Participants"), { target: { value: "4" } });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
     expect(onEdit).toHaveBeenCalledWith("workshop-booking-1", {
       fullName: "Noor Al-Hashemi",
       mobile: "+970591234567",
       email: "noor@example.com",
-      date: "2026-07-13",
+      workshopId: "mini-course",
+      date: null,
       participants: 4,
     });
 

@@ -20,6 +20,7 @@ import {
 import {
   workshopBookingStatuses,
   type WorkshopBookingAdminUpdateInput,
+  type WorkshopId,
   type WorkshopBookingListItem,
   type WorkshopBookingStatus,
 } from "@/features/workshop-booking/workshop-booking";
@@ -46,7 +47,8 @@ const tableActionDividerClassName = "h-4 w-px shrink-0 bg-[#ececef]";
 
 function getWorkshopActionLinks(booking: WorkshopBookingListItem) {
   const whatsappNumber = booking.mobile.replace(/\D/g, "");
-  const reminderMessage = `Hi ${booking.fullName}, this is a reminder for your ${booking.workshopName} workshop on ${booking.date}.`;
+  const dateClause = booking.date ? ` on ${booking.date}` : "";
+  const reminderMessage = `Hi ${booking.fullName}, this is a reminder for your ${booking.workshopName} workshop${dateClause}.`;
   return {
     reminderHref: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(reminderMessage)}`,
     messageHref: `https://wa.me/${whatsappNumber}`,
@@ -122,6 +124,10 @@ export function DashboardWorkshopBookings({
   updatingId?: string | null;
   updateError?: string;
 }) {
+  type WorkshopBookingEditForm = Omit<
+    WorkshopBookingAdminUpdateInput,
+    "workshopId" | "date"
+  > & { date: string };
   const [filters, setFilters] = useState<WorkshopBookingFilters>({
     query: "",
     workshopId: "all",
@@ -131,7 +137,7 @@ export function DashboardWorkshopBookings({
   const [deletingBooking, setDeletingBooking] = useState<WorkshopBookingListItem | null>(null);
   const [notePreview, setNotePreview] = useState<WorkshopBookingListItem | null>(null);
   const [editFormError, setEditFormError] = useState("");
-  const [editForm, setEditForm] = useState<WorkshopBookingAdminUpdateInput>({
+  const [editForm, setEditForm] = useState<WorkshopBookingEditForm>({
     fullName: "",
     mobile: "",
     email: "",
@@ -155,7 +161,7 @@ export function DashboardWorkshopBookings({
       fullName: booking.fullName,
       mobile: booking.mobile,
       email: booking.email,
-      date: booking.date,
+      date: booking.date ?? "",
       participants: booking.participants,
     });
     setEditFormError("");
@@ -165,17 +171,18 @@ export function DashboardWorkshopBookings({
   function submitEdit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!editingBooking) return;
-    const input = {
-      ...editForm,
+    const input: WorkshopBookingAdminUpdateInput = {
+      workshopId: editingBooking.workshopId as WorkshopId,
       fullName: editForm.fullName.trim(),
       mobile: editForm.mobile.trim(),
       email: editForm.email.trim(),
+      date: editForm.date || null,
       participants: Number(editForm.participants),
     };
     if (
       !input.fullName ||
       !input.mobile ||
-      !input.date ||
+      (input.workshopId === "corset-workshop" && !input.date) ||
       !Number.isInteger(input.participants) ||
       input.participants < 1
     ) {
@@ -295,7 +302,7 @@ export function DashboardWorkshopBookings({
                       </td>
                       <td className="text-slate-500">{booking.workshopName}</td>
                       <td className="text-slate-500" dir="ltr">
-                        {booking.date}
+                        {booking.date ?? "Not set"}
                       </td>
                       <td className="text-slate-500">{booking.participants}</td>
                       <td className="max-w-48 text-slate-500">
@@ -393,7 +400,7 @@ export function DashboardWorkshopBookings({
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs text-slate-500">
                     <span dir="ltr">{booking.mobile}</span>
-                    <span dir="ltr">{booking.date}</span>
+                    <span dir="ltr">{booking.date ?? "Not set"}</span>
                     <span>{booking.participants} participants</span>
                   </div>
                   <p className="text-xs text-slate-500">{booking.notes || "No notes"}</p>
@@ -503,7 +510,7 @@ export function DashboardWorkshopBookings({
                 value={editForm.date}
                 onChange={(event) => setEditForm({ ...editForm, date: event.target.value })}
                 className="mt-1 h-10 w-full rounded-lg border border-slate-200 px-3"
-                required
+                required={editingBooking?.workshopId === "corset-workshop"}
               />
             </label>
             <label className="block text-sm text-slate-700">

@@ -379,6 +379,7 @@ function dependencies(allowed = true) {
 }
 
 const workshopUpdateInput = {
+  workshopId: "mini-course",
   fullName: "Noor Khalil",
   mobile: "+970591234567",
   email: "noor@example.com",
@@ -509,6 +510,20 @@ describe("workshop booking admin functions", () => {
     expect(testDependencies.repository.update).toHaveBeenCalledWith(
       booking.id,
       workshopUpdateInput,
+    );
+  });
+
+  it("forwards an unset date for a supervisor-assigned workshop", async () => {
+    const testDependencies = dependencies();
+
+    await updateWorkshopBookingForAdmin(
+      { token: "admin-token", id: booking.id, input: { ...workshopUpdateInput, date: null } },
+      testDependencies,
+    );
+
+    expect(testDependencies.repository.update).toHaveBeenCalledWith(
+      booking.id,
+      expect.objectContaining({ workshopId: "mini-course", date: null }),
     );
   });
 
