@@ -22,7 +22,7 @@ describe("OpeningSplash", () => {
     act(() => vi.advanceTimersByTime(1600));
     expect(screen.getByTestId("opening-splash").dataset.state).toBe("exiting");
 
-    act(() => vi.advanceTimersByTime(400));
+    act(() => vi.advanceTimersByTime(500));
     expect(screen.queryByTestId("opening-splash")).toBeNull();
     expect(sessionStorage.getItem(OPENING_SPLASH_STORAGE_KEY)).toBe("complete");
     expect(document.documentElement.style.overflow).toBe("");

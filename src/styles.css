@@ -294,7 +294,7 @@
 }
 
 .opening-splash[data-state="exiting"] {
-  animation: opening-splash-exit 400ms var(--motion-ease-move) both;
+  animation: opening-splash-exit 500ms var(--motion-ease-move) both;
 }
 
 .opening-splash__lockup {
@@ -302,6 +302,10 @@
   flex-direction: column;
   align-items: center;
   transform: translateY(-1.5vh);
+}
+
+.opening-splash[data-state="exiting"] .opening-splash__lockup {
+  animation: opening-splash-lockup-exit 500ms var(--motion-ease-out) both;
 }
 
 .opening-splash__monogram {
@@ -356,6 +360,14 @@
   }
 }
 
+@keyframes opening-splash-lockup-exit {
+  to {
+    opacity: 0;
+    filter: blur(0.8rem);
+    transform: translateY(-4vh) scale(1.16);
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .group:hover .editorial-image,
   .editorial-image:hover {
@@ -379,6 +391,10 @@
 
   .opening-splash[data-state="exiting"] {
     animation: motion-fade-out 180ms linear both;
+  }
+
+  .opening-splash[data-state="exiting"] .opening-splash__lockup {
+    animation: none !important;
   }
 
   .opening-splash__monogram,
