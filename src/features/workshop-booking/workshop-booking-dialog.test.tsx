@@ -17,6 +17,11 @@ const workshop = {
   name: "Private mini course",
 };
 
+const corsetWorkshop = {
+  id: "corset-workshop",
+  name: "Gift workshop",
+};
+
 function futureDate() {
   const date = new Date();
   date.setDate(date.getDate() + 1);
@@ -33,11 +38,15 @@ function fillValidForm() {
   fireEvent.change(screen.getByLabelText("WhatsApp Number"), {
     target: { value: "0502345678" },
   });
-  fireEvent.change(screen.getByLabelText("Workshop date"), {
-    target: { value: futureDate() },
-  });
   fireEvent.change(screen.getByLabelText("Number of participants"), {
     target: { value: "3" },
+  });
+}
+
+function fillValidCorsetForm() {
+  fillValidForm();
+  fireEvent.change(screen.getByLabelText("Workshop date"), {
+    target: { value: futureDate() },
   });
 }
 
@@ -55,7 +64,7 @@ describe("WorkshopBookingDialog", () => {
   it("uses the Arabic font and correct field directions", () => {
     render(
       <SiteLanguageProvider locale="ar">
-        <WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />
+        <WorkshopBookingDialog workshop={corsetWorkshop} onOpenChange={() => undefined} />
       </SiteLanguageProvider>,
     );
 
@@ -78,9 +87,19 @@ describe("WorkshopBookingDialog", () => {
     expect(screen.getByLabelText("Full name")).toBeTruthy();
     expect(screen.getByLabelText("WhatsApp Number")).toBeTruthy();
     expect(screen.queryByLabelText("Email (optional)")).toBeNull();
-    expect(screen.getByLabelText("Workshop date")).toBeTruthy();
+    expect(screen.queryByLabelText("Workshop date")).toBeNull();
     expect(screen.getByLabelText("Number of participants")).toBeTruthy();
     expect(screen.getByLabelText("Additional notes (optional)")).toBeTruthy();
+  });
+
+  it("only asks customers for a date on the final workshop", () => {
+    const { rerender } = render(
+      <WorkshopBookingDialog workshop={workshop} onOpenChange={() => undefined} />,
+    );
+
+    expect(screen.queryByLabelText("Workshop date")).toBeNull();
+    rerender(<WorkshopBookingDialog workshop={corsetWorkshop} onOpenChange={() => undefined} />);
+    expect(screen.getByLabelText("Workshop date")).toBeTruthy();
   });
 
   it("stacks booking fields on small screens", () => {
@@ -105,9 +124,7 @@ describe("WorkshopBookingDialog", () => {
 
     expect(mobile.value).toBe("0502345678");
     expect(screen.getByText("Enter your full name.")).toBeTruthy();
-    expect(screen.getByText("Choose a workshop date.")).toBeTruthy();
     expect(screen.getByLabelText("Full name")).toBeTruthy();
-    expect(screen.getByLabelText("Workshop date")).toBeTruthy();
   });
 
   it("shows a real confirmation after persistence succeeds", async () => {
@@ -130,6 +147,27 @@ describe("WorkshopBookingDialog", () => {
         workshopId: "mini-course",
         fullName: "Noor Al-Hashemi",
         participants: 3,
+        date: null,
+      }),
+    });
+  });
+
+  it("submits the date selected for the final workshop", async () => {
+    vi.mocked(submitWorkshopBooking).mockReset();
+    vi.mocked(submitWorkshopBooking).mockResolvedValue({
+      success: true,
+      bookingId: "workshop-booking-1",
+    });
+    render(<WorkshopBookingDialog workshop={corsetWorkshop} onOpenChange={() => undefined} />);
+
+    fillValidCorsetForm();
+    fireEvent.click(screen.getByRole("button", { name: "Send booking request" }));
+
+    await screen.findByRole("status");
+    expect(submitWorkshopBooking).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        workshopId: "corset-workshop",
+        date: futureDate(),
       }),
     });
   });
