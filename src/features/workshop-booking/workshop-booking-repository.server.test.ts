@@ -11,7 +11,7 @@ const validatedBooking: ValidatedWorkshopBooking = {
   fullName: "Noor Al-Hashemi",
   mobile: "+970591234567",
   email: "noor@example.com",
-  date: "2026-07-13",
+  date: null,
   participants: 3,
   notes: "Vegetarian lunch",
 };
@@ -23,7 +23,7 @@ const workshopBookingRow = {
   full_name: "Noor Al-Hashemi",
   mobile: "+970591234567",
   email: "noor@example.com",
-  workshop_date: "2026-07-13",
+  workshop_date: null,
   participants: 3,
   notes: "Vegetarian lunch",
   status: "confirmed" as const,
@@ -38,7 +38,7 @@ const mappedWorkshopBooking = {
   fullName: "Noor Al-Hashemi",
   mobile: "+970591234567",
   email: "noor@example.com",
-  date: "2026-07-13",
+  date: null,
   participants: 3,
   notes: "Vegetarian lunch",
   status: "confirmed",
@@ -47,10 +47,11 @@ const mappedWorkshopBooking = {
 };
 
 const updateInput = {
+  workshopId: "mini-course" as const,
   fullName: "Noor Khalil",
   mobile: "+970591234567",
   email: "noor@example.com",
-  date: "2026-07-13",
+  date: null,
   participants: 4,
 };
 
@@ -71,7 +72,7 @@ describe("workshop booking repository", () => {
         "Noor Al-Hashemi",
         "+970591234567",
         "noor@example.com",
-        "2026-07-13",
+        null,
         3,
         "Vegetarian lunch",
       ],
@@ -122,7 +123,7 @@ describe("workshop booking repository", () => {
     });
     expect(execute).toHaveBeenCalledWith(
       expect.stringContaining("UPDATE public.workshop_bookings"),
-      ["workshop-booking-1", "Noor Khalil", "+970591234567", "noor@example.com", "2026-07-13", 4],
+      ["workshop-booking-1", "Noor Khalil", "+970591234567", "noor@example.com", null, 4],
     );
   });
 

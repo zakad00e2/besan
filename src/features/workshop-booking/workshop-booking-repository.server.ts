@@ -36,7 +36,7 @@ type WorkshopBookingRow = {
   full_name: string;
   mobile: string;
   email: string;
-  workshop_date: string;
+  workshop_date: string | null;
   participants: number;
   notes: string;
   status: WorkshopBookingStatus;
