@@ -100,11 +100,12 @@ Expected: both test files pass with no failed tests.
 Run:
 
 ```powershell
+npm test
 npm run lint
 npm run build
 ```
 
-Expected: ESLint exits with code 0 and the Vite production build completes successfully.
+Expected: the full Vitest suite and ESLint exit with code 0, and the Vite production build completes successfully.
 
 - [ ] **Step 7: Commit the implementation**
 
