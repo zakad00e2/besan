@@ -334,7 +334,15 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
                 {ar ? "كورس خاص" : "COURSE 02"}
               </p>
               <h2 className="mt-2 font-serif text-4xl leading-[0.8] tracking-tighter md:text-6xl">
-                {ar ? "بناء الكورسيه" : "Corset Construction Course"}
+                {ar ? (
+                  "بناء الكورسيه"
+                ) : (
+                  <>
+                    Corset
+                    <br />
+                    Construction
+                  </>
+                )}
               </h2>
             </div>
           </div>
@@ -347,7 +355,7 @@ function MiniCourse({ onBook }: { onBook: BookWorkshop }) {
                 <h3
                   className={`${ar ? "text-3xl md:text-4xl arabic-ui-heading" : "font-serif text-4xl md:text-5xl"} leading-none tracking-tighter`}
                 >
-                  {ar ? "الكورسيه من الصفر" : "Corset Construction Course"}
+                  {ar ? "الكورسيه من الصفر" : "Corset from Scratch"}
                 </h3>
                 <BookingButton
                   workshop={miniCourse}
