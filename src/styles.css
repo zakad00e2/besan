@@ -334,6 +334,7 @@ body:has(.opening-splash) {
 
 .opening-splash__letter {
   display: inline-block;
+  letter-spacing: 0.28em;
   opacity: 0;
   transform: translateY(0.5rem);
   animation: opening-splash-letter-in 550ms var(--motion-ease-out) both;

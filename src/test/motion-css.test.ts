@@ -41,6 +41,9 @@ describe("motion CSS", () => {
     expect(css).toContain("html:has(.opening-splash)");
     expect(css).toContain("body:has(.opening-splash)");
     expect(css).toContain(".opening-splash__letter");
+    expect(css).toMatch(
+      /\.opening-splash__letter\s*\{[^}]*letter-spacing:\s*0\.28em;/s,
+    );
     expect(css).toContain("width: clamp(6.5rem, 14vw, 10rem)");
     expect(css).toContain("animation: none !important");
   });

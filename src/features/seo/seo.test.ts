@@ -14,6 +14,18 @@ function titleValue(meta: MetaDescriptor[]) {
 }
 
 describe("SEO head generation", () => {
+  it("uses the requested brand title for the Arabic home page", () => {
+    expect(titleValue(createSeoHead("home", "ar").meta)).toBe(
+      "Besan Khalaily - Timeless Couture",
+    );
+  });
+
+  it("uses the requested Arabic home page description", () => {
+    expect(metaValue(createSeoHead("home", "ar").meta, "name", "description")).toBe(
+      "بيسان خلايلة، مصممة أزياء متخصصة في تصميم الفساتين حسب الطلب، وتأجير الفساتين، وتقديم الاستشارات الشخصية. احجزي موعدك في الأتيليه.",
+    );
+  });
+
   it("provides unique titles and descriptions for all public pages", () => {
     const heads = SITE_LOCALES.flatMap((locale) =>
       PUBLIC_PAGE_KEYS.map((page) => createSeoHead(page, locale)),
