@@ -36,7 +36,6 @@ export function getDashboardRedirect(redirectTo?: string) {
 }
 
 export function AuthPage({ redirectTo }: { redirectTo?: string }) {
-  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -48,16 +47,11 @@ export function AuthPage({ redirectTo }: { redirectTo?: string }) {
     setError("");
     try {
       const result = await withTimeout(
-        mode === "sign-in"
-          ? authClient.signIn.email({ email, password })
-          : authClient.signUp.email({ email, password, name: "Besan dashboard admin" }),
+        authClient.signIn.email({ email, password }),
         15_000,
       );
       if (result.error) {
-        setError(
-          result.error.message ||
-            (mode === "sign-in" ? "Could not sign in." : "Could not create the account."),
-        );
+        setError(result.error.message || "Could not sign in.");
       } else window.location.assign(getDashboardRedirect(redirectTo));
     } catch (signInError) {
       console.error(signInError);
@@ -126,12 +120,10 @@ export function AuthPage({ redirectTo }: { redirectTo?: string }) {
           <div className="my-auto w-full max-w-[390px] self-center py-6 sm:py-8">
             <div className="mb-6">
               <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.035em] text-[#19191c]">
-                {mode === "sign-in" ? "Welcome back Besan" : "Create admin account"}
+                Welcome back Besan
               </h1>
               <p className="mt-2 max-w-[42ch] text-[12px] leading-5 text-[#88898f]">
-                {mode === "sign-in"
-                  ? "Sign in to manage bookings, customers, and workshop requests."
-                  : "Set up the administrator account for your atelier workspace."}
+                Sign in to manage bookings, customers, and workshop requests.
               </p>
             </div>
 
@@ -173,7 +165,7 @@ export function AuthPage({ redirectTo }: { redirectTo?: string }) {
                   <input
                     id="dashboard-password"
                     type="password"
-                    autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
+                    autoComplete="current-password"
                     required
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
@@ -201,30 +193,8 @@ export function AuthPage({ redirectTo }: { redirectTo?: string }) {
                   "h-11 w-full gap-2 px-4 text-[12px] disabled:cursor-not-allowed disabled:opacity-60",
                 )}
               >
-                <span>
-                  {saving ? "Please wait…" : mode === "sign-in" ? "Sign in" : "Create account"}
-                </span>
+                <span>{saving ? "Please wait…" : "Sign in"}</span>
                 {!saving ? <ArrowRight className="size-3.5" aria-hidden="true" /> : null}
-              </button>
-
-              <div className="flex items-center gap-3 py-1" aria-hidden="true">
-                <span className="h-px flex-1 bg-[#ececee]" />
-                <span className="text-[9px] text-[#b0b1b5]">ADMIN ACCESS</span>
-                <span className="h-px flex-1 bg-[#ececee]" />
-              </div>
-
-              <button
-                type="button"
-                disabled={saving}
-                onClick={() => {
-                  setError("");
-                  setMode((current) => (current === "sign-in" ? "sign-up" : "sign-in"));
-                }}
-                className="mx-auto block rounded-md px-2 py-1 text-[11px] font-medium text-[#67686d] outline-none transition-colors hover:text-[#19191c] focus-visible:ring-2 focus-visible:ring-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {mode === "sign-in"
-                  ? "First time? Create the admin account"
-                  : "Already have an account? Sign in"}
               </button>
             </form>
           </div>
