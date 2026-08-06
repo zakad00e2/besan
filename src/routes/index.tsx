@@ -159,7 +159,7 @@ function Hero() {
         </Reveal>
         <Reveal delay={200}>
           <div
-            className={`mt-4 max-w-md text-muted-foreground ${ar ? "space-y-2 text-base leading-6 md:text-lg md:leading-7" : "space-y-4 text-xs leading-relaxed md:text-[13px]"}`}
+            className={`mt-4 max-w-md text-muted-foreground ${ar ? "space-y-2 text-base leading-6 md:text-lg md:leading-7" : "space-y-0 text-xs leading-relaxed md:text-[13px]"}`}
           >
             {ar ? (
               <p>
@@ -167,17 +167,12 @@ function Hero() {
                 مجموعة مصممة لتشعرك بأنها خاصة بك، وترافقك بأسلوب يعكس شخصيتك
               </p>
             ) : (
-              <>
-                <p>
-                  I am an independent fashion designer creating quiet, considered pieces where craft
-                  meets modern femininity - tailored silhouettes, natural fabrics, and timeless
-                  details.
-                </p>
-                <p>
-                  Each collection is designed to feel personal - an intimate wardrobe made to move
-                  with you and last beyond seasons.
-                </p>
-              </>
+              <p>
+                I am an independent fashion designer creating quiet, considered pieces where craftsmanship
+                meets modern femininity through tailored silhouettes, natural fabrics, and timeless details.
+                Each collection is designed to feel personal—an intimate wardrobe that moves with you and
+                endures beyond seasons.
+              </p>
             )}
           </div>
         </Reveal>

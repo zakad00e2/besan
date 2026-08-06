@@ -35,6 +35,16 @@ describe("homepage motion", () => {
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("BESAN");
   });
 
+  it("renders the English introduction as one updated paragraph", () => {
+    render(<HomePage locale="en" />);
+
+    expect(
+      screen.getByText(
+        "I am an independent fashion designer creating quiet, considered pieces where craftsmanship meets modern femininity through tailored silhouettes, natural fabrics, and timeless details. Each collection is designed to feel personal—an intimate wardrobe that moves with you and endures beyond seasons.",
+      ),
+    ).toBeTruthy();
+  });
+
   it("retargets rapid testimonial navigation to the latest quote", () => {
     vi.useFakeTimers();
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
