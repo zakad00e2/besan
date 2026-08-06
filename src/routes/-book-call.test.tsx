@@ -109,6 +109,15 @@ describe("book-call route", () => {
     expect(title.querySelector("br")).toBeNull();
   });
 
+  it("keeps the booking description close to the title", () => {
+    render(<BookCallPage locale="ar" />);
+
+    const description = document.querySelector(
+      'p[data-book-copy][class*="mt-"]',
+    )!;
+    expect(description.className).toContain("mt-4");
+  });
+
   it("shows a retry action and hides time choices when availability cannot load", () => {
     availability.error = "Could not load available appointments.";
     render(<BookCallPage locale="en" />);

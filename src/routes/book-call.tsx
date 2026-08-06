@@ -255,7 +255,7 @@ function BookCallContent() {
               </h1>
               <p
                 data-book-copy
-                className={`mt-8 max-w-lg text-base leading-8 text-muted-foreground ${ar ? "arabic-name-title" : ""}`}
+                className={`mt-4 max-w-lg text-base leading-8 text-muted-foreground ${ar ? "arabic-name-title" : ""}`}
               >
                 {ar
                   ? "اختاري نوع الموعد واليوم والوقت المناسب لك."
@@ -502,7 +502,7 @@ function BookCallContent() {
                 <h2 className="font-serif text-3xl leading-none tracking-tighter">
                   {ar ? "بياناتك" : "Your Details"}
                 </h2>
-                <div className="mt-6 grid grid-cols-2 gap-5">
+                <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <label className="block text-sm">
                     <span className="text-xs tracking-[0.12em] text-muted-foreground">
                       {ar ? "الاسم الكامل" : "Full Name"}
