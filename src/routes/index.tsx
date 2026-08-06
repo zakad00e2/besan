@@ -288,9 +288,13 @@ export function HowICanHelp() {
           </h2>
           <a
             href={getPublicPath("bookCall", locale)}
-            className={`motion-press mt-6 inline-block border border-foreground px-14 py-4 tracking-[0.1em] transition-colors hover:bg-foreground hover:text-background ${ar ? "arabic-name-title text-base" : "text-xs"}`}
+            className={`motion-press relative mt-6 inline-flex w-48 items-center justify-start border border-foreground px-6 py-4 ${ar ? "text-sm md:text-base" : "text-xs"} font-normal tracking-[0.1em] transition-colors hover:bg-foreground hover:text-background ${ar ? "arabic-name-title" : ""}`}
           >
             {ar ? "احجزي موعدًا" : "BOOK A CALL"}
+            <ArrowUpLeft
+              className={`absolute end-5 size-4 ${ar ? "" : "scale-x-[-1]"}`}
+              aria-hidden="true"
+            />
           </a>
         </Reveal>
         <div>

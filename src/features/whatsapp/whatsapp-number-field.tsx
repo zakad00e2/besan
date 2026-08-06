@@ -39,21 +39,10 @@ export function WhatsAppNumberField({
       >
         {label}
       </label>
-      <div className={`${fieldSpacing} grid grid-cols-[5.25rem_minmax(0,1fr)]`}>
-        <select
-          aria-label={countryLabel}
-          dir="ltr"
-          value={country}
-          disabled={disabled}
-          onChange={(event) => onCountryChange(event.target.value as CountryCode)}
-          className={`w-full min-w-0 border border-foreground/40 bg-transparent px-1.5 ${fieldPadding} text-xs outline-none focus:border-foreground`}
-        >
-          {options.map((option) => (
-            <option key={option.country} value={option.country}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+      <div
+        dir={locale === "ar" ? "rtl" : "ltr"}
+        className={`${fieldSpacing} grid ${locale === "ar" ? "grid-cols-[minmax(0,1fr)_5.25rem]" : "grid-cols-[5.25rem_minmax(0,1fr)]"}`}
+      >
         <input
           id={id}
           type="tel"
@@ -65,9 +54,23 @@ export function WhatsAppNumberField({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           onChange={(event) => onValueChange(event.target.value)}
-          placeholder="05xxxxxxxx"
-          className={`border border-l-0 border-foreground/40 bg-transparent px-4 ${fieldPadding} text-sm outline-none focus:border-foreground rtl:border-l rtl:border-r-0`}
+          placeholder="5xxxxxxxx"
+          className={`border border-l-0 border-foreground/40 bg-transparent px-4 ${fieldPadding} text-sm outline-none focus:border-foreground ${locale === "en" ? "order-2" : ""}`}
         />
+        <select
+          aria-label={countryLabel}
+          dir="ltr"
+          value={country}
+          disabled={disabled}
+          onChange={(event) => onCountryChange(event.target.value as CountryCode)}
+          className={`w-full min-w-0 border border-foreground/40 bg-transparent px-1.5 ${fieldPadding} text-xs outline-none focus:border-foreground ${locale === "en" ? "order-1" : ""}`}
+        >
+          {options.map((option) => (
+            <option key={option.country} value={option.country}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
       {error ? <span id={errorId} className="mt-2 block text-xs text-destructive">{error}</span> : null}
     </div>

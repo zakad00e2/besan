@@ -157,21 +157,36 @@ export function SiteFooter() {
   const { direction } = useSiteLanguage();
   return (
     <footer id="contact" dir={direction} className="bg-accent/40">
-      <Reveal className="mx-auto max-w-[1400px] px-6 py-16 md:px-10 md:py-20">
-        <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
-          <SiteSocialLinks />
-          <div className="hidden h-px flex-1 bg-foreground/40 md:mx-10 md:block" />
+      <Reveal className="mx-auto max-w-[1400px] px-6 py-12 md:px-10 md:py-20">
+        <div className="md:hidden">
           <a
             href="https://besankhalaily.com"
-            className="flex items-center gap-3 text-lg md:text-xl"
+            dir="ltr"
+            className="flex items-center justify-start gap-3 text-lg"
           >
+            <Globe className="h-5 w-5" />
+            <span>besankhalaily.com</span>
+          </a>
+          <div className="mt-8 flex items-center">
+            <SiteSocialLinks />
+            <div className="ms-6 h-px flex-1 bg-foreground/40" />
+          </div>
+          <p className="mt-12 text-center text-[10px] tracking-[0.14em] text-muted-foreground">
+            © {new Date().getFullYear()} BESAN KHALAILY · ALL RIGHTS RESERVED
+          </p>
+        </div>
+
+        <div className="hidden items-center justify-between gap-8 md:flex">
+          <SiteSocialLinks />
+          <div className="mx-10 h-px flex-1 bg-foreground/40" />
+          <a href="https://besankhalaily.com" className="flex items-center gap-3 text-xl">
             <Globe className="h-5 w-5 rtl:order-last" />
             <span dir="ltr" className="rtl:order-first">
               besankhalaily.com
             </span>
           </a>
         </div>
-        <p className="mt-16 text-center text-xs tracking-[0.2em] text-muted-foreground">
+        <p className="mt-16 hidden text-center text-xs tracking-[0.2em] text-muted-foreground md:block">
           © {new Date().getFullYear()} BESAN KHALAILY · ALL RIGHTS RESERVED
         </p>
       </Reveal>

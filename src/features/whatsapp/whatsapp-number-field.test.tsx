@@ -27,6 +27,11 @@ it("renders the WhatsApp label with Israel's flag and calling code selected", ()
   expect(screen.getByRole("option", { name: /🇮🇱 \+972/ })).toBeTruthy();
 });
 
+it("shows a local number example without a leading zero", () => {
+  renderField();
+  expect(screen.getByLabelText("WhatsApp Number").getAttribute("placeholder")).toBe("5xxxxxxxx");
+});
+
 it("reports country and number changes", () => {
   const props = renderField();
   fireEvent.change(screen.getByLabelText("WhatsApp country code"), { target: { value: "AE" } });

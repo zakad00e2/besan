@@ -101,6 +101,14 @@ describe("book-call route", () => {
     }
   });
 
+  it("keeps the Arabic booking title on one line", () => {
+    render(<BookCallPage locale="ar" />);
+
+    const title = screen.getByRole("heading", { level: 1 });
+    expect(title.textContent).toBe("احجزي موعدك");
+    expect(title.querySelector("br")).toBeNull();
+  });
+
   it("shows a retry action and hides time choices when availability cannot load", () => {
     availability.error = "Could not load available appointments.";
     render(<BookCallPage locale="en" />);

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import gsap from "gsap";
 import { arSA, enUS } from "date-fns/locale";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { SiteFooter, SiteNav } from "@/components/site-shell";
 import { PublicSite } from "@/features/site-language/public-site";
 import { useSiteLanguage } from "@/features/site-language/site-language";
@@ -241,14 +241,10 @@ function BookCallContent() {
               </p>
               <h1
                 data-book-copy
-                className={`mt-4 max-w-3xl font-serif tracking-tighter ${ar ? "arabic-name-title leading-[1.05] text-5xl md:text-6xl" : "leading-[0.85] text-6xl md:text-8xl"}`}
+                className={`mt-4 max-w-3xl font-serif tracking-tighter ${ar ? "leading-[1.05] text-5xl md:text-6xl" : "leading-[0.85] text-6xl md:text-8xl"}`}
               >
                 {ar ? (
-                  <>
-                    احجزي
-                    <br />
-                    موعدك
-                  </>
+                  "احجزي موعدك"
                 ) : (
                   <>
                     Book Your
@@ -257,7 +253,10 @@ function BookCallContent() {
                   </>
                 )}
               </h1>
-              <p data-book-copy className="mt-8 max-w-lg text-base leading-8 text-muted-foreground">
+              <p
+                data-book-copy
+                className={`mt-8 max-w-lg text-base leading-8 text-muted-foreground ${ar ? "arabic-name-title" : ""}`}
+              >
                 {ar
                   ? "اختاري نوع الموعد واليوم والوقت المناسب لك."
                   : "Choose the appointment type, day, and time that suits you."}
@@ -503,7 +502,7 @@ function BookCallContent() {
                 <h2 className="font-serif text-3xl leading-none tracking-tighter">
                   {ar ? "بياناتك" : "Your Details"}
                 </h2>
-                <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div className="mt-6 grid grid-cols-2 gap-5">
                   <label className="block text-sm">
                     <span className="text-xs tracking-[0.12em] text-muted-foreground">
                       {ar ? "الاسم الكامل" : "Full Name"}
@@ -575,18 +574,18 @@ function BookCallContent() {
                 </p>
               ) : null}
 
-              <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-8 flex flex-row items-center justify-between gap-3">
                 <a
                   href={getPublicPath("home", locale)}
-                  className="motion-press inline-flex items-center justify-center gap-3 border border-foreground/40 px-8 py-4 text-xs tracking-[0.1em] transition-colors hover:border-foreground hover:bg-accent/35"
+                  className="motion-press inline-flex flex-1 items-center justify-center gap-3 border border-foreground/40 px-8 py-4 text-xs tracking-[0.1em] transition-colors hover:border-foreground hover:bg-accent/35 sm:flex-none"
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  {ar ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
                   {ar ? "رجوع" : "Back"}
                 </a>
                 <button
                   type="submit"
                   disabled={submitting || submitted}
-                  className="motion-press inline-flex items-center justify-center gap-3 border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.1em] text-background transition-opacity hover:opacity-85"
+                  className="motion-press inline-flex flex-1 items-center justify-center gap-3 border border-foreground bg-foreground px-8 py-4 text-xs tracking-[0.1em] text-background transition-opacity hover:opacity-85 sm:flex-none"
                 >
                   {submitted ? (
                     <span className="t-success-check" data-state="in" aria-hidden="true">
