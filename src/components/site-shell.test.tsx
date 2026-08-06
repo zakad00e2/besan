@@ -2,7 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PublicSite } from "@/features/site-language/public-site";
-import { Reveal, SiteNav } from "./site-shell";
+import { Reveal, SiteFooter, SiteNav } from "./site-shell";
 
 let pathname = "/";
 vi.mock("@tanstack/react-router", () => ({ useLocation: () => ({ pathname }) }));
@@ -53,6 +53,20 @@ describe("SiteNav", () => {
 
     expect(screen.getByRole("link", { name: "Switch language" }).getAttribute("href")).toBe(
       "/book-call",
+    );
+  });
+});
+
+describe("SiteFooter", () => {
+  it("hides the website link in the mobile footer", () => {
+    render(
+      <PublicSite locale="en">
+        <SiteFooter />
+      </PublicSite>,
+    );
+
+    expect(screen.getAllByRole("link", { name: "besankhalaily.com" })[0].className).toContain(
+      "hidden",
     );
   });
 });

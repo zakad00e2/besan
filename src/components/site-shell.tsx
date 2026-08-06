@@ -162,7 +162,7 @@ export function SiteFooter() {
           <a
             href="https://besankhalaily.com"
             dir="ltr"
-            className="flex items-center justify-start gap-3 text-lg"
+            className="hidden items-center justify-start gap-3 text-lg"
           >
             <Globe className="h-5 w-5" />
             <span>besankhalaily.com</span>
