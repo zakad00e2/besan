@@ -149,6 +149,28 @@ describe("book-call route", () => {
     ).toBe("https://www.google.com/maps?q=32.866546630859375,35.29303741455078&z=17&hl=ar");
   });
 
+  it("shows the punctuality policy in the Arabic booking confirmation", async () => {
+    submitBooking.mockResolvedValue({ success: true, appointmentId: "appointment-1" });
+    render(<BookCallPage locale="ar" />);
+
+    fireEvent.click(document.querySelector('[data-day="2026-07-19"] button')!);
+    fireEvent.click(screen.getAllByRole("button", { name: "11:00" })[0]);
+    fireEvent.change(screen.getByLabelText("الاسم الكامل"), { target: { value: "نور" } });
+    fireEvent.change(screen.getByLabelText("رقم واتساب"), {
+      target: { value: "+970591234567" },
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "تأكيد الحجز" }));
+      await Promise.resolve();
+    });
+
+    expect(
+      screen.getByText(
+        "يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 20 دقيقة، يُعتبر الحجز ملغيًا.",
+      ),
+    ).toBeTruthy();
+  });
+
   it("keeps the booking form visible when the booking is not saved", async () => {
     submitBooking.mockResolvedValue({ success: false, reason: "storage-error" });
     render(<BookCallPage locale="en" />);
