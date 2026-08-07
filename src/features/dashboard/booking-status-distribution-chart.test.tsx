@@ -7,9 +7,7 @@ afterEach(cleanup);
 describe("BookingStatusDistributionChart", () => {
   it("renders status labels, supplied counts, and their total", () => {
     render(
-      <BookingStatusDistributionChart
-        statusDist={{ confirmed: 7, completed: 2, cancelled: 1 }}
-      />,
+      <BookingStatusDistributionChart statusDist={{ confirmed: 7, completed: 2, cancelled: 1 }} />,
     );
 
     expect(screen.getByText("Booking status distribution")).toBeTruthy();
@@ -23,9 +21,7 @@ describe("BookingStatusDistributionChart", () => {
 
   it("renders a stable empty distribution", () => {
     render(
-      <BookingStatusDistributionChart
-        statusDist={{ confirmed: 0, completed: 0, cancelled: 0 }}
-      />,
+      <BookingStatusDistributionChart statusDist={{ confirmed: 0, completed: 0, cancelled: 0 }} />,
     );
 
     expect(screen.getByText("0", { selector: "p" })).toBeTruthy();
