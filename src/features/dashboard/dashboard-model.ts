@@ -4,7 +4,14 @@ export { customerStages };
 export type { CustomerStage };
 export type BookingType = "workshop" | "design";
 export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled";
+export type DashboardAppointmentStatus = Exclude<AppointmentStatus, "pending">;
 export type ReminderStatus = "not-scheduled" | "scheduled" | "sent";
+
+export function normalizeDashboardAppointmentStatus(
+  status: AppointmentStatus,
+): DashboardAppointmentStatus {
+  return status === "pending" ? "confirmed" : status;
+}
 
 export type CustomerNote = { id: string; body: string; createdAt: string };
 export type CustomerActivity = { id: string; label: string; createdAt: string };
@@ -33,7 +40,7 @@ export type Appointment = {
   reminderStatus: ReminderStatus;
 };
 
-export type BookingStatusDistribution = Record<AppointmentStatus, number>;
+export type BookingStatusDistribution = Record<DashboardAppointmentStatus, number>;
 
 export type DashboardMetrics = {
   today: number;
@@ -68,10 +75,10 @@ export function getBookingStatusDistribution(
 ): BookingStatusDistribution {
   return appointments.reduce<BookingStatusDistribution>(
     (distribution, appointment) => {
-      distribution[appointment.status] += 1;
+      distribution[normalizeDashboardAppointmentStatus(appointment.status)] += 1;
       return distribution;
     },
-    { confirmed: 0, pending: 0, completed: 0, cancelled: 0 },
+    { confirmed: 0, completed: 0, cancelled: 0 },
   );
 }
 

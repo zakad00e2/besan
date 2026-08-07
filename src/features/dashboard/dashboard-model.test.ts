@@ -7,6 +7,7 @@ import {
   getDashboardMetricComparisons,
   getDashboardMetrics,
   getBookingStatusDistribution,
+  normalizeDashboardAppointmentStatus,
   reminderStatusLabels,
   stageLabels,
   type Appointment,
@@ -85,24 +86,23 @@ describe("getBookingStatusDistribution", () => {
   it("counts every booking status", () => {
     const statusAppointments: Appointment[] = [
       { ...appointments[0], id: "confirmed", status: "confirmed" },
-      { ...appointments[0], id: "pending", status: "pending" },
+      { ...appointments[0], id: "legacy-pending", status: "pending" },
       { ...appointments[0], id: "completed", status: "completed" },
       { ...appointments[0], id: "cancelled", status: "cancelled" },
       { ...appointments[0], id: "confirmed-2", status: "confirmed" },
     ];
 
     expect(getBookingStatusDistribution(statusAppointments)).toEqual({
-      confirmed: 2,
-      pending: 1,
+      confirmed: 3,
       completed: 1,
       cancelled: 1,
     });
+    expect(normalizeDashboardAppointmentStatus("pending")).toBe("confirmed");
   });
 
   it("returns zero counts for an empty appointment list", () => {
     expect(getBookingStatusDistribution([])).toEqual({
       confirmed: 0,
-      pending: 0,
       completed: 0,
       cancelled: 0,
     });
