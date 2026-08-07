@@ -77,9 +77,26 @@ describe("DashboardOverview", () => {
     expect(chart).toBeTruthy();
     expect(within(chart!).getByText(String(dashboardFixture.appointments.length))).toBeTruthy();
     expect(within(chart!).getByText("Confirmed")).toBeTruthy();
-    expect(within(chart!).getByText("Pending")).toBeTruthy();
+    expect(within(chart!).queryByText("Pending")).toBeNull();
     expect(within(chart!).getByText("Completed")).toBeTruthy();
     expect(within(chart!).getByText("Cancelled")).toBeTruthy();
+  });
+
+  it("shows a legacy pending appointment as confirmed in today's schedule", () => {
+    render(
+      <DashboardOverview
+        customers={dashboardFixture.customers}
+        appointments={[{ ...dashboardFixture.appointments[0], status: "pending" }]}
+        now={new Date("2026-07-10T08:00:00.000Z")}
+      />,
+    );
+
+    const schedule = screen
+      .getByRole("heading", { name: "Today's appointments" })
+      .closest("section");
+    expect(schedule).toBeTruthy();
+    expect(within(schedule!).getByText("Confirmed")).toBeTruthy();
+    expect(within(schedule!).queryByText("Pending confirmation")).toBeNull();
   });
 
   it("shows a customer-specific empty state when no customers exist", () => {

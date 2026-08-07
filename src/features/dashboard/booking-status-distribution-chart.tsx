@@ -18,7 +18,6 @@ export type BookingStatusDistributionChartProps = {
 
 const statusBuckets = [
   { key: "confirmed", label: "Confirmed", top: "#60a5fa", bottom: "#3b82f6" },
-  { key: "pending", label: "Pending", top: "#34d399", bottom: "#10b981" },
   { key: "completed", label: "Completed", top: "#fb923c", bottom: "#f97316" },
   { key: "cancelled", label: "Cancelled", top: "#f472b6", bottom: "#ec4899" },
 ] as const;

@@ -13,6 +13,7 @@ import {
   getDashboardMetrics,
   getDashboardMetricComparisons,
   getBookingStatusDistribution,
+  normalizeDashboardAppointmentStatus,
   reminderStatusLabels,
   stageLabels,
 } from "./dashboard-model";
@@ -319,7 +320,9 @@ export function DashboardOverview({
                           {timeLabel(appointment.startsAt)}
                         </td>
                         <td className="px-4 py-3">
-                          <StatusBadge status={appointment.status} />
+                          <StatusBadge
+                            status={normalizeDashboardAppointmentStatus(appointment.status)}
+                          />
                         </td>
                       </tr>
                     );
