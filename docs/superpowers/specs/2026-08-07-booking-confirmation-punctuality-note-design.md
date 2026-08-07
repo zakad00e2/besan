@@ -8,7 +8,7 @@ Show customers a clear Arabic punctuality policy after a design booking is succe
 
 The existing public booking confirmation in `src/routes/book-call.tsx` will show this exact Arabic copy below the appointment date and time, and before the map prompt and map:
 
-> يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 20 دقيقة، يُعتبر الحجز ملغيًا.
+> يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 15 دقيقة، يُعتبر الحجز ملغيًا.
 
 The note will be displayed only in the post-submission confirmation state. It will use an inline, bordered notice treatment that follows the existing monochrome editorial styling and remains legible on narrow screens.
 

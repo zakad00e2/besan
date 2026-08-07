@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Preserve all booking submission, date/time display, location map, and error-state behavior.
-- Render the exact Arabic policy: `يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 20 دقيقة، يُعتبر الحجز ملغيًا.`
+- Render the exact Arabic policy: `يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 15 دقيقة، يُعتبر الحجز ملغيًا.`
 - Display the notice only after a successful booking submission, below the appointment details and before the map.
 
 ---
@@ -44,7 +44,7 @@ it("shows the punctuality policy in the Arabic booking confirmation", async () =
     await Promise.resolve();
   });
 
-  expect(screen.getByText("يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 20 دقيقة، يُعتبر الحجز ملغيًا.")).toBeTruthy();
+  expect(screen.getByText("يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 15 دقيقة، يُعتبر الحجز ملغيًا.")).toBeTruthy();
 });
 ```
 
@@ -61,8 +61,8 @@ In the submitted-state confirmation panel, directly after the appointment-detail
 ```tsx
 <p className="mt-6 border border-foreground/25 px-4 py-3 text-sm leading-7 text-foreground">
   {ar
-    ? "يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 20 دقيقة، يُعتبر الحجز ملغيًا."
-    : "Please arrive on time. Arrivals more than 20 minutes late are considered cancelled."}
+    ? "يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 15 دقيقة، يُعتبر الحجز ملغيًا."
+    : "Please arrive on time. Arrivals more than 15 minutes late are considered cancelled."}
 </p>
 ```
 

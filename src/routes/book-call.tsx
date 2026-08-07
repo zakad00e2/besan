@@ -201,8 +201,8 @@ function BookCallContent() {
               </p>
               <p className="mt-6 border border-foreground/25 px-4 py-3 text-sm leading-7 text-foreground">
                 {ar
-                  ? "يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 20 دقيقة، يُعتبر الحجز ملغيًا."
-                  : "Please arrive on time. Arrivals more than 20 minutes late are considered cancelled."}
+                  ? "يرجى الالتزام بموعد الحجز. في حال التأخر أكثر من 15 دقيقة، يُعتبر الحجز ملغيًا."
+                  : "Please arrive on time. Arrivals more than 15 minutes late are considered cancelled."}
               </p>
               <p className="mt-10 text-xs tracking-[0.12em] text-muted-foreground">
                 {ar ? "اضغطي على الخريطة لفتح الموقع" : "Tap the map to open the location"}
