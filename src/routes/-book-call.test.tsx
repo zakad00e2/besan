@@ -58,6 +58,7 @@ describe("book-call route", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-07-15T12:00:00"));
     vi.clearAllMocks();
+    vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
     availability.openDates = ["2026-07-19"];
     availability.slots = [{ startsAt: "11:00", endsAt: "12:00" }];
     availability.monthLoading = false;
@@ -68,6 +69,7 @@ describe("book-call route", () => {
   afterEach(() => {
     cleanup();
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it("shows only persisted date slots after selecting an open date", () => {
@@ -147,6 +149,19 @@ describe("book-call route", () => {
         .getByRole("link", { name: "Open atelier location in Google Maps" })
         .getAttribute("href"),
     ).toBe("https://www.google.com/maps?q=32.866546630859375,35.29303741455078&z=17&hl=ar");
+  });
+
+  it("returns to the top of the confirmation after a successful booking", async () => {
+    submitBooking.mockResolvedValue({ success: true, appointmentId: "appointment-1" });
+    render(<BookCallPage locale="en" />);
+
+    fillBookingForm();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Confirm Booking" }));
+      await Promise.resolve();
+    });
+
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: "auto" });
   });
 
   it("shows the punctuality policy in the Arabic booking confirmation", async () => {

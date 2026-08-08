@@ -75,6 +75,12 @@ function BookCallContent() {
   }, [availability.loadMonth]);
 
   useEffect(() => {
+    if (submitted) {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
+  }, [submitted]);
+
+  useEffect(() => {
     const root = pageRef.current;
     if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
